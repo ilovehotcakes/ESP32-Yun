@@ -1,6 +1,14 @@
-// Define macros for commands
-# define MOVE 2
-# define STOP 3
+// Define flags for motor
+#define MOTOR_RUNNING 2
+#define MOTOR_STOPPED 3
+
+// Define commands
+#define CLOSE -1
+#define STOP  -2
+#define OPEN  -3
+#define UP    -4
+#define DOWN  -5
+
 
 // Define connections to BTT TMC2209 V1.2 UART and ESP32 pin
 #define EN_PIN           23 // Enable
@@ -19,7 +27,7 @@ int velocity = 8000;
 int acceleration = 80000;
 
 // Initalize command
-int command = STOP;
+int motor_flag = STOP;
 
 // For WiFi
 char ssid[] = "NalaSecretBase_2.4";  // Network SSID (name)
@@ -32,4 +40,3 @@ const char broker[] = "192.168.1.26"; // Address of the MQTT server
 int        port     = 1883;
 const char topic[]  = "/arduino/simple";
 const char subtopic[] = "/arduino/receive";
-String subMessage = "";

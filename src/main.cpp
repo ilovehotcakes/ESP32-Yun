@@ -13,6 +13,7 @@ TaskHandle_t C0;  // Dual core setup
 void core0Task(void * parameter);
 void moveToPosition(int position);
 void stopMotor();
+int percentToSteps(int percent);
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
@@ -80,20 +81,18 @@ void setup() {
 
 
 void loop() {
-  if (command == MOVE && stepper.distanceToGo() != 0) {
+  if (motor_flag == MOTOR_RUNNING && stepper.distanceToGo() != 0) {
     stepper.run();
-  } else if (command == MOVE && stepper.distanceToGo() == 0) {
+  } else if (motor_flag == MOTOR_RUNNING && stepper.distanceToGo() == 0) {
     stopMotor();
   }
 }
 
 
 void core0Task(void * parameter) {
-  for (;;) {
-    // call poll() regularly to allow the library to send MQTT keep alives which
-    // avoids being disconnected by the broker
-    // mqttClient.poll();
+  String subMessage = "";
 
+  for (;;) {
     int messageSize = mqttClient.parseMessage();
     if (messageSize) {
       // we received a message, print out the topic and contents
@@ -105,25 +104,24 @@ void core0Task(void * parameter) {
 
       // Use the Stream interface to print the contents
       while (mqttClient.available()) subMessage = subMessage + (char) mqttClient.read();
-      Serial.println(subMessage);
+      int command = subMessage.toInt();
+      subMessage = "";
+      Serial.println(command);
 
-      // Interpret input
-      if (subMessage == "cls") {
+      // Interpret command
+      if (command >= 0) {
+        moveToPosition(percentToSteps(command));
+      } else if (command == CLOSE) {
         moveToPosition(max_steps);
-      } else if (subMessage == "stp") {
+      } else if (command == STOP) {
         stopMotor();
-      } else if (subMessage == "opn") {
+      } else if (command == OPEN) {
         moveToPosition(0);
-      } else if (subMessage == "zer") {
-        stopMotor();
-      } else if (subMessage == "smx") {
-        max_steps = stepper.currentPosition();
-      } else if (subMessage == "dwn") {
+      } else if (command == DOWN) {
         moveToPosition(100000000);
-      } else if (subMessage == "up") {
+      } else if (command == UP) {
         moveToPosition(-100000000);
       }
-      subMessage = "";
     }
     delay(100);
   }
@@ -134,24 +132,27 @@ void sendMqttMessage() {
   mqttClient.beginMessage(subtopic);
   mqttClient.print(open_percent);
   mqttClient.endMessage();
-  Serial.println("Sent MQTT message: ");
+  Serial.println("Sent MQTT message");
 }
 
 
 void moveToPosition(int position) {
   stepper.moveTo(position);
-  command = MOVE;
+  motor_flag = MOTOR_RUNNING;
   stepper.enableOutputs();
 }
 
 
 void stopMotor() {
-  command = STOP;
+  motor_flag = MOTOR_STOPPED;
   stepper.moveTo(stepper.currentPosition());
   stepper.disableOutputs();
   current_position = stepper.currentPosition();
   open_percent = (int) ((float) current_position / (float) max_steps * 100);
-  Serial.println(open_percent);
   // preferences_local.putInt("current_position", current_position);
   sendMqttMessage();
+}
+
+int percentToSteps(int percent) {
+  return percent * max_steps / 100;
 }
