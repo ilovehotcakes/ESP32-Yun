@@ -1,5 +1,3 @@
-// MQTT example from https://github.com/garyexplains/examples/blob/master/MKR1000/mqtt_button_and_led.ino
-// ESP32 dual core example from https://www.youtube.com/watch?v=k_D_Qu0cgu8
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include <TMCStepper.h>
@@ -13,18 +11,23 @@ TMC2209Stepper driver(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 AccelStepper stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
 TaskHandle_t C0;  // Dual core setup
 void core0Task(void * parameter);
+void moveToPosition(int position);
+void stopMotor();
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 
 void setup() {
+  // Initialize hardware serial for debugging
+  Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
 
-  Serial.begin(9600);         // Initialize hardware serial for debugging
+  // Load preferences from memory
   preferences_local.begin("local", false);
   load_preference();
+  // Send current open_precent
 
 
   // Core 0 setup for dual core operation
@@ -37,21 +40,17 @@ void setup() {
   driver.pdn_disable(true);   // Enable UART on TMC2209
   driver.begin();             // Begin sending data
   driver.toff(4);             // Enables driver in software
-  driver.rms_current(600);    // Set motor current to 600mA
+  driver.rms_current(600);    // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
   driver.pwm_autoscale(true);    // Needed for stealthChop
   driver.en_spreadCycle(false);  // Toggle spreadCycle on TMC2208/2209/2224
-  // driver.TPWMTHRS(0);
-  driver.semin(0);
-  driver.semax(2);
-  driver.sedn(0b00);
   driver.blank_time(24);
   driver.microsteps(microsteps);
 
 
   // Motor setup
   stepper.setEnablePin(EN_PIN);
-  stepper.setMaxSpeed(8000);
-  stepper.setAcceleration(50000);
+  stepper.setMaxSpeed(velocity);
+  stepper.setAcceleration(acceleration);
   stepper.setPinsInverted(false, false, true);
   stepper.setCurrentPosition(current_position);
   stepper.disableOutputs();
@@ -75,17 +74,16 @@ void setup() {
   mqttClient.subscribe(topic);  // Subscribe to a topic
 
 
-  // Indicate finished setup
+  // Indicate setup is complete
   digitalWrite(LED_PIN, LOW);
 }
 
 
 void loop() {
-  if (command == STOP) {
-    stepper.moveTo(stepper.currentPosition());
-    stepper.disableOutputs();
-  } else if (command == MOVE) {
+  if (command == MOVE && stepper.distanceToGo() != 0) {
     stepper.run();
+  } else if (command == MOVE && stepper.distanceToGo() == 0) {
+    stopMotor();
   }
 }
 
@@ -98,7 +96,6 @@ void core0Task(void * parameter) {
 
     int messageSize = mqttClient.parseMessage();
     if (messageSize) {
-      subMessage = "";
       // we received a message, print out the topic and contents
       Serial.print("Received a message with topic '");
       Serial.print(mqttClient.messageTopic());
@@ -106,39 +103,55 @@ void core0Task(void * parameter) {
       Serial.print(messageSize);
       Serial.println(" bytes:");
 
-      // use the Stream interface to print the contents
-      while (mqttClient.available()) {
-        subMessage = subMessage + (char)mqttClient.read();
-      }
+      // Use the Stream interface to print the contents
+      while (mqttClient.available()) subMessage = subMessage + (char) mqttClient.read();
       Serial.println(subMessage);
 
-      if(subMessage == "1") {
-        command = MOVE;
-        stepper.moveTo(steps_per_rev * 5);
-        stepper.enableOutputs();
-        mqttClient.beginMessage(subtopic);
-        mqttClient.print("Rotate cw");
-        mqttClient.endMessage();
-        Serial.println("Sent MQTT message.");
-        subMessage = "";
-      } else if(subMessage == "2") {
-        command = STOP;
-        mqttClient.beginMessage(subtopic);
-        mqttClient.print("Stop");
-        mqttClient.endMessage();
-        Serial.println("Sent MQTT message.");
-        subMessage = "";
-      } else if(subMessage == "3") {
-        command = MOVE;
-        stepper.moveTo(0);
-        stepper.enableOutputs();
-        mqttClient.beginMessage(subtopic);
-        mqttClient.print("Rotate ccw");
-        mqttClient.endMessage();
-        Serial.println("Sent MQTT message.");
-        subMessage = "";
+      // Interpret input
+      if (subMessage == "cls") {
+        moveToPosition(max_steps);
+      } else if (subMessage == "stp") {
+        stopMotor();
+      } else if (subMessage == "opn") {
+        moveToPosition(0);
+      } else if (subMessage == "zer") {
+        stopMotor();
+      } else if (subMessage == "smx") {
+        max_steps = stepper.currentPosition();
+      } else if (subMessage == "dwn") {
+        moveToPosition(100000000);
+      } else if (subMessage == "up") {
+        moveToPosition(-100000000);
       }
+      subMessage = "";
     }
-    delay(10);
+    delay(100);
   }
+}
+
+
+void sendMqttMessage() {
+  mqttClient.beginMessage(subtopic);
+  mqttClient.print(open_percent);
+  mqttClient.endMessage();
+  Serial.println("Sent MQTT message: ");
+}
+
+
+void moveToPosition(int position) {
+  stepper.moveTo(position);
+  command = MOVE;
+  stepper.enableOutputs();
+}
+
+
+void stopMotor() {
+  command = STOP;
+  stepper.moveTo(stepper.currentPosition());
+  stepper.disableOutputs();
+  current_position = stepper.currentPosition();
+  open_percent = (int) ((float) current_position / (float) max_steps * 100);
+  Serial.println(open_percent);
+  // preferences_local.putInt("current_position", current_position);
+  sendMqttMessage();
 }

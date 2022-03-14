@@ -1,3 +1,7 @@
+// Define macros for commands
+# define MOVE 2
+# define STOP 3
+
 // Define connections to BTT TMC2209 V1.2 UART and ESP32 pin
 #define EN_PIN           23 // Enable
 #define STEP_PIN         19 // Steps
@@ -7,10 +11,15 @@
 #define R_SENSE       0.11f // Match to your driver, SilentStepStick series use 0.11
 #define DRIVER_ADDR    0b00 // 0b00 is slave, since there're no other drivers
 
-// Stepper motor steps information
+// Calulations to convert travel distance
 const float gear_ratio = 5.18;  // Use 1 if stepper motor doesn't have a gearbox
 const uint16_t microsteps = 8;
 const int steps_per_rev = 200 * gear_ratio * microsteps;
+int velocity = 8000;
+int acceleration = 80000;
+
+// Initalize command
+int command = STOP;
 
 // For WiFi
 char ssid[] = "NalaSecretBase_2.4";  // Network SSID (name)
