@@ -13,7 +13,12 @@ TaskHandle_t C0;  // Dual core setup
 void core0Task(void * parameter);
 void moveToPosition(int position);
 void stopMotor();
+void updatePosition();
+void sendPercentage();
 int percentToSteps(int percent);
+int stepsToPercent(int steps);
+void setMax();
+void setMin();
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
@@ -23,12 +28,6 @@ void setup() {
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
-
-
-  // Load preferences from memory
-  preferences_local.begin("local", false);
-  load_preference();
-  // Send current open_precent
 
 
   // Core 0 setup for dual core operation
@@ -75,6 +74,12 @@ void setup() {
   mqttClient.subscribe(topic);  // Subscribe to a topic
 
 
+  // Load preferences from memory
+  preferences_local.begin("local", false);
+  load_preference();
+  sendPercentage();
+
+
   // Indicate setup is complete
   digitalWrite(LED_PIN, LOW);
 }
@@ -90,7 +95,7 @@ void loop() {
 
 
 void core0Task(void * parameter) {
-  String subMessage = "";
+  String mqttMessage = "";
 
   for (;;) {
     int messageSize = mqttClient.parseMessage();
@@ -100,27 +105,27 @@ void core0Task(void * parameter) {
       Serial.print(mqttClient.messageTopic());
       Serial.print("', length ");
       Serial.print(messageSize);
-      Serial.println(" bytes:");
+      Serial.print(" bytes: ");
 
       // Use the Stream interface to print the contents
-      while (mqttClient.available()) subMessage = subMessage + (char) mqttClient.read();
-      int command = subMessage.toInt();
-      subMessage = "";
+      while (mqttClient.available()) mqttMessage = mqttMessage + (char) mqttClient.read();
+      int command = mqttMessage.toInt();
+      mqttMessage = "";
       Serial.println(command);
 
       // Interpret command
       if (command >= 0) {
         moveToPosition(percentToSteps(command));
-      } else if (command == CLOSE) {
-        moveToPosition(max_steps);
       } else if (command == STOP) {
         stopMotor();
+      } else if (command == CLOSE) {
+        moveToPosition(max_steps);
       } else if (command == OPEN) {
         moveToPosition(0);
-      } else if (command == DOWN) {
-        moveToPosition(100000000);
-      } else if (command == UP) {
-        moveToPosition(-100000000);
+      } else if (command == SET_MAX) {
+        setMax();
+      } else if (command == SET_MIN) {
+        setMin();
       }
     }
     delay(100);
@@ -128,31 +133,73 @@ void core0Task(void * parameter) {
 }
 
 
-void sendMqttMessage() {
-  mqttClient.beginMessage(subtopic);
-  mqttClient.print(open_percent);
-  mqttClient.endMessage();
-  Serial.println("Sent MQTT message");
+void updatePosition() {
+  current_position = stepper.currentPosition();
+  // preferences_local.putInt("current_position", current_position);
+  open_percent = stepsToPercent(current_position);
 }
 
 
+void sendPercentage() {
+  mqttClient.beginMessage(subtopic);
+  mqttClient.print(open_percent);
+  mqttClient.endMessage();
+  Serial.print("Sent MQTT message: ");
+  Serial.print(open_percent);
+  Serial.print("% = ");
+  Serial.print(stepper.currentPosition());
+  Serial.print(" / ");
+  Serial.println(max_steps);
+}
+
+
+// Only enable the driver if the distance isn't 0, or else the drive will be enabled and won't be disable unless STOP is explicitly used
 void moveToPosition(int position) {
   stepper.moveTo(position);
-  motor_flag = MOTOR_RUNNING;
-  stepper.enableOutputs();
+  if (stepper.distanceToGo() != 0) {
+    motor_flag = MOTOR_RUNNING;
+    stepper.enableOutputs();
+  }
 }
 
 
 void stopMotor() {
   motor_flag = MOTOR_STOPPED;
+  if (set_max == true) {
+    set_max = false;
+    max_steps = stepper.currentPosition();
+  } else if (set_min == true) {
+    set_min = false;
+    int distance_traveled = 2147483646 - stepper.currentPosition();
+    max_steps = max_steps + distance_traveled - previous_position;
+    stepper.setCurrentPosition(0);
+  }
   stepper.moveTo(stepper.currentPosition());
   stepper.disableOutputs();
-  current_position = stepper.currentPosition();
-  open_percent = (int) ((float) current_position / (float) max_steps * 100);
-  // preferences_local.putInt("current_position", current_position);
-  sendMqttMessage();
+  updatePosition();
+  sendPercentage();
 }
+
 
 int percentToSteps(int percent) {
   return percent * max_steps / 100;
+}
+
+
+int stepsToPercent(int steps) {
+  return (int) ((float) current_position / (float) max_steps * 100);
+}
+
+
+void setMax() {
+  set_max = true;
+  moveToPosition(2147483646);
+}
+
+
+void setMin() {
+  set_min = true;
+  previous_position = stepper.currentPosition();
+  stepper.setCurrentPosition(2147483646);
+  moveToPosition(0);
 }
