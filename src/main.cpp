@@ -3,9 +3,9 @@
 #include <TMCStepper.h>
 #include <ArduinoMqttClient.h>
 #include <WiFi.h>
+#include <math.h>
 #include "variables.h"
 #include "my_preferences.h"
-
 
 TMC2209Stepper driver(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 AccelStepper stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
@@ -128,14 +128,14 @@ void core0Task(void * parameter) {
         setMin();
       }
     }
-    delay(100);
+    delay(10);
   }
 }
 
 
 void updatePosition() {
   current_position = stepper.currentPosition();
-  // preferences_local.putInt("current_position", current_position);
+  preferences_local.putInt("current_position", current_position);
   open_percent = stepsToPercent(current_position);
 }
 
@@ -168,6 +168,7 @@ void stopMotor() {
   if (set_max == true) {
     set_max = false;
     max_steps = stepper.currentPosition();
+    preferences_local.putInt("max_steps", max_steps);
   } else if (set_min == true) {
     set_min = false;
     int distance_traveled = 2147483646 - stepper.currentPosition();
@@ -176,29 +177,34 @@ void stopMotor() {
   }
   stepper.moveTo(stepper.currentPosition());
   stepper.disableOutputs();
+  stepper.setMaxSpeed(velocity);
   updatePosition();
   sendPercentage();
 }
 
 
 int percentToSteps(int percent) {
-  return percent * max_steps / 100;
+  float result = (float) percent * (float) max_steps / 100.0;
+  return (int) round(result);
 }
 
 
 int stepsToPercent(int steps) {
-  return (int) ((float) current_position / (float) max_steps * 100);
+  float result = (float) current_position / (float) max_steps * 100;
+  return (int) round(result);
 }
 
 
 void setMax() {
   set_max = true;
+  stepper.setMaxSpeed(velocity / 4);
   moveToPosition(2147483646);
 }
 
 
 void setMin() {
   set_min = true;
+  stepper.setMaxSpeed(velocity / 4);
   previous_position = stepper.currentPosition();
   stepper.setCurrentPosition(2147483646);
   moveToPosition(0);
