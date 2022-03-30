@@ -55,7 +55,7 @@ void setup() {
   stepper.setCurrentPosition(current_position);
   stepper.disableOutputs();
 
-
+  // Todo: set static ip for faster connection
   // Attempt to connect to Wifi network:
   Serial.print("Attempting to connect to WPA SSID: ");
   Serial.println(ssid);
@@ -144,6 +144,7 @@ void sendPercentage() {
   mqttClient.beginMessage(subtopic);
   mqttClient.print(open_percent);
   mqttClient.endMessage();
+  // Todo: setup #ifdef
   Serial.print("Sent MQTT message: ");
   Serial.print(open_percent);
   Serial.print("% = ");
