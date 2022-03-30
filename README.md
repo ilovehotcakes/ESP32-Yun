@@ -11,3 +11,5 @@ TMCStepper library documentation: https://teemuatlut.github.io/TMCStepper/class_
 TMC2209 example before it was compatible with hardware serial: https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/10
 Explaning TMC2209 settings: https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/25
 More explanation on Stallguard: https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126
+
+https://www.home-assistant.io/integrations/cover.mqtt/
