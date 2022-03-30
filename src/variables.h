@@ -40,5 +40,5 @@ const char* mqtt_user = mqtt_user_secret;
 const char* mqtt_pass = mqtt_pass_secret;
 const char* broker    = broker_secret;  // Address of the MQTT server
 int        port       = 1883;
-const char topic[]    = "/send/blinds/1";
-const char subtopic[] = "/receive/blinds/1";
+const char topic[]    = "/send/blinds/2";
+const char subtopic[] = "/receive/blinds/2";
