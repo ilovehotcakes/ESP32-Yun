@@ -3,9 +3,9 @@
 Preferences preferences_local;
 
 // Global variables
-static uint8_t open_percent;
-static uint32_t max_steps;
-static uint32_t current_position;
+// static uint8_t open_percent;
+uint32_t max_steps;
+uint32_t current_position;
 
 void load_preference() {
   max_steps = preferences_local.getInt("max_steps", 100000);

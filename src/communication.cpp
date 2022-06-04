@@ -1,6 +1,6 @@
 #include "communication.h"
 
-Commuication::Commuication() {
+Connection::Connection() {
   state = initializing;
   strcpy(ssid, String("NalaSecretBase_2.4").c_str());  // WiFi SSID (name)
   strcpy(pass, String("2063832037s").c_str());  // WiFi password
@@ -18,7 +18,7 @@ Commuication::Commuication() {
 
 
 // Todo: add timeout and restart
-void Commuication::startWifi() {
+void Connection::startWifi() {
   Serial.println((String) "[E] Attempting to connect to WPA SSID: " + ssid);
 
   while (WiFi.begin(ssid, pass) != WL_CONNECTED)
@@ -31,7 +31,7 @@ void Commuication::startWifi() {
 }
 
 
-int Commuication::callback(char* topic, byte* buf, unsigned int len) {
+int Connection::callback(char* topic, byte* buf, unsigned int len) {
   int command = 0;
   for (int i = 0; i < len; i++) command += (buf[i]-'0') * pow(10, len-1-i);
 
@@ -56,7 +56,7 @@ int Commuication::callback(char* topic, byte* buf, unsigned int len) {
 
 // Todo: add timeout and restart
 // Todo: add will message to send percentage
-void Commuication::connectMqtt() {
+void Connection::connectMqtt() {
   // mqttClient.setClient(wifiClient);
   // mqttClient.setServer(brokerIP, brokerPort);
 
@@ -72,7 +72,7 @@ void Commuication::connectMqtt() {
 }
 
 
-// int Commuication::run() {
+// int Connection::run() {
 //   switch (state) {
 //     case connectingWifi:
 //       // Wait for reconnection
