@@ -1,5 +1,3 @@
-#include "secrets.h"
-
 // Define flags for motor
 #define MOTOR_STOPPED 0
 #define MOTOR_RUNNING 1
@@ -31,14 +29,20 @@ uint32_t previous_position = 0;
 bool set_max = false;
 bool set_min = false;
 
-// For WiFi
-const char* ssid = ssid_secret;  // Network SSID (name)
-const char* pass = pass_secret;  // Network password
+// For connections
+const char ssid[]      = "NalaSecretBase_2.4";  // Network SSID (name)
+const char pass[]      = "2063832037s";         // Network password
+const char mqttID[]    = "shade1";
+const char mqttUser[]  = "mqtt-user";
+const char mqttPass[]  = "jnkjnk37";
+const char brokerIP[]  = "192.168.1.26";
+int   brokerPort       = 1883;
+const char inTopic[]   = "/server/shades/1";
+const char outTopic[]  = "/client/blinds/1";
 
-// For MQTT
-const char* mqtt_user = mqtt_user_secret;
-const char* mqtt_pass = mqtt_pass_secret;
-const char* broker    = broker_secret;  // Address of the MQTT server
-int        port       = 1883;
-const char topic[]    = "/send/blinds/2";
-const char subtopic[] = "/receive/blinds/2";
+enum Control_State {
+  initializing,
+  connectingWifi,
+  connectingMqtt,
+  readingMqttMessage
+};
