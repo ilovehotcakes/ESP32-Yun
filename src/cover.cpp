@@ -1,6 +1,6 @@
-#include "motor.h"
+#include "cover.h"
 
-Motor::Motor() {
+Cover::Cover() {
   // Driver setup
   SERIAL_PORT.begin(115200);  // Initialize hardware serial for hardware UART driver
   driver.pdn_disable(true);   // Enable UART on TMC2209
@@ -26,7 +26,7 @@ Motor::Motor() {
 
 
 // Only enable the driver if the distance isn't 0, or else the drive will be enabled and won't be disable unless STOP is explicitly used
-void Motor::moveTo(int steps) {
+void Cover::moveTo(int steps) {
   stepper.moveTo(steps);
   if (stepper.distanceToGo() != 0) {
     motor = MOTOR_ENABLE;
@@ -35,7 +35,7 @@ void Motor::moveTo(int steps) {
 }
 
 
-void Motor::run() {
+void Cover::run() {
   if (motor == MOTOR_ENABLE) {
     if (stepper.distanceToGo() != 0)
       stepper.run();
@@ -45,7 +45,7 @@ void Motor::run() {
 }
 
 
-void Motor::stop() {
+void Cover::stop() {
   motor = MOTOR_DISABLE;
   if (set_max) {
     set_max = false;
@@ -65,29 +65,29 @@ void Motor::stop() {
 }
 
 
-void Motor::open() {
+void Cover::open() {
   moveTo(0);
 }
 
 
-void Motor::close() {
+void Cover::close() {
   moveTo(max_steps);
 }
 
 
-void Motor::percent(int percent) {
+void Cover::percent(int percent) {
   moveTo(percentToSteps(percent));
 }
 
 
-void Motor::setMax() {
+void Cover::setMax() {
   set_max = true;
   stepper.setMaxSpeed(velocity / 4);
   moveTo(2147483646);
 }
 
 
-void Motor::setMin() {
+void Cover::setMin() {
   set_min = true;
   stepper.setMaxSpeed(velocity / 4);
   previous_position = stepper.currentPosition();
@@ -96,25 +96,25 @@ void Motor::setMin() {
 }
 
 
-void Motor::updatePosition() {
+void Cover::updatePosition() {
   current_position = stepper.currentPosition();
   preferences_local.putInt("current_position", current_position);
 }
 
 
-void Motor::load_preference() {
+void Cover::load_preference() {
   max_steps = preferences_local.getInt("max_steps", 100000);
   current_position = preferences_local.getInt("current_position", 0);
 }
 
 
-int Motor::percentToSteps(int percent) {
+int Cover::percentToSteps(int percent) {
   float result = (float) percent * (float) max_steps / 100.0;
   return (int) round(result);
 }
 
 
-int Motor::stepsToPercent(int steps) {
+int Cover::stepsToPercent(int steps) {
   float result = (float) current_position / (float) max_steps * 100;
   return (int) round(result);
 }
