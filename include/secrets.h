@@ -1,9 +1,0 @@
-const String secretSSID       = "NalaSecretBase_2.4"; // Network SSID (name)
-const String secretPass       = "2063832037s";        // Network password
-const String secretMqttID     = "shade1";
-const String secretMqttUser   = "mqtt-user";
-const String secretMqttPass   = "jnkjnk37";
-const String secretBrokerIP   = "192.168.1.26";
-const int    secretBrokerPort = 1883;
-const String secretInTopic    = "/server/shades/1";
-const String secretOutTopic   = "/client/shades/1";
