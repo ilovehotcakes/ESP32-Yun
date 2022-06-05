@@ -1,3 +1,14 @@
+/*
+ Motorized Cover - ESP32
+ Aurthor: Jason Chen
+
+ A simple ESP32 program that let's user control powerful and quiet stepper
+ motors via MQTT. You use it to open and close blinds/shades, etc. Can be
+ used with Alexa or Home Assistant.
+
+ This program utilizes TMC2209 drivers for the stepper motor and it drives
+ NEMA stepper motors.
+*/
 #include <Arduino.h>
 #include <math.h>
 #include <WiFi.h>
@@ -5,17 +16,19 @@
 #include "secrets.h"
 #include "motor.h"
 
-
+// Defining states for the state machine
 #define INITIALIZING      0
 #define RECONNECTING_WIFI 1
 #define CONNECTING_MQTT   2
 #define READ_MQTT_MSG     3
+// Defining commands recieved from MQTT
 #define COVER_STOP       -1
 #define COVER_OPEN       -2
 #define COVER_CLOSE      -3
 #define COVER_SET_MAX    -4
 #define COVER_SET_MIN    -5
-#define LED_PIN           2 // LED tied to GPIO2 on HiLetGo board
+// Defining LED pin, it's tied to GPIO2 on HiLetGo board
+#define LED_PIN           2
 
 
 void core0Task(void * parameter);
@@ -24,23 +37,21 @@ void connectMqtt();
 void sendMessage(String);
 
 
-
 bool VERBOSE = true;
-TaskHandle_t C0;  // Dual core setup
+TaskHandle_t C0;  // For dual core setup
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 Motor    motor;
-int connection = INITIALIZING;  // For WiFi/MQTT state machine
-String   ssid = secretSSID;     // SSID (name) for WiFi
-String   pass = secretPass;     // Network password for WiFi
-String   mqttID     = secretMqttID;    // For MQTT
-String   mqttUser   = secretMqttUser;
-String   mqttPass   = secretMqttPass;
-String   brokerIP   = secretBrokerIP;  // Address of the MQTT server
+int      state = INITIALIZING;   // State machine to manage WiFi/MQTT
+String   ssid  = secretSSID;     // SSID (name) for WiFi
+String   pass  = secretPass;     // Network password for WiFi
+String   mqttID     = secretMqttID;    // MQTT ID for PubSubClient
+String   mqttUser   = secretMqttUser;  // MQTT server username (optional)
+String   mqttPass   = secretMqttPass;  // MQTT server password (optional)
+String   brokerIP   = secretBrokerIP;  // IP of MQTT server
 uint16_t brokerPort = secretBrokerPort;
-String   inTopic    = secretInTopic;
-String   outTopic   = secretOutTopic;
-
+String   inTopic    = secretInTopic;   // MQTT inbound topic
+String   outTopic   = secretOutTopic;  // MQTT outbound topic
 
 
 
@@ -48,7 +59,7 @@ void setup() {
   // Initialize hardware serial for debugging
   if (VERBOSE) Serial.begin(9600);
   
-  // Turn on 
+  // Initialized and turn on LED to indicate boot up
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
@@ -56,14 +67,19 @@ void setup() {
   disableCore0WDT();  // Disable watchdog timer
   xTaskCreatePinnedToCore(core0Task, "Core_0", 8192, NULL, 1, &C0, 0);
 
-  // Connect to the WiFi
+  // Start the WiFi connection
   startWifi();
-  connection = CONNECTING_MQTT;
+  state = CONNECTING_MQTT;
 
   motor = Motor();
 }
 
 
+/*
+ Keeps running the motor and checks if there is any messages avaiable to
+ publish to MQTT server. The motor must run in the loop. For some unknown
+ reasons, the stepper doesn't run smoothly on core0.
+*/
 void loop() {
   motor.run();
   
@@ -74,46 +90,56 @@ void loop() {
 }
 
 
-// Motor tasks
+/*
+ The state machine that tracks communication to MQTT/WiFi. I have tried to
+ start the WiFi in the state machine but it doesn't work. Also, the delay at
+ the of the function is required, else WiFi can't connect for unknown reason.
+*/
 void core0Task(void * parameter) {
   for (;;) {
-    switch (connection) {
+    switch (state) {
       case RECONNECTING_WIFI:
         // Turn on LED to indicate disconnected
         digitalWrite(LED_PIN, HIGH);
         
         // Wait for reconnection
         if (WiFi.status() == WL_CONNECTED)
-          connection = CONNECTING_MQTT;
+          state = CONNECTING_MQTT;
       break;
 
       case CONNECTING_MQTT:
         // Turn on LED to indicate disconnected
         digitalWrite(LED_PIN, HIGH);
+
         connectMqtt();
+
+        // Update MQTT server of current shade opening position
+        sendMessage((String) motor.currentPosition());
+
+        // Turn off LED to indicate fully connected
         digitalWrite(LED_PIN, LOW);
-        connection = READ_MQTT_MSG;
+        state = READ_MQTT_MSG;
       break;
 
       case READ_MQTT_MSG:
         // Check wifi connection
         if (WiFi.status() == WL_NO_SSID_AVAIL)
-          connection = RECONNECTING_WIFI;
+          state = RECONNECTING_WIFI;
 
         // Check mqtt connection
         if (!mqttClient.connected())
-          connection = CONNECTING_MQTT;
+          state = CONNECTING_MQTT;
         
-        // Use non blocking pubsub to read messages
+        // Use non blocking method to check for messages
         mqttClient.loop();
       break;
     }
-    delay(100);  // Must have or else state won't change when initializing
+    delay(100);
   }
 }
 
 
-// Todo: add timeout and restart
+// TODO: Add timeout and restart
 void startWifi() {
   Serial.println("[E] Attempting to connect to WPA SSID: " + ssid);
 
@@ -141,8 +167,7 @@ void callback(char* topic, byte* buf, unsigned int len) {
 }
 
 
-// Todo: add timeout and restart
-// Todo: add will message to send percentage
+// TODO: add timeout and restart
 void connectMqtt() {
   Serial.println("[E] Attempting to connect to MQTT broker: " + brokerIP);
 
