@@ -13,7 +13,7 @@ static TMC2209Stepper driver(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 static AccelStepper stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
 static Preferences preferences_local;
 
-class Motor {
+class Cover {
 private:
   int motor = MOTOR_DISABLE;
 
@@ -30,7 +30,7 @@ private:
   int stepsToPercent(int);
 
 public:
-  Motor();
+  Cover();
   void run();
   void stop();
   void open();
