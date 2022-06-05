@@ -20,11 +20,13 @@ Motor::Motor() {
   stepper.setCurrentPosition(currPos);
   stepper.disableOutputs();
 
+  // Load previous position and maximum position
   loadPositions();
 }
 
 
-// Only enable the driver if the distance isn't 0, or else the drive will be enabled and won't be disable unless STOP is explicitly used
+// Only enable the driver if the distance isn't 0, or else the drive will be
+// enabled and won't be disable unless STOP is explicitly used.
 void Motor::moveTo(int steps) {
   stepper.moveTo(steps);
   if (stepper.distanceToGo() != 0) {
@@ -34,6 +36,7 @@ void Motor::moveTo(int steps) {
 }
 
 
+// Returns current rounded position percentage. 0 is closed.
 int Motor::currentPosition() {
   if (currPos == 0)
     return 0;
@@ -69,20 +72,30 @@ void Motor::percent(int percent) {
 
 void Motor::stop() {
   motor = MOTOR_DISABLE;
-  if (set_max) {
-    set_max = false;
+
+  // Re-calcuate max/min positions
+  if (isSetMax) {
+    isSetMax = false;
     maxPos = stepper.currentPosition();
     memory.putInt("maxPos", maxPos);
-  } else if (set_min) {
-    set_min = false;
-    int distance_traveled = 2147483646 - stepper.currentPosition();
-    maxPos = maxPos + distance_traveled - prevPos;
+    stepper.setMaxSpeed(velocity);  // Set stepper motor speed back to normal
+  } else if (isSetMin) {
+    isSetMin = false;
+    int distanceTraveled = 2147483646 - stepper.currentPosition();
+    maxPos = maxPos + distanceTraveled - prevPos;
     stepper.setCurrentPosition(0);
+    stepper.setMaxSpeed(velocity);  // Set stepper motor speed back to normal
   }
+
+  // Stop stepper motor and disable driver
   stepper.moveTo(stepper.currentPosition());
   stepper.disableOutputs();
-  stepper.setMaxSpeed(velocity);
-  updatePosition();
+
+  // Updated current position
+  currPos = stepper.currentPosition();
+  memory.putInt("currPos", currPos);
+
+  // Set msgAvail flag to true so driver can output current position to MQTT
   msgAvail = true;
 }
 
@@ -98,14 +111,14 @@ void Motor::close() {
 
 
 void Motor::setMax() {
-  set_max = true;
+  isSetMax = true;
   stepper.setMaxSpeed(velocity / 4);
   moveTo(2147483646);
 }
 
 
 void Motor::setMin() {
-  set_min = true;
+  isSetMin = true;
   stepper.setMaxSpeed(velocity / 4);
   prevPos = stepper.currentPosition();
   stepper.setCurrentPosition(2147483646);
@@ -116,12 +129,6 @@ void Motor::setMin() {
 void Motor::loadPositions() {
   maxPos = memory.getInt("maxPos", 100000);
   currPos = memory.getInt("currPos", 0);
-}
-
-
-void Motor::updatePosition() {
-  currPos = stepper.currentPosition();
-  memory.putInt("currPos", currPos);
 }
 
 

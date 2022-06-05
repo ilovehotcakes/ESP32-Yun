@@ -1,14 +1,15 @@
 /*
  secrets_example.h - A example of a secret.h file
-  Author: Jason Chen
+ Author: Jason Chen
  
  For security reaons, WiFi and MQTT credentials are in the actual secrets.h
- file which isn't uploaded onto GitHub. It is also a place that is easy to
- fill in all the credentials at once instead of digging through main.
+ file which is exluded from GitHub. It is also a place that is easy to fill
+ out all the credentials at once instead of digging through the driver program.
 
  To use this file:
   - Rename the file to "secrets.h"
-  - Uncomment the relevant fields and fillout the information
+  - Uncomment the relevant fields
+  - Fillout relevant fields
 */
 
 // const String secretSSID       = "Your WiFi Name";
