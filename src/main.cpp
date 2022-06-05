@@ -126,7 +126,7 @@ void callback(char* topic, byte* buf, unsigned int len) {
   for (int i = 0; i < len; i++) message += (char) buf[i];
   int command = message.toInt();
 
-  Serial.println("Received a command: " + message);
+  Serial.println("Received message: " + message);
 
   if (command >= 0 && command <= 100) motor.percent(command);
   else if (command == COVER_STOP) motor.stop();
@@ -153,11 +153,10 @@ void connectMqtt() {
 }
 
 
-void sendMessage() {
-  // Serial.print("Sent MQTT message: "+ (open_percent) + "% = ");
-  // Serial.print(stepper.currentPosition() + " / " + max_steps);
-  // mqttClient.beginPublish(outTopic, msglen, false);
-  // mqttClient.print(open_percent);
+void sendMessage () {
+  // int percent = (int) (currPos + " / " + maxPos);
+  // mqttClient.beginPublish("client/shades/1", 1, false);
+  // mqttClient.print(percent);
   // mqttClient.endPublish();
+  // Serial.println((String) "Sent message: " + percent + "% = " + currPos + " / " + maxPos);
 }
-

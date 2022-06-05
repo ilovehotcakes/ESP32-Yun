@@ -17,11 +17,10 @@ Motor::Motor() {
   stepper.setMaxSpeed(velocity);
   stepper.setAcceleration(acceleration);
   stepper.setPinsInverted(false, false, true);
-  stepper.setCurrentPosition(current_position);
+  stepper.setCurrentPosition(currPos);
   stepper.disableOutputs();
 
-  // load_preference();
-  setMax();
+  // loadPositions();
 }
 
 
@@ -49,19 +48,18 @@ void Motor::stop() {
   motor = MOTOR_DISABLE;
   if (set_max) {
     set_max = false;
-    max_steps = stepper.currentPosition();
-    preferences_local.putInt("max_steps", max_steps);
+    maxPos = stepper.currentPosition();
+    preferences_local.putInt("maxPos", maxPos);
   } else if (set_min) {
     set_min = false;
     int distance_traveled = 2147483646 - stepper.currentPosition();
-    max_steps = max_steps + distance_traveled - previous_position;
+    maxPos = maxPos + distance_traveled - prevPos;
     stepper.setCurrentPosition(0);
   }
   stepper.moveTo(stepper.currentPosition());
   stepper.disableOutputs();
   stepper.setMaxSpeed(velocity);
   updatePosition();
-  // sendPercentage();
 }
 
 
@@ -71,7 +69,7 @@ void Motor::open() {
 
 
 void Motor::close() {
-  moveTo(max_steps);
+  moveTo(maxPos);
 }
 
 
@@ -90,31 +88,31 @@ void Motor::setMax() {
 void Motor::setMin() {
   set_min = true;
   stepper.setMaxSpeed(velocity / 4);
-  previous_position = stepper.currentPosition();
+  prevPos = stepper.currentPosition();
   stepper.setCurrentPosition(2147483646);
   moveTo(0);
 }
 
 
 void Motor::updatePosition() {
-  current_position = stepper.currentPosition();
-  preferences_local.putInt("current_position", current_position);
+  currPos = stepper.currentPosition();
+  preferences_local.putInt("currPos", currPos);
 }
 
 
-void Motor::load_preference() {
-  max_steps = preferences_local.getInt("max_steps", 100000);
-  current_position = preferences_local.getInt("current_position", 0);
+void Motor::loadPositions() {
+  maxPos = preferences_local.getInt("maxPos", 100000);
+  currPos = preferences_local.getInt("currPos", 0);
 }
 
 
 int Motor::percentToSteps(int percent) {
-  float result = (float) percent * (float) max_steps / 100.0;
+  float result = (float) percent * (float) maxPos / 100.0;
   return (int) round(result);
 }
 
 
 int Motor::stepsToPercent(int steps) {
-  float result = (float) current_position / (float) max_steps * 100;
+  float result = (float) currPos / (float) maxPos * 100;
   return (int) round(result);
 }
