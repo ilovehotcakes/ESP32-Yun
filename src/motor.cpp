@@ -20,7 +20,7 @@ Motor::Motor() {
   stepper.setCurrentPosition(currPos);
   stepper.disableOutputs();
 
-  // loadPositions();
+  loadPositions();
 }
 
 
@@ -34,6 +34,24 @@ void Motor::moveTo(int steps) {
 }
 
 
+int Motor::currentPosition() {
+  if (currPos == 0)
+    return 0;
+  else
+    return (int) round((float) currPos / (float) maxPos * 100);
+}
+
+
+int Motor::isMessageAvailable() {
+  return msgAvail;
+}
+
+
+void Motor::markMessageRead() {
+  msgAvail = false;
+}
+
+
 void Motor::run() {
   if (motor == MOTOR_ENABLE) {
     if (stepper.distanceToGo() != 0)
@@ -44,12 +62,17 @@ void Motor::run() {
 }
 
 
+void Motor::percent(int percent) {
+  moveTo(percentToSteps(percent));
+}
+
+
 void Motor::stop() {
   motor = MOTOR_DISABLE;
   if (set_max) {
     set_max = false;
     maxPos = stepper.currentPosition();
-    preferences_local.putInt("maxPos", maxPos);
+    memory.putInt("maxPos", maxPos);
   } else if (set_min) {
     set_min = false;
     int distance_traveled = 2147483646 - stepper.currentPosition();
@@ -60,6 +83,7 @@ void Motor::stop() {
   stepper.disableOutputs();
   stepper.setMaxSpeed(velocity);
   updatePosition();
+  msgAvail = true;
 }
 
 
@@ -70,11 +94,6 @@ void Motor::open() {
 
 void Motor::close() {
   moveTo(maxPos);
-}
-
-
-void Motor::percent(int percent) {
-  moveTo(percentToSteps(percent));
 }
 
 
@@ -94,15 +113,15 @@ void Motor::setMin() {
 }
 
 
-void Motor::updatePosition() {
-  currPos = stepper.currentPosition();
-  preferences_local.putInt("currPos", currPos);
+void Motor::loadPositions() {
+  maxPos = memory.getInt("maxPos", 100000);
+  currPos = memory.getInt("currPos", 0);
 }
 
 
-void Motor::loadPositions() {
-  maxPos = preferences_local.getInt("maxPos", 100000);
-  currPos = preferences_local.getInt("currPos", 0);
+void Motor::updatePosition() {
+  currPos = stepper.currentPosition();
+  memory.putInt("currPos", currPos);
 }
 
 
@@ -111,8 +130,3 @@ int Motor::percentToSteps(int percent) {
   return (int) round(result);
 }
 
-
-int Motor::stepsToPercent(int steps) {
-  float result = (float) currPos / (float) maxPos * 100;
-  return (int) round(result);
-}

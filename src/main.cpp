@@ -21,7 +21,7 @@
 void core0Task(void * parameter);
 void startWifi();
 void connectMqtt();
-void sendMessage();
+void sendMessage(String);
 
 
 
@@ -66,6 +66,11 @@ void setup() {
 
 void loop() {
   motor.run();
+  
+  if (motor.isMessageAvailable()) {
+    sendMessage((String) motor.currentPosition());
+    motor.markMessageRead();
+  }
 }
 
 
@@ -106,7 +111,6 @@ void core0Task(void * parameter) {
     delay(100);  // Must have or else state won't change when initializing
   }
 }
-
 
 
 // Todo: add timeout and restart
@@ -153,10 +157,7 @@ void connectMqtt() {
 }
 
 
-void sendMessage () {
-  // int percent = (int) (currPos + " / " + maxPos);
-  // mqttClient.beginPublish("client/shades/1", 1, false);
-  // mqttClient.print(percent);
-  // mqttClient.endPublish();
-  // Serial.println((String) "Sent message: " + percent + "% = " + currPos + " / " + maxPos);
+void sendMessage (String message) {
+  mqttClient.publish("/client/shades/1", message.c_str());
+  Serial.println((String) "Sent message: " + message);
 }
