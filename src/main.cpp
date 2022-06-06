@@ -27,6 +27,7 @@
 #define COVER_CLOSE      -3
 #define COVER_SET_MAX    -4
 #define COVER_SET_MIN    -5
+#define REBOOT_SYS       -99
 // Defining LED pin, it's tied to GPIO2 on HiLetGo board
 #define LED_PIN           2
 
@@ -164,6 +165,7 @@ void callback(char* topic, byte* buf, unsigned int len) {
   else if (command == COVER_CLOSE) motor.close();
   else if (command == COVER_SET_MAX) motor.setMax();
   else if (command == COVER_SET_MIN) motor.setMin();
+  else if (command == REBOOT_SYS) ESP.restart();
 }
 
 
@@ -186,3 +188,4 @@ void sendMessage (String message) {
   mqttClient.publish("/client/shades/1", message.c_str());
   Serial.println((String) "Sent message: " + message);
 }
+
