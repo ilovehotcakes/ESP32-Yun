@@ -25,6 +25,11 @@ Motor::Motor() {
 }
 
 
+Motor::Motor(std::function<void(String)> cb) : callback(cb) {
+  Motor();
+}
+
+
 // Only enable the driver if the distance isn't 0, or else the drive will be
 // enabled and won't be disable unless STOP is explicitly used.
 void Motor::moveTo(int steps) {
@@ -42,16 +47,6 @@ int Motor::currentPosition() {
     return 0;
   else
     return (int) round((float) currPos / (float) maxPos * 100);
-}
-
-
-int Motor::isMessageAvailable() {
-  return msgAvail;
-}
-
-
-void Motor::markMessageRead() {
-  msgAvail = false;
 }
 
 
@@ -95,8 +90,8 @@ void Motor::stop() {
   currPos = stepper.currentPosition();
   memory.putInt("currPos", currPos);
 
-  // Set msgAvail flag to true so driver can output current position to MQTT
-  msgAvail = true;
+  // Callback
+  callback((String) currentPosition());
 }
 
 

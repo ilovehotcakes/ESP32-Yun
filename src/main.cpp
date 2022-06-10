@@ -72,30 +72,25 @@ void setup() {
   startWifi();
   state = CONNECTING_MQTT;
 
-  motor = Motor();
+  motor = Motor(sendMqtt);
 }
 
 
-/*
- Keeps running the motor and checks if there is any messages avaiable to
- publish to MQTT server. The motor must run in the loop. For some unknown
- reasons, the stepper doesn't run smoothly on core0.
-*/
+/**
+  Keeps running the motor and checks if there is any messages avaiable to
+  publish to MQTT server. The motor must run in the loop. For some unknown
+  reasons, the stepper doesn't run smoothly on core0.
+**/
 void loop() {
   motor.run();
-  
-  if (motor.isMessageAvailable()) {
-    sendMessage((String) motor.currentPosition());
-    motor.markMessageRead();
-  }
 }
 
 
-/*
- The state machine that tracks communication to MQTT/WiFi. I have tried to
- start the WiFi in the state machine but it doesn't work. Also, the delay at
- the of the function is required, else WiFi can't connect for unknown reason.
-*/
+/**
+  The state machine that tracks communication to MQTT/WiFi. I have tried to
+  start the WiFi in the state machine but it doesn't work. Also, the delay at
+  the of the function is required, else WiFi can't connect for unknown reason.
+**/
 void core0Task(void * parameter) {
   for (;;) {
     switch (state) {
@@ -115,7 +110,7 @@ void core0Task(void * parameter) {
         connectMqtt();
 
         // Update MQTT server of current shade opening position
-        sendMessage((String) motor.currentPosition());
+        sendMqtt((String) motor.currentPosition());
 
         // Turn off LED to indicate fully connected
         digitalWrite(LED_PIN, LOW);
@@ -152,7 +147,7 @@ void startWifi() {
 }
 
 
-void callback(char* topic, byte* buf, unsigned int len) {
+void readMqtt(char* topic, byte* buf, unsigned int len) {
   String message = "";
   for (int i = 0; i < len; i++) message += (char) buf[i];
   int command = message.toInt();
@@ -178,14 +173,14 @@ void connectMqtt() {
   while (!mqttClient.connect(mqttID.c_str(), mqttUser.c_str(), mqttPass.c_str()));
 
   mqttClient.subscribe(inTopic.c_str());
-  mqttClient.setCallback(callback);
+  mqttClient.setCallback(readMqtt);
 
   Serial.println("[E] You're connected to the MQTT broker! Topic: " + inTopic);
 }
 
 
-void sendMessage(String message) {
-  mqttClient.publish("/client/shades/1", message.c_str());
+void sendMqtt(String message) {
+  mqttClient.publish(secretOutTopic.c_str(), message.c_str());
   Serial.println((String) "Sent message: " + message);
 }
 
