@@ -1,7 +1,7 @@
 /**
   motor_settings.h - Specific settings for the stepper driver and motor
   Author: Jason Chen
- 
+
   A file that includes all the stepper driver and motor settings instead of going
   through main.
 
@@ -26,4 +26,4 @@ const float gearbox_ratio = 5.18;        // Use 1 if stepper motor doesn't have 
 const uint16_t microsteps = 8;           // 8 is a good in-between, powerful enough but also quiet
 const int steps_per_rev = 200 * gearbox_ratio * microsteps;  // NEMA motors typically have 200 full steps per rev
 const int velocity = steps_per_rev * 1;  // For 5.18:1 planetary gearbox, x1 is the fastest it will go
-const int acceleration = steps_per_rev * 10;
+const int acceleration = steps_per_rev * 5;

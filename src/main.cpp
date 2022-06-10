@@ -35,7 +35,7 @@
 void core0Task(void * parameter);
 void startWifi();
 void connectMqtt();
-void sendMessage(String);
+void sendMqtt(String);
 
 
 bool VERBOSE = true;
