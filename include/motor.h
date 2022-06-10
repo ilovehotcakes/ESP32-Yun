@@ -2,7 +2,7 @@
  motor.h - A wrapper class for TMCStepper and AccelStepper
  Author: Jason Chen
  
- This is wrapper class so it's simpler for the driver program to manage the
+ This is a wrapper class so it's simpler for the driver program to manage the
  stepper motor. A motor object remember its last and maximum position so the
  user doesn't have to set it everytime after reboot.
  

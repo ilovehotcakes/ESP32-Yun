@@ -1,14 +1,14 @@
-/*
- Motorized Cover - ESP32
- Aurthor: Jason Chen
+/**
+  Motorized Cover - ESP32
+  Aurthor: Jason Chen
 
- A simple ESP32 program that let's user control powerful and quiet stepper
- motors via MQTT. You use it to open and close blinds/shades, etc. Can be
- used with Alexa or Home Assistant.
+  A simple ESP32 program that let's user control powerful and quiet stepper
+  motors via MQTT. You use it to open and close blinds/shades, etc. Can be
+  used with Alexa or Home Assistant.
 
- This program utilizes TMC2209 drivers for the stepper motor and it drives
- NEMA stepper motors.
-*/
+  This program utilizes TMC2209 drivers for the stepper motor and it drives
+  NEMA stepper motors.
+**/
 #include <Arduino.h>
 #include <math.h>
 #include <WiFi.h>
@@ -25,8 +25,8 @@
 #define COVER_STOP       -1
 #define COVER_OPEN       -2
 #define COVER_CLOSE      -3
-#define COVER_SET_MAX    -4
-#define COVER_SET_MIN    -5
+#define COVER_SET_MIN    -4
+#define COVER_SET_MAX    -5
 #define REBOOT_SYS       -99
 // Defining LED pin, it's tied to GPIO2 on HiLetGo board
 #define LED_PIN           2
@@ -184,7 +184,7 @@ void connectMqtt() {
 }
 
 
-void sendMessage (String message) {
+void sendMessage(String message) {
   mqttClient.publish("/client/shades/1", message.c_str());
   Serial.println((String) "Sent message: " + message);
 }

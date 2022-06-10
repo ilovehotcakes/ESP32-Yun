@@ -4,6 +4,7 @@
 MQTT example from https://github.com/garyexplains/examples/blob/master/MKR1000/mqtt_button_and_led.ino
 ESP32 dual core example from https://www.youtube.com/watch?v=k_D_Qu0cgu8
 BigTreeTech TMC2209 schematic: https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/Schematic/TMC2209-V1.2.pdf
+BigTreeTech TMC2209 manual: https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/manual/TMC2209-V1.2-manual.pdf
 TMC2208 with AccelStepper library example: https://github.com/teemuatlut/TMCStepper/blob/master/examples/TMC_AccelStepper/TMC_AccelStepper.ino
 TMC2209 example: https://github.com/edwardocano/Esp32-TMC2209/blob/master/stallguard/stallguard.ino
 TMC simple example: https://github.com/teemuatlut/TMCStepper/blob/master/examples/Simple/Simple.ino
