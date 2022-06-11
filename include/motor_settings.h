@@ -17,6 +17,9 @@
 #define EN_PIN           23 // Enable
 #define STEP_PIN         22 // Steps
 #define DIR_PIN          21 // Direction
+#define DIAG_PIN         34 // Stallguard
+#define RXD2             16 // UART receive
+#define TXD2             17 // UART transmission
 #define SERIAL_PORT Serial2 // TMC2209 HardwareSerial port
 #define R_SENSE       0.11f // Match to your driver, SilentStepStick series use 0.11
 #define DRIVER_ADDR    0b00 // 0b00 is slave, since there're no other drivers

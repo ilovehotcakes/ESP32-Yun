@@ -42,7 +42,6 @@ bool VERBOSE = true;
 TaskHandle_t C0;  // For dual core setup
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
-Motor    motor;
 int      state = INITIALIZING;   // State machine to manage WiFi/MQTT
 String   ssid  = secretSSID;     // SSID (name) for WiFi
 String   pass  = secretPass;     // Network password for WiFi
@@ -72,7 +71,7 @@ void setup() {
   startWifi();
   state = CONNECTING_MQTT;
 
-  motor = Motor(sendMqtt);
+  motorSetup();
 }
 
 
@@ -82,7 +81,7 @@ void setup() {
   reasons, the stepper doesn't run smoothly on core0.
 **/
 void loop() {
-  motor.run();
+  motorRun();
 }
 
 
@@ -110,7 +109,7 @@ void core0Task(void * parameter) {
         connectMqtt();
 
         // Update MQTT server of current shade opening position
-        sendMqtt((String) motor.currentPosition());
+        sendMqtt((String) motorCurrentPosition());
 
         // Turn off LED to indicate fully connected
         digitalWrite(LED_PIN, LOW);
@@ -154,12 +153,12 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
 
   Serial.println("Received message: " + message);
 
-  if (command >= 0 && command <= 100) motor.percent(command);
-  else if (command == COVER_STOP) motor.stop();
-  else if (command == COVER_OPEN) motor.open();
-  else if (command == COVER_CLOSE) motor.close();
-  else if (command == COVER_SET_MAX) motor.setMax();
-  else if (command == COVER_SET_MIN) motor.setMin();
+  if (command >= 0 && command <= 100) motorMoveTo(command);
+  else if (command == COVER_STOP) motorStop();
+  else if (command == COVER_OPEN) motorOpen();
+  else if (command == COVER_CLOSE) motorClose();
+  else if (command == COVER_SET_MAX) motorSetMax();
+  else if (command == COVER_SET_MIN) motorSetMin();
   else if (command == REBOOT_SYS) ESP.restart();
 }
 
@@ -183,4 +182,3 @@ void sendMqtt(String message) {
   mqttClient.publish(secretOutTopic.c_str(), message.c_str());
   Serial.println((String) "Sent message: " + message);
 }
-
