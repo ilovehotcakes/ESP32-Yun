@@ -30,6 +30,7 @@
 #define REBOOT_SYS       -99
 // Defining LED pin, it's tied to GPIO2 on HiLetGo board
 #define LED_PIN           2
+#define VERBOSE           1
 
 
 void core0Task(void * parameter);
@@ -38,7 +39,6 @@ void connectMqtt();
 void sendMqtt(String);
 
 
-bool VERBOSE = true;
 TaskHandle_t C0;  // For dual core setup
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -109,7 +109,7 @@ void core0Task(void * parameter) {
         connectMqtt();
 
         // Update MQTT server of current shade opening position
-        sendMqtt((String) motorCurrentPosition());
+        sendMqtt((String) motorCurrentPercentage());
 
         // Turn off LED to indicate fully connected
         digitalWrite(LED_PIN, LOW);
@@ -151,12 +151,12 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   for (int i = 0; i < len; i++) message += (char) buf[i];
   int command = message.toInt();
 
-  Serial.println("Received message: " + message);
+  Serial.println("[I] Received message: " + message);
 
-  if (command >= 0 && command <= 100) motorMoveTo(command);
+  if (command >= 0) motorMove(command);
   else if (command == COVER_STOP) motorStop();
-  else if (command == COVER_OPEN) motorOpen();
-  else if (command == COVER_CLOSE) motorClose();
+  else if (command == COVER_OPEN) motorMin();
+  else if (command == COVER_CLOSE) motorMax();
   else if (command == COVER_SET_MAX) motorSetMax();
   else if (command == COVER_SET_MIN) motorSetMin();
   else if (command == REBOOT_SYS) ESP.restart();
@@ -180,5 +180,5 @@ void connectMqtt() {
 
 void sendMqtt(String message) {
   mqttClient.publish(secretOutTopic.c_str(), message.c_str());
-  Serial.println((String) "Sent message: " + message);
+  Serial.println((String) "[I] Sent message: " + message);
 }
