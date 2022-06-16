@@ -58,7 +58,7 @@ void motorSetup() {
   driver.begin();             // Begin sending data
   driver.toff(4);             // Not used in StealthChop but required to enable the motor, 0=off
   driver.pdn_disable(true);   // PDN_UART input disabled; set this bit when using the UART interface
-  driver.rms_current(550);    // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
+  driver.rms_current(475);    // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
   driver.pwm_autoscale(true);    // Needed for StealthChop
   driver.en_spreadCycle(false);  // Disable SpreadCycle; SC is faster but louder
   driver.blank_time(24);         // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
@@ -82,7 +82,6 @@ void motorSetup() {
     stepper->setSpeedInHz(max_speed);
     stepper->setAcceleration(acceleration);
     stepper->setAutoEnable(true);
-    // stepper->setDelayToEnable(50);
     stepper->setDelayToDisable(200);
   } else {
     Serial.println("[E] Please use a different GPIO pin for the STEP_PIN. The current pin is incompatible..");
@@ -155,6 +154,7 @@ int motorCurrentPercentage() {
 
 void motorStop() {
   stepper->forceStop();
+  stepper->moveTo(stepper->getCurrentPosition());
 }
 
 
