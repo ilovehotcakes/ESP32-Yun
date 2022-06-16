@@ -1,5 +1,16 @@
 # motorblinds_esp32
 
+### Parts
+- Stepper motor
+- Stepper driver
+- ESP32 node mcu
+- Coupling
+- 100uF Capacitor
+- Voltage step down convertor
+- Breadboard
+- Wires/solder
+- Mounting bracket and screws
+
 ### Resources
 #### TMC2209 Info
 TMC2209 datasheet: https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf

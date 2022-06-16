@@ -29,4 +29,4 @@ const float gearbox_ratio = 5.18;         // Use 1 if stepper motor doesn't have
 const uint16_t microsteps = 8;            // 8 microsteps per full step
 const int steps_per_rev = 200 * gearbox_ratio * microsteps;  // NEMA motors have 200 full steps per rev
 const int max_speed = steps_per_rev * 1;  // Max speed in Hz
-const int acceleration = max_speed * 4;
+const int acceleration = max_speed * 0.5; // Use lower value as not overshoot when there is a spring

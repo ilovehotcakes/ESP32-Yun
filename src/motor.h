@@ -67,8 +67,8 @@ void motorSetup() {
   #ifdef DIAG_PIN
   #ifdef RXD2
     driver.semin(0);    // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0 disable
-    driver.TCOOLTHRS((3089838.00 * pow(float(max_speed*2), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on smart energy CoolStep and StallGuard to DIAG output
-    driver.SGTHRS(30);  // [0..255] the higher the more sensitive to stall
+    driver.TCOOLTHRS((3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on smart energy CoolStep and StallGuard to DIAG output
+    driver.SGTHRS(20);  // [0..255] the higher the more sensitive to stall
     attachInterrupt(DIAG_PIN, stallguardInterrupt, RISING);
   #endif
   #endif
@@ -82,10 +82,10 @@ void motorSetup() {
     stepper->setSpeedInHz(max_speed);
     stepper->setAcceleration(acceleration);
     stepper->setAutoEnable(true);
-    stepper->setDelayToEnable(50);
-    stepper->setDelayToDisable(5);
+    // stepper->setDelayToEnable(50);
+    stepper->setDelayToDisable(200);
   } else {
-    Serial.println("[E] Please use a different GPIO pin. The current pin is not compatible..");
+    Serial.println("[E] Please use a different GPIO pin for the STEP_PIN. The current pin is incompatible..");
   }
 
   // Load current position and maximum position from memory
@@ -154,7 +154,7 @@ int motorCurrentPercentage() {
 
 
 void motorStop() {
-  stepper->stopMove();
+  stepper->forceStop();
 }
 
 
