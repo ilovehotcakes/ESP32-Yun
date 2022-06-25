@@ -17,19 +17,25 @@
 #include <Preferences.h>
 #include "motor_settings.h"
 
+#define MOTOR_STOPPED  -1
+#define MOTOR_OPENING  -2
+#define MOTOR_CLOSING  -3
+#define MOTOR_SET_MIN  -4
+#define MOTOR_SET_MAX  -5
+
 TMC2209Stepper driver(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *stepper;
-Preferences memory;
+Preferences settings;
 void sendMqtt(String);
-
 
 int maxPos;
 int currPos;
 int prevPos = 0;
-bool isSetMax = false;
-bool isSetMin = false;
+int currState = MOTOR_STOPPED;
+int prevState = MOTOR_STOPPED;
 bool isMotorRunning = false;
+bool flipDir = false;
 
 
 void IRAM_ATTR stallguardInterrupt() {
@@ -39,9 +45,9 @@ void IRAM_ATTR stallguardInterrupt() {
 
 
 void loadPositions() {
-  memory.begin("local", false);
-  maxPos = memory.getInt("maxPos", 50000);
-  currPos = memory.getInt("currPos", 0);
+  settings.begin("local", false);
+  maxPos = settings.getInt("maxPos", 30000);
+  currPos = settings.getInt("currPos", 0);
   stepper->setCurrentPosition(currPos);
 }
 
@@ -51,7 +57,6 @@ void motorSetup() {
   pinMode(EN_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
-  pinMode(DIAG_PIN, INPUT);
 
   // Stepper driver setup
   SERIAL_PORT.begin(115200);  // Initialize hardware serial for hardware UART driver
@@ -63,14 +68,15 @@ void motorSetup() {
   driver.en_spreadCycle(false);  // Disable SpreadCycle; SC is faster but louder
   driver.blank_time(24);         // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
   driver.microsteps(microsteps);
+  // driver.shaft(flipDir);  // Test
 
-  #ifdef DIAG_PIN
-  #ifdef RXD2
+  // Use Stallguard if the DIAG_PIN and RXD2(UART2) are defined
+  #if defined(DIAG_PIN) && defined(RXD2)
+    pinMode(DIAG_PIN, INPUT);
     driver.semin(0);    // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0 disable
     driver.TCOOLTHRS((3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on smart energy CoolStep and StallGuard to DIAG output
-    driver.SGTHRS(20);  // [0..255] the higher the more sensitive to stall
+    driver.SGTHRS(10);  // [0..255] the higher the more sensitive to stall
     attachInterrupt(DIAG_PIN, stallguardInterrupt, RISING);
-  #endif
   #endif
 
   // Stepper motor setup
@@ -87,7 +93,7 @@ void motorSetup() {
     Serial.println("[E] Please use a different GPIO pin for the STEP_PIN. The current pin is incompatible..");
   }
 
-  // Load current position and maximum position from memory
+  // Load current position and maximum position from settings
   loadPositions();
 }
 
@@ -100,8 +106,8 @@ int percentToSteps(int percent) {
 
 // Stepper must move first before isMotorRunning==true; else motorRun will excute first before stepper stops
 void motorMoveTo(int newPos) {
-  if ((newPos < stepper->targetPos() && stepper->getCurrentPosition() < stepper->targetPos())
-  || (newPos > stepper->targetPos() && stepper->getCurrentPosition() > stepper->targetPos()))
+  if ((prevState == MOTOR_CLOSING && currState == MOTOR_OPENING)
+  || (prevState == MOTOR_OPENING && currState == MOTOR_CLOSING))
     stepper->forceStop();
   
   if (newPos != stepper->getCurrentPosition() && newPos <= maxPos) {
@@ -117,29 +123,39 @@ void motorMove(int percent) {
 
 
 void motorMin() {
+  prevState = currState;
+  currState = MOTOR_OPENING;
+  driver.rms_current(475);
   motorMoveTo(0);
 }
 
 
 void motorMax() {
+  prevState = currState;
+  currState = MOTOR_CLOSING;
+  driver.rms_current(475);
   motorMoveTo(maxPos);
 }
 
 
-void motorSetMax() {
-  isSetMax = true;
-  stepper->setSpeedInHz(max_speed / 4);
-  maxPos = 2147483646;
-  motorMoveTo(2147483646);
-}
-
-
 void motorSetMin() {
-  isSetMin = true;
+  prevState = currState;
+  currState = MOTOR_SET_MIN;
+  driver.rms_current(350);
   stepper->setSpeedInHz(max_speed / 4);
   prevPos = stepper->getCurrentPosition();
   stepper->setCurrentPosition(2147483646);
   motorMoveTo(0);
+}
+
+
+void motorSetMax() {
+  prevState = currState;
+  currState = MOTOR_SET_MAX;
+  driver.rms_current(475);
+  stepper->setSpeedInHz(max_speed / 4);
+  maxPos = 2147483646;
+  motorMoveTo(2147483646);
 }
 
 
@@ -155,6 +171,10 @@ int motorCurrentPercentage() {
 void motorStop() {
   stepper->forceStop();
   stepper->moveTo(stepper->getCurrentPosition());
+  if (currState == MOTOR_OPENING || currState == MOTOR_CLOSING) {
+    prevState = currState;
+    currState = MOTOR_STOPPED;
+  }
 }
 
 
@@ -164,21 +184,20 @@ void motorRun() {
     if (!stepper->isRunning()) {
       isMotorRunning = false;
 
-      if (isSetMax) {
-        isSetMax = false;
+      if (currState == MOTOR_SET_MAX) {
         maxPos = stepper->getCurrentPosition();
-        memory.putInt("maxPos", maxPos);
+        settings.putInt("maxPos", maxPos);
         stepper->setSpeedInHz(max_speed);  // Set stepper motor speed back to normal
-      } else if (isSetMin) {
-        isSetMin = false;
+      } else if (currState == MOTOR_SET_MIN) {
         int distanceTraveled = 2147483646 - stepper->getCurrentPosition();
         maxPos = maxPos + distanceTraveled - prevPos;
         stepper->setCurrentPosition(0);
         stepper->setSpeedInHz(max_speed);  // Set stepper motor speed back to normal
       }
-
+      prevState = currState;
+      currState = MOTOR_STOPPED;
       currPos = stepper->getCurrentPosition();
-      memory.putInt("currPos", currPos);
+      settings.putInt("currPos", currPos);
       sendMqtt((String) motorCurrentPercentage());
     }
   }
