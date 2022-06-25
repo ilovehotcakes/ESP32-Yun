@@ -13,8 +13,9 @@
 #include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include "secrets.h"
 #include "motor.h"
+#include "ota.h"
+#include "secrets.h"
 
 // Defining states for the state machine
 #define INITIALIZING      0
@@ -27,7 +28,7 @@
 #define COVER_CLOSE      -3
 #define COVER_SET_MIN    -4
 #define COVER_SET_MAX    -5
-#define REBOOT_SYS       -99
+#define SYS_REBOOT       -99
 // Defining LED pin, it's tied to GPIO2 on HiLetGo board
 #define LED_PIN           2
 #define VERBOSE           1
@@ -70,6 +71,8 @@ void setup() {
   // Start the WiFi connection
   startWifi();
   state = CONNECTING_MQTT;
+
+  otaSetup();
 
   motorSetup();
 }
@@ -130,6 +133,7 @@ void core0Task(void * parameter) {
       break;
     }
     delay(100);
+    ArduinoOTA.handle();
   }
 }
 
@@ -159,7 +163,7 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   else if (command == COVER_CLOSE) motorMax();
   else if (command == COVER_SET_MAX) motorSetMax();
   else if (command == COVER_SET_MIN) motorSetMin();
-  else if (command == REBOOT_SYS) ESP.restart();
+  else if (command == SYS_REBOOT) ESP.restart();
 }
 
 
