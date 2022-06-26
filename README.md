@@ -1,15 +1,19 @@
 # motorblinds_esp32
 
 ### Parts
-- Stepper motor
-- Stepper driver
-- ESP32 node mcu
-- Coupling
-- 100uF Capacitor
-- Voltage step down convertor
-- Breadboard
-- Wires/solder
-- Mounting bracket and screws
+name                             cost     shipping    total    link
+- Stepper motor                  166.70   33.12       199.82   https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5
+- ESP32 node mcu                 12.10                60.50    https://www.amazon.com/dp/B0718T232Z/
+- Voltage step down convertor    29.75    7.99        37.74    https://www.mouser.com/ProductDetail/485-4739
+- Stepper driver                 34.12                34.12    https://www.amazon.com/gp/product/B07YW7BM68/
+- Coupling                       14.96                14.96    https://www.amazon.com/gp/product/B07MPFJGZW/
+- 100uF Capacitor                6.82                 6.82     https://www.amazon.com/gp/product/B07Y3F194W/
+- Solderless breadboard          6.59                 6.59     https://www.amazon.com/gp/product/B07LF71ZTS/
+- Power supply                   17.51                35.02    https://www.amazon.com/gp/product/B07N18XN84/
+- Wires                          14.86                14.86    https://www.amazon.com/gp/product/B07Z4W6V6R/
+- Mounting bracket               30.21    9.99        40.20
+- Screws                         10                   10
+- Total                                               460.63/5
 
 ### Resources
 #### TMC2209 Info
