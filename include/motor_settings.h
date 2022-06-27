@@ -13,12 +13,15 @@
     enough to fit inside the top compartment.
 **/
 
+// Define LED pin, it's tied to GPIO2 on the HiLetGo board
+#define LED_PIN           2
+
 // Define ESP32 connections to stepper motor driver (BigTreeTech TMC2209 V1.2 UART)
 #define EN_PIN           23 // Enable pin
 #define STEP_PIN         32 // Step pin
 #define DIR_PIN          21 // Direction pin
-#define DIAG_PIN         35 // Stallguard (diag) pin
-#define RXD2             17 // UART receive, must be connected to a UART port on the ESP32
+#define DIAG_PIN         35 // Optional for StallGuard: diag pin
+#define RXD2             17 // Optional for StallGuard: must be connected to a UART port on the ESP32
 #define SERIAL_PORT Serial2 // TMC2209 HardwareSerial port
 #define R_SENSE       0.11f // Sense resistor, TMC2209 uses 0.11
 #define DRIVER_ADDR    0b00 // 0b00 is slave, since there're no other drivers
