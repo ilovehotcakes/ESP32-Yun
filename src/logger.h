@@ -1,12 +1,12 @@
 /**
-  logger.h - A simple logger wrapper
-  Aurthor: Jason Chen
+  logger.h - A simple Serial.println wrapper
+  Aurthor: Jason Chen, 2022
 
   A simple wrapper file for Serial.println statements that imitates the output
   format of Espressif ESP32 logger library. Main features includes:
   - Output Serial.println statements based on LogLevel(ERROR, INFO, DEBUG).
     Logs that are higher level than set level will not be outputted.
-  - Serial.println statements easily can be omitted during compiling.
+  - Serial.println statements can be easily omitted during compiling.
 
   Usage:
   - #include "logger.h"

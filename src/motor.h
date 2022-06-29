@@ -1,16 +1,15 @@
 /**
   motor.h - A file that contains all stepper motor controls
-  Author: Jason Chen
+  Author: Jason Chen, 2022
 
   This file contains all stepper motor controls, which includes, initializing
   the stepper driver (TMCStepper), stepper motor control (FastAccelStepper), as
-  well as recalling its current position and maximum position on reboot. It also
+  well as recalling its previous position and maximum position on reboot. It also
   sends current position via MQTT after it stops.
 
   It also gives the user the option to set the maximum and minimum stepper motor
   positions via MQTT. (1) User doesn't have to pre-calculate the max/min travel
-  distance (2) User can still re-adjust max/min positions if the stepper motor
-  slips.
+  distance (2) User can re-adjust max/min positions without reflashing firmware.
 **/
 #include <TMCStepper.h>
 #include <FastAccelStepper.h>
@@ -37,7 +36,7 @@ int openingRMS = 475;
 int closingRMS = 475;
 
 
-// TODO: test
+// For StallGuard
 #if defined(DIAG_PIN) && defined(RXD2)
 void IRAM_ATTR stallguardInterrupt() {
   stepper->forceStop();
@@ -46,6 +45,7 @@ void IRAM_ATTR stallguardInterrupt() {
 #endif
 
 
+// Load motor settings from flash
 void loadMotorSettings() {
   motorSettings.begin("local", false);
   maxPos = motorSettings.getInt("maxPos", 30000);
@@ -55,7 +55,6 @@ void loadMotorSettings() {
 }
 
 
-// 
 void motorSetup() {
   pinMode(EN_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
@@ -73,7 +72,7 @@ void motorSetup() {
   driver.microsteps(microsteps);
   driver.shaft(flipDir);
 
-  // Use StallGuard if user specifies
+  // Use StallGuard if user specifies connection to DIAG_PIN && RXD2
   #if defined(DIAG_PIN) && defined(RXD2)
   if (enableSG) {
     pinMode(DIAG_PIN, INPUT);
@@ -104,13 +103,14 @@ void motorSetup() {
 }
 
 
+// Helper function to calculate position percentage to steps
 int percentToSteps(int percent) {
   float x = (float) percent * (float) maxPos / 100.0;
   return (int) round(x);
 }
 
 
-// Stepper must move first before isMotorRunning==true, else motorRun will excute first before stepper stops
+// Motor must move first before isMotorRunning==true, else motorRun will excute first before stepper stops
 void motorMoveTo(int newPos) {
   if ((prevState == MOTOR_MAX && currState == MOTOR_MIN)
   || (prevState == MOTOR_MIN && currState == MOTOR_MAX))
