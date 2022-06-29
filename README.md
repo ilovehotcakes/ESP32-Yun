@@ -48,20 +48,22 @@ It is also useful for protecting pets/children in the case of motorized windows.
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
 
-### Flashing firmware
+### Flashing Firmware
 #### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project.
+You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your Arduino library/project.
 
-#### Cloning this repo
-Clone this repo and look at the settings.
+#### Adding WiFi/MQTT Credentials and Setting Motor Specs
+Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 MCU via your choice of IDE. It is good to have the motor specifications for this part.
 
-#### WiFi and MQTT
-* You will need a MQTT server/broker.
-* Set inTopic
-* Set outTopic
+### MQTT
+* You will need a MQTT server/broker. You can run one on a rpi4 or via docker.
+* inTopic is where the motorcover will receive MQTT commands. For example, I set /server/shades/1 on the MQTT server
+  to send commands to the motorshade.
+* outTopic is where motorcover will send MQTT messages to update its state. For example, I set /client/shades/1 on the
+  MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
 
-#### MQTT commands
+#### MQTT Commands
 * 0~100: move to position(%); 0 -> open, 100 -> close
 *  -1  : stop
 *  -2  : open
@@ -71,7 +73,22 @@ Clone this repo and look at the settings.
 *  -99 : reboot system
 
 ### My Use Case
-#### Spring dampening
+#### Spring Dampening
+With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is older
+design, which just contains an axle that is connected to 2-3 spools to lift the shade. It has a tape-like spring to
+prevent it from dropping when it is opened. It might be tempting to remove the spring but when the stepper motor is
+disabled, i.e. when no current is running through the motor, it is easy for the shade to fall by itself. So I would
+advise to keep it.
+
+When you keep the spring, I've discovered that the shade will "overshoot" when opening if all the weights are taken out
+of the shade. So one way to fix this issue is by leaving some of the weights in the shade so it dampens the bouncing
+effect when retracting. If your motor is powerful enough to lift the cover without reduce the weight, then you should
+leave it as-is.
+
+#### Sound Dampening
+I have an old mousepad laying around so I cut it into small pieces and placed it underneath the mounting bracket to
+reduce the vibration and provide a bit of sound dampening.
+
 
 ## Resources
 ### TMC2209 Info
