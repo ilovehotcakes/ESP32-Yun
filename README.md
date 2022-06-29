@@ -4,22 +4,24 @@ is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://w
 cover provides the ability to control your covers via your choice of smarthome hub/system (Alexa, HA, etc.). Currently,
 the ESP32 motorcover interfaces via WiFi/MQTT.
 
+
+## Motivation
 Commercial available motorized honeycomb cellular shades start around $250-$400 per unit but the quality in terms of
 the speed, noise level, build material, and user expreience are below my expectations. On the other hand, high end
 honeycomb shades are too expensive so I've decided to retrofit a motor in my existing cordless honeycomb shades. I've
 seen DIY projects for motorized roller shade/blind or tilting control for venetian blind but not for honeycomb shade.
-I believe it's because honeycomb shade is a heavier cover and, therefore, more challening to lift. This project focuses
-on using powerful (geared) NEMA motors and silent stepper driver TMC2209 to move heavier covers swiftly and silently
-within a reasonable budget.
+I believe the reason is that honeycomb shade is a heavier cover, therefore, more challenging to lift. This project
+focuses on using powerful (geared) NEMA motor and silent stepper driver TMC2209 to move heavier covers swiftly and
+silently within a reasonable budget.
 
 
 ## Parts List
 The exact parts I used to make 5 motorized shades. It was **~$92/unit** but if you own a 3D printer, some wires and
-screws, the cost can be lowered to **~$80/unit**. Since I need the motor to fit inside the top compartment of the 
-shades, I had to get the smaller NEMA 11 stepper motors with the 5.18:1 planetary gears to have enough power to lift
-the shades. If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for $10-$20/unit +
-free shipping. Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to
-manually solder the pads underneath.
+screws, the cost can be lowered to **~$80/unit**. Since the motor requires to fit inside the top compartment of the 
+shades, I had to get the smaller NEMA 11 stepper motors with the 5.18:1 planetary gears to have enough lifting power.
+If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit + free shipping.
+Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to manually solder
+the pads underneath.
 
 |Item                         |Cost (incl. tax)|Shipping|Subtotal   |Links  |
 |-----------------------------|---------------:|-------:|----------:|:-----:|
@@ -32,7 +34,7 @@ manually solder the pads underneath.
 |Solderless breadboard        |           $6.59|        |      $6.59|[[Amazon]](https://www.amazon.com/gp/product/B07LF71ZTS)|
 |Power supply                 |          $17.51|        |     $35.02|[[Amazon]](https://www.amazon.com/gp/product/B07N18XN84)|
 |Wires                        |          $14.86|        |     $14.86|[[Amazon]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket (Shapeways) |          $30.21|   $9.99|     $40.20|[[File]](resources/mounting_bracket_v3.stl)[[Mirrored File]](resources/mounting_bracket_v3_mirrored.stl)|
+|Mounting bracket (Shapeways) |          $30.21|   $9.99|     $40.20|[[STL File]](resources/mounting_bracket_v3.stl)[[Mirrored File]](resources/mounting_bracket_v3_mirrored.stl)|
 |Screws                       |          $10.00|        |        $10|       |
 |Total                        |                |        |**$460.63**|       |
 
@@ -41,15 +43,15 @@ manually solder the pads underneath.
 ### Connections
 You can use this without StallGuard 4. SG4 is a TMC2209 feature that enables the stepper motor to stop in an instance
 when it encounters a resistance. SG4 is convenient for setting the minimum position for the shades, i.e. sensorless homing.
-It might also be useful for protecting pets/children in the use case of motorized windows.
-![stallguard](images/esp32_motorcover.png)
+It is also useful for protecting pets/children in the case of motorized windows.
+![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
 
 ### Flashing firmware
 #### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your project.
+You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project.
 
-### WiFi and MQTT
+#### WiFi and MQTT
 https://www.home-assistant.io/integrations/cover.mqtt/
 #### MQTT commands
 * 0~100 percentage of position; 0 -> open, 100 -> close
