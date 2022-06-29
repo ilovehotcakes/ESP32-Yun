@@ -1,28 +1,28 @@
 # ESP32 Motorcover
 A ESP32-based DIY motorcover solution for smarthomes. A [cover](https://www.home-assistant.io/integrations/cover/)
-is a rollershutter, blinds, or window in [Home Assistant](https://www.home-assistant.io/). A motorized cover
-provides the possibility to control your covers via your choice of smarthome hub/system. Currently, the ESP32
-motorcover interfaces with the smarthome via MQTT. Home Assistant provides
+is a rollershutter, blinds, shades, window, etc. in [Home Assistant](https://www.home-assistant.io/). A motorized
+cover provides the ability to control your covers via your choice of smarthome hub/system. Currently, the ESP32
+motorcover interfaces with the smarthome via MQTT.
 
 
 ## Parts List
-Here are exact parts and costs to make 5 motorcovers. I spent ~$92 per motorcovers but if you
-have a 3D printer, extra wires and screws around, it will cost you ~$80 per motor covers.
+Here are the exact parts I used to make 5 motorized shades. It was ~$92 per motorcovers but if you own a 3D printer,
+some wires and screws, it will cost you ~$80 for one.
 
-|Name                       |Cost (incl. tax)|Shipping|Total  |Links  |
-|---------------------------|---------------:|-------:|------:|:-----:|
-|NEMA stepper motor         |         $166.70|  $33.12|$199.82|[[Link]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
-|ESP32 node mcu             |          $12.10|        | $60.50|[[Link]](https://www.amazon.com/dp/B0718T232Z)|
-|Buck convertor             |          $29.75|   $7.99| $37.74|[[Link]](https://www.mouser.com/ProductDetail/485-4739)|
-|TMC2209 UART stepper driver|          $34.12|        | $34.12|[[Link]](https://www.amazon.com/gp/product/B07YW7BM68)|
-|Coupling                   |          $14.96|        | $14.96|[[Link]](https://www.amazon.com/gp/product/B07MPFJGZW)|
-|100uF capacitor            |           $6.82|        |  $6.82|[[Link]](https://www.amazon.com/gp/product/B07Y3F194W)|
-|Solderless breadboard      |           $6.59|        |  $6.59|[[Link]](https://www.amazon.com/gp/product/B07LF71ZTS)|
-|Power supply               |          $17.51|        | $35.02|[[Link]](https://www.amazon.com/gp/product/B07N18XN84)|
-|Wires                      |          $14.86|        | $14.86|[[Link]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket           |          $30.21|   $9.99| $40.20|       |
-|Screws                     |          $10.00|        |    $10|       |
-|Total                      |                |        |$460.63|       |
+|Name                        |Cost (incl. tax)|Shipping|Subtotal|Links  |
+|----------------------------|---------------:|-------:|-------:|:-----:|
+|NEMA stepper motor          |          $33.34|  $33.12| $199.82|[[Link]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
+|ESP32 node mcu              |          $12.10|        |  $60.50|[[Link]](https://www.amazon.com/dp/B0718T232Z)|
+|Buck convertor              |           $5.95|   $7.99|  $37.74|[[Link]](https://www.mouser.com/ProductDetail/485-4739)|
+|TMC2209 UART stepper driver |          $34.12|        |  $34.12|[[Link]](https://www.amazon.com/gp/product/B07YW7BM68)|
+|Coupling                    |          $14.96|        |  $14.96|[[Link]](https://www.amazon.com/gp/product/B07MPFJGZW)|
+|100uF capacitor             |           $6.82|        |   $6.82|[[Link]](https://www.amazon.com/gp/product/B07Y3F194W)|
+|Solderless breadboard       |           $6.59|        |   $6.59|[[Link]](https://www.amazon.com/gp/product/B07LF71ZTS)|
+|Power supply                |          $17.51|        |  $35.02|[[Link]](https://www.amazon.com/gp/product/B07N18XN84)|
+|Wires                       |          $14.86|        |  $14.86|[[Link]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
+|Mounting bracket (Shapeways)|          $30.21|   $9.99|  $40.20|[[File]](resources/mounting_bracket_v3.stl)|
+|Screws                      |          $10.00|        |     $10|       |
+|Total                       |                |        | $460.63|       |
 
 
 ## Usage
