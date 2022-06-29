@@ -31,15 +31,23 @@ MotorState prevState = MOTOR_IDLE;
 bool isMotorRunning = false;
 bool flipDir = false;
 bool enableSG = true;  // Default false
+// bool quietMode = false;
 int sgThreshold = 10;
 int openingRMS = 475;
 int closingRMS = 475;
 
 
+void setMotorState(MotorState newState) {
+  prevState = currState;
+  currState = newState;
+}
+
+
 // For StallGuard
-#if defined(DIAG_PIN) && defined(RXD2)
+#ifdef DIAG_PIN
 void IRAM_ATTR stallguardInterrupt() {
   stepper->forceStop();
+  setMotorState(MOTOR_IDLE);
   LOGE("Motor stalled");
 }
 #endif
@@ -61,10 +69,10 @@ void motorSetup() {
   pinMode(STEP_PIN, OUTPUT);
 
   // Stepper driver setup
-  SERIAL_PORT.begin(115200);  // Initialize hardware serial for hardware UART driver
-  driver.begin();             // Begin sending data
-  driver.toff(4);             // Not used in StealthChop but required to enable the motor, 0=off
-  driver.pdn_disable(true);   // PDN_UART input disabled; set this bit when using the UART interface
+  SERIAL_PORT.begin(115200, SERIAL_8N1, 16, TXD2); // Initialize HardwareSerial for hardware UART driver; remapped TXD2 from GPIO 17 to GPIO 22
+  driver.begin();                 // Begin sending data
+  driver.toff(4);                 // Not used in StealthChop but required to enable the motor, 0=off
+  driver.pdn_disable(true);       // PDN_UART input disabled; set this bit when using the UART interface
   driver.rms_current(closingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
   driver.pwm_autoscale(true);     // Needed for StealthChop
   driver.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
@@ -73,11 +81,11 @@ void motorSetup() {
   driver.shaft(flipDir);
 
   // Use StallGuard if user specifies connection to DIAG_PIN && RXD2
-  #if defined(DIAG_PIN) && defined(RXD2)
+  #ifdef DIAG_PIN
   if (enableSG) {
     pinMode(DIAG_PIN, INPUT);
-    driver.semin(0);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0 is disable
-    driver.TCOOLTHRS((3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
+    driver.semin(0);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
+    driver.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
     driver.SGTHRS(sgThreshold);   // [0..255] the higher the more sensitive to stall
     attachInterrupt(DIAG_PIN, stallguardInterrupt, RISING);
   }
@@ -89,7 +97,7 @@ void motorSetup() {
   if (stepper) {
     stepper->setEnablePin(EN_PIN);
     stepper->setDirectionPin(DIR_PIN);
-    stepper->setSpeedInHz(max_speed);
+    stepper->setSpeedInHz(maxSpeed);
     stepper->setAcceleration(acceleration);
     stepper->setAutoEnable(true);
     stepper->setDelayToDisable(200);
@@ -129,16 +137,10 @@ void motorMove(int percent) {
 }
 
 
-void setMotorState(MotorState newState) {
-  prevState = currState;
-  currState = newState;
-}
-
-
 void motorMin() {
   setMotorState(MOTOR_MIN);
   driver.rms_current(openingRMS);
-  stepper->setSpeedInHz(max_speed);
+  stepper->setSpeedInHz(maxSpeed);
   motorMoveTo(0);
 }
 
@@ -146,7 +148,7 @@ void motorMin() {
 void motorMax() {
   setMotorState(MOTOR_MAX);
   driver.rms_current(closingRMS);
-  stepper->setSpeedInHz(max_speed);
+  stepper->setSpeedInHz(maxSpeed);
   motorMoveTo(maxPos);
 }
 
@@ -154,7 +156,7 @@ void motorMax() {
 void motorSetMin() {
   setMotorState(MOTOR_SET_MIN);
   driver.rms_current(openingRMS);
-  stepper->setSpeedInHz(max_speed / 4);
+  stepper->setSpeedInHz(maxSpeed / 4);
   prevPos = stepper->getCurrentPosition();
   stepper->setCurrentPosition(INT_MAX);
   LOGD("Motor setting new min position");
@@ -165,14 +167,14 @@ void motorSetMin() {
 void motorSetMax() {
   setMotorState(MOTOR_SET_MAX);
   driver.rms_current(closingRMS);
-  stepper->setSpeedInHz(max_speed / 4);
+  stepper->setSpeedInHz(maxSpeed / 4);
   maxPos = INT_MAX;
   LOGD("Motor setting new max position");
   motorMoveTo(INT_MAX);
 }
 
 
-// Returns current rounded position percentage. 0 is closed.
+// Returns current rounded position percentage. 0 is open; 100 is closed.
 // TODO: add inaccuracy mode
 int motorCurrentPercentage() {
   if (currPos == 0)
@@ -221,3 +223,16 @@ void motorRun() {
     }
   }
 }
+
+
+// void motorZero() {}
+// void motorSetCurrentPosition() {}
+// void motorSetSpeed() {}
+// void motorSetQuietModeSpeed() {}
+// void motorSetOpeningRMS() {}
+// void motorSetclosingRMS() {}
+// void motorSetDirection() {}
+// void motorEnableQuietmode() {}
+// void motorDisableQuietmode() {}
+// void motorEnableSG() {}
+// void motorDisableSG() {}
