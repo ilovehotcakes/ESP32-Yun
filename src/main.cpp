@@ -13,23 +13,19 @@
 #include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include "secrets.h"
+#define DONTCOMPILELOGS
+#include "logger.h"
 #include "motor.h"
+#if __has_include("ota.h")
+#include "ota.h"
+#endif
+#include "secrets.h"
 
-// Defining states for the state machine
-#define INITIALIZING      0
-#define RECONNECTING_WIFI 1
-#define CONNECTING_MQTT   2
-#define READ_MQTT_MSG     3
-// Defining commands recieved from MQTT
-#define COVER_STOP       -1
-#define COVER_OPEN       -2
-#define COVER_CLOSE      -3
-#define COVER_SET_MIN    -4
-#define COVER_SET_MAX    -5
-#define REBOOT_SYS       -99
-// Defining LED pin, it's tied to GPIO2 on HiLetGo board
-#define LED_PIN           2
+
+// States for the state machine
+enum CoverState { INITIALIZING, RECONNECTING_WIFI, CONNECTING_MQTT, READ_MQTT_MSG };
+// Commands recieved from MQTT
+enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_REBOOT=-99 };
 
 
 void core0Task(void * parameter);
@@ -38,14 +34,12 @@ void connectMqtt();
 void sendMqtt(String);
 
 
-bool VERBOSE = true;
 TaskHandle_t C0;  // For dual core setup
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
-Motor    motor;
-int      state = INITIALIZING;   // State machine to manage WiFi/MQTT
-String   ssid  = secretSSID;     // SSID (name) for WiFi
-String   pass  = secretPass;     // Network password for WiFi
+CoverState state = INITIALIZING;       // State machine to manage WiFi/MQTT
+String   ssid       = secretSSID;      // SSID (name) for WiFi
+String   pass       = secretPass;      // Network password for WiFi
 String   mqttID     = secretMqttID;    // MQTT ID for PubSubClient
 String   mqttUser   = secretMqttUser;  // MQTT server username (optional)
 String   mqttPass   = secretMqttPass;  // MQTT server password (optional)
@@ -55,14 +49,14 @@ String   inTopic    = secretInTopic;   // MQTT inbound topic
 String   outTopic   = secretOutTopic;  // MQTT outbound topic
 
 
-
 void setup() {
-  // Initialize hardware serial for debugging
-  if (VERBOSE) Serial.begin(9600);
-  
+  LOG_INIT(9600, LogLevel::INFO);
+
   // Initialized and turn on LED to indicate boot up
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
+
+  motorSetup();
 
   // Core 0 setup for dual core operation
   disableCore0WDT();  // Disable watchdog timer
@@ -72,7 +66,9 @@ void setup() {
   startWifi();
   state = CONNECTING_MQTT;
 
-  motor = Motor(sendMqtt);
+  #if __has_include("ota.h")
+  otaSetup();
+  #endif
 }
 
 
@@ -82,7 +78,7 @@ void setup() {
   reasons, the stepper doesn't run smoothly on core0.
 **/
 void loop() {
-  motor.run();
+  motorRun();
 }
 
 
@@ -110,7 +106,7 @@ void core0Task(void * parameter) {
         connectMqtt();
 
         // Update MQTT server of current shade opening position
-        sendMqtt((String) motor.currentPosition());
+        sendMqtt((String) motorCurrentPercentage());
 
         // Turn off LED to indicate fully connected
         digitalWrite(LED_PIN, LOW);
@@ -131,19 +127,22 @@ void core0Task(void * parameter) {
       break;
     }
     delay(100);
+
+    #if __has_include("ota.h")
+    ArduinoOTA.handle();
+    #endif
   }
 }
 
 
 // TODO: Add timeout and restart
 void startWifi() {
-  Serial.println("[E] Attempting to connect to WPA SSID: " + ssid);
+  LOGI("Attempting to connect to WPA SSID: %s", ssid.c_str());
 
   while (WiFi.begin(ssid.c_str(), pass.c_str()) != WL_CONNECTED)
     delay(5000);
   
-  Serial.print("[E] You're connected to the WiFi! IP: ");
-  Serial.println(WiFi.localIP());
+  LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
 }
 
 
@@ -152,21 +151,21 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   for (int i = 0; i < len; i++) message += (char) buf[i];
   int command = message.toInt();
 
-  Serial.println("Received message: " + message);
+  LOGI("Received message: %s", message);
 
-  if (command >= 0 && command <= 100) motor.percent(command);
-  else if (command == COVER_STOP) motor.stop();
-  else if (command == COVER_OPEN) motor.open();
-  else if (command == COVER_CLOSE) motor.close();
-  else if (command == COVER_SET_MAX) motor.setMax();
-  else if (command == COVER_SET_MIN) motor.setMin();
-  else if (command == REBOOT_SYS) ESP.restart();
+  if (command >= 0) motorMove(command);
+  else if (command == COVER_STOP) motorStop();
+  else if (command == COVER_OPEN) motorMin();
+  else if (command == COVER_CLOSE) motorMax();
+  else if (command == COVER_SET_MAX) motorSetMax();
+  else if (command == COVER_SET_MIN) motorSetMin();
+  else if (command == SYS_REBOOT) ESP.restart();
 }
 
 
 // TODO: add timeout and restart
 void connectMqtt() {
-  Serial.println("[E] Attempting to connect to MQTT broker: " + brokerIP);
+  LOGI("Attempting to connect to MQTT broker: %s", brokerIP.c_str());
 
   mqttClient.setServer(brokerIP.c_str(), brokerPort);
   
@@ -175,12 +174,11 @@ void connectMqtt() {
   mqttClient.subscribe(inTopic.c_str());
   mqttClient.setCallback(readMqtt);
 
-  Serial.println("[E] You're connected to the MQTT broker! Topic: " + inTopic);
+  LOGI("Connected to the MQTT broker, topic: %s", inTopic.c_str());
 }
 
 
 void sendMqtt(String message) {
   mqttClient.publish(secretOutTopic.c_str(), message.c_str());
-  Serial.println((String) "Sent message: " + message);
+  LOGI("Sent message: %s", message);
 }
-
