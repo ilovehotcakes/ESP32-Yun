@@ -56,11 +56,11 @@ You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [Pu
 Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 MCU via your choice of IDE. It is good to have the motor specifications for this part.
 
 ### MQTT
-* You will need a MQTT server/broker. You can run one on a rpi4 or via docker.
-* inTopic is where the motorcover will receive MQTT commands. For example, I set /server/shades/1 on the MQTT server
+You will need a MQTT server/broker. You can run one on a rpi4 or via docker.
+* inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server
   to send commands to the motorshade.
-* outTopic is where motorcover will send MQTT messages to update its state. For example, I set /client/shades/1 on the
-  MQTT server to receive messages from the motorshade.
+* outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on
+  the MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
 
 * MQTT Commands
