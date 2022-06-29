@@ -70,7 +70,7 @@ You will need a MQTT server/broker. You can run one on rpi4 or docker.
     *  -5  : set max position
     *  -99 : reboot system
 
-### 4. Tuning StallGuard 4 (Optionsal)
+### 4. Tuning StallGuard 4 (Optional)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
 * Set the minimum RMS current to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
@@ -79,7 +79,7 @@ If you decided to use SG, you will need some patience to tune it to be useable. 
 * Adjust the sensitivity of SG by changing sgThreshold.
 
 ## Sample Use Case - Honeycomb Cellular Shades
-#### Spring Dampening
+### Spring Dampening
 With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
 older design, which just contains an axle that is connected to 2-3 spools to lift the shade via an internal cord.
 It has a tape-like spring also connected to the axle to prevent it from dropping when the shade is retracted. I would
@@ -90,13 +90,13 @@ way to fix this issue is by leaving some of the weights in the shade so it dampe
 especially when retracting. If your motor is powerful enough to lift the cover without reduce the weight, then you
 should leave it as-is.
 
-#### Sound Dampening
+### Sound Dampening
 I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper motor mounting
 bracket to reduce the vibration and provide a bit of sound dampening. Most of noise comes from the spring retracting
 and the bearings of the stepper motor, which is unavoidable. Also, the slower the speed is, the quieter the motorshade
 becomes.
 
-#### Installation
+### Installation
 Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
 
 ## Resources
