@@ -44,6 +44,7 @@ the pads underneath.
 You can use this without StallGuard 4. SG4 is a TMC2209 feature that enables the stepper motor to stop in an instance
 when it encounters a resistance. SG4 is convenient for setting the minimum position for the shades, i.e. sensorless homing.
 It is also useful for protecting pets/children in the case of motorized windows.
+
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
 
@@ -51,29 +52,36 @@ It is also useful for protecting pets/children in the case of motorized windows.
 #### Dependencies
 You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project.
 
+#### Cloning this repo
+Clone this repo and look at the settings.
+
 #### WiFi and MQTT
-https://www.home-assistant.io/integrations/cover.mqtt/
+* You will need a MQTT server/broker.
+* Set inTopic
+* Set outTopic
+* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
+
 #### MQTT commands
-* 0~100 percentage of position; 0 -> open, 100 -> close
-* -1 stop
-* -2 open
-* -3 close
-* -4 set min position
-* -5 set max position
-* -99 reboot system
+* 0~100: move to position(%); 0 -> open, 100 -> close
+*  -1  : stop
+*  -2  : open
+*  -3  : close
+*  -4  : set min position
+*  -5  : set max position
+*  -99 : reboot system
 
 ### My Use Case
 #### Spring dampening
 
 ## Resources
 ### TMC2209 Info
-* [TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
+* [Trinamic TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
 * [BigTreeTech TMC2209 schematic](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/Schematic/TMC2209-V1.2.pdf)
 * [BigTreeTech TMC2209 manual](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/manual/TMC2209-V1.2-manual.pdf)
 * [Explaning TMC2209 settings](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/25)
 ### StallGuard Info
 * [How to connect TMC2209 for UART (stallguard)](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/14)
-* [More explanation on Stallguard](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
 * [How to connect UART for stallguard](https://forum.arduino.cc/t/tmcstepper-arduino-tmc2209/956036/9)
+* [Stallguard eaxmple](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
 ### ESP-now (future feature)
 * [ESP-now scanning devices](https://circuitcellar.com/research-design-hub/design-solutions/using-esp-now-protocol-part-1/)
