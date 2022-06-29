@@ -1,13 +1,18 @@
 # ESP32 Motorcover
-A ESP32-based DIY motorcover solution for smarthomes. A [cover](https://www.home-assistant.io/integrations/cover/)
-is a rollershutter, blinds, shades, window, etc. in [Home Assistant](https://www.home-assistant.io/). A motorized
-cover provides the ability to control your covers via your choice of smarthome hub/system. Currently, the ESP32
-motorcover interfaces with the smarthome via MQTT.
+A ESP32-based DIY motorcover solution for smarthomes. A [**cover**](https://www.home-assistant.io/integrations/cover/)
+is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://www.home-assistant.io/). A motorized
+cover provides the ability to control your covers via your choice of smarthome hub/system (Alexa, HA, etc.). Currently,
+the ESP32 motorcover interfaces with the smarthome via WiFi/MQTT.
+
+I've seen DIY motorized roller shade/blinds or motorized tilting control for venetian blinds but not DIY motorized
+honeycomb cellular shade. Commercial available motorized honeycomb cellular shades starts around $300-$400 per
+unit and the quality in terms of the speed, noise level, build material is below average. So I have decided to
+retrofit a motor in my cordless honeycomb shades.
 
 
 ## Parts List
-Here are the exact parts I used to make 5 motorized shades. It was ~$92 per motorcovers but if you own a 3D printer,
-some wires and screws, it will cost you ~$80 for one.
+The exact parts I used to make 5 motorized shades. It was ~$92 per motorcovers but if you own a 3D printer, some
+wires and screws, it will cost you ~$80 per unit.
 
 |Name                        |Cost (incl. tax)|Shipping|Subtotal|Links  |
 |----------------------------|---------------:|-------:|-------:|:-----:|
