@@ -63,10 +63,10 @@ Clone this repo and follow the instructions in [motor_settings.h](include/motor_
   MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
 
-#### MQTT Commands
-* 0~100: move to position(%); 0 -> open, 100 -> close
-*  -1  : stop
-*  -2  : open
+* #### MQTT Commands
+    * 0~100: move to position(%); 0 -> open, 100 -> close
+    *  -1  : stop
+    *  -2  : open
 *  -3  : close
 *  -4  : set min position
 *  -5  : set max position
