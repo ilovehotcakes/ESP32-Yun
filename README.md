@@ -27,6 +27,7 @@ have a 3D printer, extra wires and screws around, it will cost you ~$80 per moto
 
 ## Usage
 ### Connections
+![schematic](images/esp32_motorcover.png)
 
 ### Flashing firmware
 #### Dependencies
@@ -43,6 +44,8 @@ MQTT commands
 -5 set max position
 -99 reboot system
 
+### My use case
+#### Spring dampening
 
 ## Resources
 ### TMC2209 Info
