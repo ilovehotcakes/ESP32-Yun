@@ -2,32 +2,32 @@
 A ESP32-based DIY motorcover solution for smarthomes. A [**cover**](https://www.home-assistant.io/integrations/cover/)
 is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://www.home-assistant.io/). A motorized
 cover provides the ability to control your covers via your choice of smarthome hub/system (Alexa, HA, etc.). Currently,
-the ESP32 motorcover interfaces with the smarthome via WiFi/MQTT.
+the ESP32 motorcover interfaces via WiFi/MQTT.
 
-I've seen DIY motorized roller shade/blinds or motorized tilting control for venetian blinds but not DIY motorized
-honeycomb cellular shade. Commercial available motorized honeycomb cellular shades starts around $300-$400 per
-unit and the quality in terms of the speed, noise level, build material is below average. So I have decided to
-retrofit a motor in my cordless honeycomb shades.
+I've seen DIY motorized roller shade/blinds or motorized tilting control for venetian blinds around but not DIY
+motorized honeycomb cellular shade. Commercial available motorized honeycomb cellular shades starts around $300-$400
+per unit but the quality in terms of the speed, noise level, build material, and user expreience is below average.
+So I have decided to retrofit a motor in my cordless honeycomb shades.
 
 
 ## Parts List
 The exact parts I used to make 5 motorized shades. It was ~$92 per motorcovers but if you own a 3D printer, some
 wires and screws, it will cost you ~$80 per unit.
 
-|Name                        |Cost (incl. tax)|Shipping|Subtotal|Links  |
-|----------------------------|---------------:|-------:|-------:|:-----:|
-|NEMA stepper motor          |          $33.34|  $33.12| $199.82|[[Link]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
-|ESP32 node mcu              |          $12.10|        |  $60.50|[[Link]](https://www.amazon.com/dp/B0718T232Z)|
-|Buck convertor              |           $5.95|   $7.99|  $37.74|[[Link]](https://www.mouser.com/ProductDetail/485-4739)|
-|TMC2209 UART stepper driver |          $34.12|        |  $34.12|[[Link]](https://www.amazon.com/gp/product/B07YW7BM68)|
-|Coupling                    |          $14.96|        |  $14.96|[[Link]](https://www.amazon.com/gp/product/B07MPFJGZW)|
-|100uF capacitor             |           $6.82|        |   $6.82|[[Link]](https://www.amazon.com/gp/product/B07Y3F194W)|
-|Solderless breadboard       |           $6.59|        |   $6.59|[[Link]](https://www.amazon.com/gp/product/B07LF71ZTS)|
-|Power supply                |          $17.51|        |  $35.02|[[Link]](https://www.amazon.com/gp/product/B07N18XN84)|
-|Wires                       |          $14.86|        |  $14.86|[[Link]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket (Shapeways)|          $30.21|   $9.99|  $40.20|[[File]](resources/mounting_bracket_v3.stl)|
-|Screws                      |          $10.00|        |     $10|       |
-|Total                       |                |        | $460.63|       |
+|Name                         |Cost (incl. tax)|Shipping|Subtotal|Links  |
+|-----------------------------|---------------:|-------:|-------:|:-----:|
+|NEMA 11 bipolar stepper motor|          $33.34|  $33.12| $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
+|ESP32 node mcu               |          $12.10|        |  $60.50|[[Amazon]](https://www.amazon.com/dp/B0718T232Z)|
+|Buck convertor               |           $5.95|   $7.99|  $37.74|[[Mouser]](https://www.mouser.com/ProductDetail/485-4739)|
+|TMC2209 UART stepper driver  |          $34.12|        |  $34.12|[[Amazon]](https://www.amazon.com/gp/product/B07YW7BM68)|
+|Coupling                     |          $14.96|        |  $14.96|[[Amazon]](https://www.amazon.com/gp/product/B07MPFJGZW)|
+|100uF capacitor              |           $6.82|        |   $6.82|[[Amazon]](https://www.amazon.com/gp/product/B07Y3F194W)|
+|Solderless breadboard        |           $6.59|        |   $6.59|[[Amazon]](https://www.amazon.com/gp/product/B07LF71ZTS)|
+|Power supply                 |          $17.51|        |  $35.02|[[Amazon]](https://www.amazon.com/gp/product/B07N18XN84)|
+|Wires                        |          $14.86|        |  $14.86|[[Amazon]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
+|Mounting bracket (Shapeways) |          $30.21|   $9.99|  $40.20|[[File]](resources/mounting_bracket_v3.stl)[[Mirrored File]](resources/mounting_bracket_v3_mirrored.stl)|
+|Screws                       |          $10.00|        |     $10|       |
+|Total                        |                |        | $460.63|       |
 
 
 ## Usage
