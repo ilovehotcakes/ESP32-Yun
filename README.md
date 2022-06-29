@@ -6,13 +6,13 @@ the ESP32 motorcover interfaces via WiFi/MQTT.
 
 
 ## Motivation
-Commercial available motorized honeycomb cellular shades start around $250-$400 per unit but the quality in terms of
+Commercial available motorized honeycomb cellular shades start from $250-$400 per unit but the quality in terms of
 the speed, noise level, build material, and user expreience are below my expectations. On the other hand, high end
 honeycomb shades are too expensive so I've decided to retrofit a motor in my existing cordless honeycomb shades. I've
-seen DIY projects for motorized roller shade/blind or tilting control for venetian blind but not for honeycomb shade.
+seen DIY projects for motorized roller shade/blind and tilting control for venetian blind but not for honeycomb shade.
 I believe the reason is that honeycomb shade is a heavier cover, therefore, more challenging to lift. This project
 focuses on using powerful (geared) NEMA motor and silent stepper driver TMC2209 to move heavier covers swiftly and
-silently within a reasonable budget.
+more silently within a reasonable budget.
 
 
 ## Parts List
@@ -63,7 +63,7 @@ Clone this repo and follow the instructions in [motor_settings.h](include/motor_
   MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
 
-* **MQTT Commands**
+* MQTT Commands
     * 0~100: move to position(%); 0 -> open, 100 -> close
     *  -1  : stop
     *  -2  : open
@@ -71,6 +71,12 @@ Clone this repo and follow the instructions in [motor_settings.h](include/motor_
     *  -4  : set min position
     *  -5  : set max position
     *  -99 : reboot system
+
+### Tuning StallGuard 4
+If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
+* Set minimum RMS current to move your cover
+* Set acceleration low enough so it doesn't trip SG when the motor starts moving
+* Adjust the sensitivity of SG by changing sgThreshold
 
 ### My Use Case
 #### Spring Dampening

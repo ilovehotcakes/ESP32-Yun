@@ -16,7 +16,9 @@
 #define DONTCOMPILELOGS
 #include "logger.h"
 #include "motor.h"
+#if __has_include("ota.h")
 #include "ota.h"
+#endif
 #include "secrets.h"
 
 
@@ -65,7 +67,7 @@ void setup() {
   state = CONNECTING_MQTT;
 
   #if __has_include("ota.h")
-    otaSetup();
+  otaSetup();
   #endif
 }
 
@@ -127,7 +129,7 @@ void core0Task(void * parameter) {
     delay(100);
 
     #if __has_include("ota.h")
-      ArduinoOTA.handle();
+    ArduinoOTA.handle();
     #endif
   }
 }
