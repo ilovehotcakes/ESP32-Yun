@@ -63,27 +63,27 @@ Clone this repo and follow the instructions in [motor_settings.h](include/motor_
   MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
 
-* #### MQTT Commands
+* **MQTT Commands**
     * 0~100: move to position(%); 0 -> open, 100 -> close
     *  -1  : stop
     *  -2  : open
-*  -3  : close
-*  -4  : set min position
-*  -5  : set max position
-*  -99 : reboot system
+    *  -3  : close
+    *  -4  : set min position
+    *  -5  : set max position
+    *  -99 : reboot system
 
 ### My Use Case
 #### Spring Dampening
-With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is older
-design, which just contains an axle that is connected to 2-3 spools to lift the shade. It has a tape-like spring to
-prevent it from dropping when it is opened. It might be tempting to remove the spring but when the stepper motor is
+With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
+older design, which just contains an axle that is connected to 2-3 spools to lift the shade. It has a tape-like spring
+to prevent it from dropping when it is opened. It might be tempting to remove the spring but when the stepper motor is
 disabled, i.e. when no current is running through the motor, it is easy for the shade to fall by itself. So I would
 advise to keep it.
 
 When you keep the spring, I've discovered that the shade will "overshoot" when opening if all the weights are taken out
 of the shade. So one way to fix this issue is by leaving some of the weights in the shade so it dampens the bouncing
-effect when retracting. If your motor is powerful enough to lift the cover without reduce the weight, then you should
-leave it as-is.
+effect when stopping, especially when retracting. If your motor is powerful enough to lift the cover without reduce the
+weight, then you should leave it as-is.
 
 #### Sound Dampening
 I have an old mousepad laying around so I cut it into small pieces and placed it underneath the mounting bracket to
