@@ -38,12 +38,12 @@ int closingRMS = 475;
 
 
 // TODO: test
+#if defined(DIAG_PIN) && defined(RXD2)
 void IRAM_ATTR stallguardInterrupt() {
-  if (enableSG) {
-    stepper->forceStop();
-    Serial.println("[E] Motor stalled");
-  }
+  stepper->forceStop();
+  LOGE("Motor stalled");
 }
+#endif
 
 
 void loadMotorSettings() {
@@ -51,7 +51,7 @@ void loadMotorSettings() {
   maxPos = motorSettings.getInt("maxPos", 30000);
   currPos = motorSettings.getInt("currPos", 0);
   stepper->setCurrentPosition(currPos);
-  Serial.println((String) "[E] Motor settings loaded(curr/max): " + currPos + "/" + maxPos);
+  LOGI("Motor settings loaded(curr/max): %d/%d", currPos, maxPos);
 }
 
 
@@ -74,6 +74,7 @@ void motorSetup() {
   driver.shaft(flipDir);
 
   // Use StallGuard if user specifies
+  #if defined(DIAG_PIN) && defined(RXD2)
   if (enableSG) {
     pinMode(DIAG_PIN, INPUT);
     driver.semin(0);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0 is disable
@@ -81,6 +82,7 @@ void motorSetup() {
     driver.SGTHRS(sgThreshold);   // [0..255] the higher the more sensitive to stall
     attachInterrupt(DIAG_PIN, stallguardInterrupt, RISING);
   }
+  #endif
 
   // Stepper motor setup
   engine.init();
@@ -93,12 +95,12 @@ void motorSetup() {
     stepper->setAutoEnable(true);
     stepper->setDelayToDisable(200);
   } else {
-    Serial.println("[E] Please use a different GPIO pin for the STEP_PIN. The current pin is incompatible..");
+    LOGE("Please use a different GPIO pin for STEP_PIN. The current pin is incompatible..");
   }
 
   // Load current position and maximum position from motorSettings
   loadMotorSettings();
-  Serial.println("[E] Motor setup complete");
+  LOGI("Motor setup complete");
 }
 
 
@@ -117,7 +119,7 @@ void motorMoveTo(int newPos) {
   if (newPos != stepper->getCurrentPosition() && newPos <= maxPos) {
     stepper->moveTo(newPos);
     isMotorRunning = true;
-    Serial.println((String) "[I] Motor moving(tar/curr/max): " + newPos + "/" + currPos + "/" + maxPos);
+    LOGD("Motor moving(tar/curr/max): %d/%d/%d", newPos, stepper->getCurrentPosition(), maxPos);
   }
 }
 
@@ -155,7 +157,7 @@ void motorSetMin() {
   stepper->setSpeedInHz(max_speed / 4);
   prevPos = stepper->getCurrentPosition();
   stepper->setCurrentPosition(INT_MAX);
-  Serial.println("[I] Motor setting new min position");
+  LOGD("Motor setting new min position");
   motorMoveTo(0);
 }
 
@@ -165,7 +167,7 @@ void motorSetMax() {
   driver.rms_current(closingRMS);
   stepper->setSpeedInHz(max_speed / 4);
   maxPos = INT_MAX;
-  Serial.println("[I] Motor setting new max position");
+  LOGD("Motor setting new max position");
   motorMoveTo(INT_MAX);
 }
 
@@ -191,18 +193,19 @@ void updatePosition() {
   if (prevState == MOTOR_SET_MAX) {
     maxPos = stepper->getCurrentPosition();
     motorSettings.putInt("maxPos", maxPos);
-    Serial.println((String) "[I] Set max position, new max position: " + maxPos);
+    LOGD("Set max position, new max position: %d", maxPos);
   } else if (prevState == MOTOR_SET_MIN) {
     int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
     maxPos = maxPos + distanceTraveled - prevPos;
     motorSettings.putInt("maxPos", maxPos);
     stepper->setCurrentPosition(0);
-    Serial.println((String) "[I] Set min position, new max position: " + maxPos);
+    LOGD("Set min position, new max position: %d", maxPos);
   }
 
   setMotorState(MOTOR_IDLE);
   currPos = stepper->getCurrentPosition();
   motorSettings.putInt("currPos", currPos);
+  LOGD("Motor stopped(curr/max): %d/%d", currPos, maxPos);
 }
 
 
@@ -213,7 +216,6 @@ void motorRun() {
       isMotorRunning = false;
 
       updatePosition();
-      Serial.println((String) "[I] Motor stopped(curr/max): " + currPos + "/" + maxPos);
 
       sendMqtt((String) motorCurrentPercentage());
     }

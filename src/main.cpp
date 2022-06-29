@@ -13,16 +13,17 @@
 #include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#define DONTCOMPILELOGS
+#include "logger.h"
 #include "motor.h"
 #include "ota.h"
 #include "secrets.h"
 
-// 0 = no debug, 1 = [E]rror messages only, 2 = [E] and [I]nfo messages
-enum LogLevel { NONE=0, ERROR=1, INFO=2 };
+
 // States for the state machine
 enum CoverState { INITIALIZING, RECONNECTING_WIFI, CONNECTING_MQTT, READ_MQTT_MSG };
 // Commands recieved from MQTT
-enum CoverCommand { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_REBOOT=-99};
+enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_REBOOT=-99 };
 
 
 void core0Task(void * parameter);
@@ -34,9 +35,9 @@ void sendMqtt(String);
 TaskHandle_t C0;  // For dual core setup
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
-CoverState state = INITIALIZING;   // State machine to manage WiFi/MQTT
-String   ssid    = secretSSID;     // SSID (name) for WiFi
-String   pass    = secretPass;     // Network password for WiFi
+CoverState state = INITIALIZING;       // State machine to manage WiFi/MQTT
+String   ssid       = secretSSID;      // SSID (name) for WiFi
+String   pass       = secretPass;      // Network password for WiFi
 String   mqttID     = secretMqttID;    // MQTT ID for PubSubClient
 String   mqttUser   = secretMqttUser;  // MQTT server username (optional)
 String   mqttPass   = secretMqttPass;  // MQTT server password (optional)
@@ -44,13 +45,11 @@ String   brokerIP   = secretBrokerIP;  // IP of MQTT server
 uint16_t brokerPort = secretBrokerPort;
 String   inTopic    = secretInTopic;   // MQTT inbound topic
 String   outTopic   = secretOutTopic;  // MQTT outbound topic
-LogLevel verbose    = INFO;
 
 
 void setup() {
-  // Initialize hardware serial for debugging
-  if (verbose) Serial.begin(9600);
-  
+  LOG_INIT(9600, LogLevel::INFO);
+
   // Initialized and turn on LED to indicate boot up
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
@@ -136,13 +135,12 @@ void core0Task(void * parameter) {
 
 // TODO: Add timeout and restart
 void startWifi() {
-  if (verbose) Serial.println("[E] Attempting to connect to WPA SSID: " + ssid);
+  LOGI("Attempting to connect to WPA SSID: %s", ssid.c_str());
 
   while (WiFi.begin(ssid.c_str(), pass.c_str()) != WL_CONNECTED)
     delay(5000);
   
-  if (verbose) Serial.print("[E] You're connected to the WiFi! IP: ");
-  Serial.println(WiFi.localIP());
+  LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
 }
 
 
@@ -151,7 +149,7 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   for (int i = 0; i < len; i++) message += (char) buf[i];
   int command = message.toInt();
 
-  if (verbose >= INFO) Serial.println("[I] Received message: " + message);
+  LOGI("Received message: %s", message);
 
   if (command >= 0) motorMove(command);
   else if (command == COVER_STOP) motorStop();
@@ -165,7 +163,7 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
 
 // TODO: add timeout and restart
 void connectMqtt() {
-  if (verbose) Serial.println("[E] Attempting to connect to MQTT broker: " + brokerIP);
+  LOGI("Attempting to connect to MQTT broker: %s", brokerIP.c_str());
 
   mqttClient.setServer(brokerIP.c_str(), brokerPort);
   
@@ -174,11 +172,11 @@ void connectMqtt() {
   mqttClient.subscribe(inTopic.c_str());
   mqttClient.setCallback(readMqtt);
 
-  if (verbose) Serial.println("[E] Connected to the MQTT broker! Topic: " + inTopic);
+  LOGI("Connected to the MQTT broker, topic: %s", inTopic.c_str());
 }
 
 
 void sendMqtt(String message) {
   mqttClient.publish(secretOutTopic.c_str(), message.c_str());
-  if (verbose >= INFO) Serial.println((String) "[I] Sent message: " + message);
+  LOGI("Sent message: %s", message);
 }
