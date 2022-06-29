@@ -40,23 +40,24 @@ the pads underneath.
 
 
 ## Usage
-### Connections
-You can use this without StallGuard 4. SG4 is a TMC2209 feature that enables the stepper motor to stop in an instance
-when it encounters a resistance. SG4 is convenient for setting the minimum position for the shades, i.e. sensorless homing.
-It is also useful for protecting pets/children in the case of motorized windows.
+### 1. Hardware Connections
+You can use this without StallGuard 4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
+when it encounters a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
+homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
+DIAG_PIN and TXD2 if you aren't planning to use SG.
 
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
 
-### Flashing Firmware
+### 2. Flashing Firmware
 #### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project.
+You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project. I'm using VSCode + PlatformIO so I need to added the libraries to my project as well.
 
 #### Adding WiFi/MQTT Credentials and Setting Motor Specs
-Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 MCU via your choice of IDE. It is handy to have the motor specifications for this part.
+Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
 
-### MQTT
-You will need a MQTT server/broker. You can run one on rpi4 or via docker.
+### 3. Sending Commands via MQTT
+You will need a MQTT server/broker. You can run one on rpi4 or docker.
 * inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
 * outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
@@ -71,9 +72,11 @@ You will need a MQTT server/broker. You can run one on rpi4 or via docker.
 
 ### Tuning StallGuard 4
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set minimum RMS current to move your cover
-* Set acceleration low enough so it doesn't trip SG when the motor starts moving
-* Adjust the sensitivity of SG by changing sgThreshold
+* Set minimum RMS current to move your cover.
+* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
+ moving. Sometimes the voltage is not high enough to accelerate to max speed and trips SG. I had to use 12V to make sure
+ the motor accelerates up to max speed.
+* Adjust the sensitivity of SG by changing sgThreshold.
 
 ### My Use Case
 #### Spring Dampening
@@ -89,11 +92,11 @@ effect when stopping, especially when retracting. If your motor is powerful enou
 weight, then you should leave it as-is.
 
 #### Sound Dampening
-I have an old mousepad laying around so I cut it into small pieces and placed it underneath the mounting bracket to
-reduce the vibration and provide a bit of sound dampening.
+I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper mortor mounting
+bracket to reduce the vibration and provide a bit of sound dampening.
 
 #### Reinstallation
-Hiding the cables.
+Hiding the power cables and added cuttings of old mousepad between the window frame and the shade mounting brackets.
 
 ## Resources
 ### TMC2209 Info
