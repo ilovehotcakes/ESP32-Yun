@@ -1,13 +1,18 @@
 /**
-  Motorized Cover - ESP32
-  Aurthor: Jason Chen
+  ESP32 Motorcover
+  Aurthor: Jason Chen, 2022
 
   A simple ESP32 program that let's user control powerful and quiet stepper
-  motors via MQTT. You use it to open and close blinds/shades, etc. Can be
-  used with Alexa or Home Assistant.
+  motors via MQTT. You use it to open/close blinds, shades, etc. Can be used
+  with Alexa or Home Assistant.
 
   This program utilizes TMC2209 drivers for the stepper motor and it drives
   NEMA stepper motors.
+
+  You can copy the BasicOTA example from the Arduino example library and paste
+  it into a file named "ota.h". Exlude the wifi setup and "loop()"; rename 
+  "setup()"" to "otaSetup()" and include it in the src folder to enable OTA
+  updates. Useful for wireless updates.
 **/
 #include <Arduino.h>
 #include <math.h>
@@ -34,7 +39,7 @@ void connectMqtt();
 void sendMqtt(String);
 
 
-TaskHandle_t C0;  // For dual core setup
+TaskHandle_t C0;  // Task for core 0
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 CoverState state = INITIALIZING;       // State machine to manage WiFi/MQTT
@@ -50,6 +55,7 @@ String   outTopic   = secretOutTopic;  // MQTT outbound topic
 
 
 void setup() {
+  // Start log
   LOG_INIT(9600, LogLevel::INFO);
 
   // Initialized and turn on LED to indicate boot up
@@ -73,9 +79,8 @@ void setup() {
 
 
 /**
-  Keeps running the motor and checks if there is any messages avaiable to
-  publish to MQTT server. The motor must run in the loop. For some unknown
-  reasons, the stepper doesn't run smoothly on core0.
+  Keeps running the motor task. For unknown reasons, the stepper doesn't run as
+  smoothly on core 0.
 **/
 void loop() {
   motorRun();
@@ -105,7 +110,7 @@ void core0Task(void * parameter) {
 
         connectMqtt();
 
-        // Update MQTT server of current shade opening position
+        // Update MQTT server of current shade position upon reconnection
         sendMqtt((String) motorCurrentPercentage());
 
         // Turn off LED to indicate fully connected
