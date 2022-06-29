@@ -70,7 +70,7 @@ You will need a MQTT server/broker. You can run one on rpi4 or docker.
     *  -5  : set max position
     *  -99 : reboot system
 
-### Tuning StallGuard 4
+### 4. Tuning StallGuard 4
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
 * Set minimum RMS current to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
@@ -78,7 +78,7 @@ If you decided to use SG, you will need some patience to tune it to be useable. 
  the motor accelerates up to max speed.
 * Adjust the sensitivity of SG by changing sgThreshold.
 
-### My Use Case
+### 5. Sample Use Case - Honeycomb Cellular Shades
 #### Spring Dampening
 With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
 older design, which just contains an axle that is connected to 2-3 spools to lift the shade. It has a tape-like spring
