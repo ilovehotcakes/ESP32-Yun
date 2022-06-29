@@ -51,7 +51,7 @@ DIAG_PIN and TXD2 if you aren't planning to use SG.
 
 ### 2. Flashing Firmware
 #### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project. I'm using VSCode + PlatformIO so I need to added the libraries to my project as well.
+You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project. I'm using VSCode + PlatformIO so I need to add the libraries to my project as well.
 
 #### Adding WiFi/MQTT Credentials and Setting Motor Specs
 Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
@@ -70,43 +70,44 @@ You will need a MQTT server/broker. You can run one on rpi4 or docker.
     *  -5  : set max position
     *  -99 : reboot system
 
-### 4. Tuning StallGuard 4
+### 4. Tuning StallGuard 4 (Optionsal)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set minimum RMS current to move your cover.
+* Set the minimum RMS current to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
- moving. Sometimes the voltage is not high enough to accelerate to max speed and trips SG. I had to use 12V to make sure
- the motor accelerates up to max speed.
+ moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
+ to make sure the motor accelerates up to max speed.
 * Adjust the sensitivity of SG by changing sgThreshold.
 
-### 5. Sample Use Case - Honeycomb Cellular Shades
+## Sample Use Case - Honeycomb Cellular Shades
 #### Spring Dampening
 With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
-older design, which just contains an axle that is connected to 2-3 spools to lift the shade. It has a tape-like spring
-to prevent it from dropping when it is opened. It might be tempting to remove the spring but when the stepper motor is
-disabled, i.e. when no current is running through the motor, it is easy for the shade to fall by itself. So I would
-advise to keep it.
+older design, which just contains an axle that is connected to 2-3 spools to lift the shade via an internal cord.
+It has a tape-like spring also connected to the axle to prevent it from dropping when the shade is retracted. I would
+advise to keep it to prevent the shade from falling by itself when there is no holding current through the motor.
 
-When you keep the spring, I've discovered that the shade will "overshoot" when opening if all the weights are taken out
-of the shade. So one way to fix this issue is by leaving some of the weights in the shade so it dampens the bouncing
-effect when stopping, especially when retracting. If your motor is powerful enough to lift the cover without reduce the
-weight, then you should leave it as-is.
+When you keep the spring, I've discovered that the shade will "overshoot" when opening if the shade is too light. One
+way to fix this issue is by leaving some of the weights in the shade so it dampens the bouncing effect when stopping,
+especially when retracting. If your motor is powerful enough to lift the cover without reduce the weight, then you
+should leave it as-is.
 
 #### Sound Dampening
-I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper mortor mounting
-bracket to reduce the vibration and provide a bit of sound dampening.
+I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper motor mounting
+bracket to reduce the vibration and provide a bit of sound dampening. Most of noise comes from the spring retracting
+and the bearings of the stepper motor, which is unavoidable. Also, the slower the speed is, the quieter the motorshade
+becomes.
 
-#### Reinstallation
-Hiding the power cables and added cuttings of old mousepad between the window frame and the shade mounting brackets.
+#### Installation
+Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
 
 ## Resources
 ### TMC2209 Info
 * [Trinamic TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
 * [BigTreeTech TMC2209 schematic](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/Schematic/TMC2209-V1.2.pdf)
 * [BigTreeTech TMC2209 manual](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/manual/TMC2209-V1.2-manual.pdf)
-* [Explaning TMC2209 settings](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/25)
+* [TMC2209 settings explanation](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/25)
 ### StallGuard Info
-* [How to connect TMC2209 for UART (stallguard)](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/14)
-* [How to connect UART for stallguard](https://forum.arduino.cc/t/tmcstepper-arduino-tmc2209/956036/9)
-* [Stallguard eaxmple](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
+* [How to connect TMC2209 for UART (StallGuard)](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/14)
+* [How to connect TMC2209 for UART (StallGuard) 2](https://forum.arduino.cc/t/tmcstepper-arduino-tmc2209/956036/9)
+* [StallGuard example code](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
 ### ESP-now (future feature)
 * [ESP-now scanning devices](https://circuitcellar.com/research-design-hub/design-solutions/using-esp-now-protocol-part-1/)
