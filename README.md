@@ -3,7 +3,7 @@
 ### Parts
 |name                       |cost  |shipping|total |link|
 |---------------------------|------|--------|------|----|
-|Stepper motor              |166.70|   33.12|199.82|[link]:https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5 |
+|Stepper motor              |166.70|   33.12|199.82|[link](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
 |ESP32 node mcu             | 12.10|        | 60.50|    https://www.amazon.com/dp/B0718T232Z |
 |Voltage step down convertor| 29.75|    7.99| 37.74|    https://www.mouser.com/ProductDetail/485-4739 |
 |Stepper driver             | 34.12|        | 34.12|    https://www.amazon.com/gp/product/B07YW7BM68 |
