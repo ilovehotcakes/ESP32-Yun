@@ -1,27 +1,27 @@
 # ESP32 Motorcover
 A ESP32-based DIY motorcover solution for smarthomes. A [**cover**](https://www.home-assistant.io/integrations/cover/)
 is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://www.home-assistant.io/). A motorized
-cover provides the ability to control your covers via your choice of smarthome hub/system (Alexa, HA, etc.). Currently,
-the ESP32 motorcover interfaces via WiFi/MQTT.
+cover provides the ability to control your covers via your choice of smarthome hub/system (HA, Alexa, etc.). Currently,
+the ESP32 motorcover interfaces via WiFi/MQTT. In the future, I'm looking switch it over to GET requests and ESP now.
 
 
 ## Motivation
 Commercial available motorized honeycomb cellular shades start from $250-$400 per unit but the quality in terms of
-the speed, noise level, build material, and user expreience are below my expectations. On the other hand, high end
-honeycomb shades are too expensive so I've decided to retrofit a motor in my existing cordless honeycomb shades. I've
-seen DIY projects for motorized roller shade/blind and tilting control for venetian blind but not for honeycomb shade.
-I believe the reason is that honeycomb shade is a heavier cover, therefore, more challenging to lift. This project
+the speed, noise level, build material, and user expreience are below my expectations. On the other hand, premium
+honeycomb cellular shades are too expensive so I've decided DIY my existing cordless honeycomb shades. There're DIY
+projects for motorized roller shade/blind and tilting control for venetian blind but not for honeycomb shade. I
+believe the reason is that honeycomb shade is a heavier cover, therefore, more challenging to lift. This project
 focuses on using powerful (geared) NEMA motor and silent stepper driver TMC2209 to move heavier covers swiftly and
-more silently within a reasonable budget.
+silently within a reasonable budget.
 
 
 ## Parts List
 The exact parts I used to make 5 motorized shades. It was **~$92/unit** but if you own a 3D printer, some wires and
 screws, the cost can be lowered to **~$80/unit**. Since the motor requires to fit inside the top compartment of the 
-shades, I had to get the smaller NEMA 11 stepper motors with the 5.18:1 planetary gears to have enough lifting power.
-If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit + free shipping.
-Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to manually solder
-the pads underneath.
+shades, NEMA 11 stepper motors with the 5.18:1 planetary gears is the optimal choice to be small and still have enough
+torque. If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit + free
+shipping. Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to 
+manually solder the pads underneath.
 
 |Item                         |Cost (incl. tax)|Shipping|Subtotal   |Links  |
 |-----------------------------|---------------:|-------:|----------:|:-----:|
@@ -42,7 +42,7 @@ the pads underneath.
 ## Usage
 ### 1. Hardware Connections
 You can use this without StallGuard 4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
-when it encounters a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
+when encountering a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
 homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
 DIAG_PIN and TXD2 if you aren't planning to use SG.
 
@@ -61,14 +61,14 @@ You will need a MQTT server/broker. You can run one on rpi4 or docker.
 * inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
 * outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
-* MQTT Commands:
-    * 0~100: move to position(%); 0 -> open, 100 -> close
-    *  -1  : stop
-    *  -2  : open
-    *  -3  : close
-    *  -4  : set min position
-    *  -5  : set max position
-    *  -99 : reboot system
+* **MQTT Commands:**
+    * **0~100: move to position(%);** 0 -> open, 100 -> close
+    *  **-1  : stop**
+    *  **-2  : open**
+    *  **-3  : close**
+    *  **-4  : set min position**
+    *  **-5  : set max position**
+    *  **-99 : reboot system**
 
 ### 4. Tuning StallGuard 4 (Optional)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
