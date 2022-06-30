@@ -48,7 +48,6 @@ DIAG_PIN and TXD2 if you aren't planning to use SG.
 
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
-
 ### 2. Flashing Firmware
 #### Dependencies
 You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project. I'm using VSCode + PlatformIO so I need to add the libraries to my project as well.
