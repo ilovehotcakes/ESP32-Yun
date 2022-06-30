@@ -79,19 +79,19 @@ to make sure the motor accelerates up to max speed.
 
 ## Sample Use Case - Honeycomb Cellular Shades
 ### Spring Dampening
-With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
-older design, which just contains an axle that is connected to 2-3 spools to lift the shade via an internal cord.
-It has a tape-like spring also connected to the axle to prevent the shade from dropping when the shade is retracted.
-I would advise to keep it to prevent the shade from falling by itself when the motor's holding current is cut.
+With cordless honeycomb cellular shades, there are a couple of different designs for the cordless mechanism. Mine is an
+older simpler design, which just contains an axle driving 2-3 spools to lift the shade via an internal cord. It has a
+tape-like spring connected to the axle to prevents the shade from dropping when it is retracted. I would advise to keep
+it to prevent the shade from falling by itself when the motor's holding current is cut.
 
 With the spring, I've discovered that the shade will "overshoot" when opening if the shade is too light because the
-spring is pulling in the same direction as the motor and it causes a bouncing effect when the motor is stopping. One
-way to fix this issue is by adding weights in the shade so it dampens the bouncing effect. My shades all come with 2
-metal rods and 2 weights each at the bottom. I took out the weights so the motor requires less torque to lift the
+spring is pulling in the same direction as the motor and causing a bouncing effect when the motor is stopped. One way
+to fix this issue is by adding weights at the bottom of the shade so it dampens the bouncing effect. My shades all come
+with 2 metal rods and weights each at the bottom. I took out the weights so the motor requires less torque to lift the
 shades. If your motor is powerful enough to lift the cover without reducing the weight, leave it as-is; if your cover
 overshoots when retracting, add some weights.
 
-### Sound Dampening
+### Sound/Vibration Dampening
 I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper motor mounting
 bracket to reduce the vibration and provide a bit of sound dampening. Most of noise comes from the spring retracting
 and the bearings of the stepper motor, which is unavoidable. Also, the slower the speed is, the quieter the motorshade
