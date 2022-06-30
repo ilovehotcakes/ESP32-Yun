@@ -81,19 +81,21 @@ to make sure the motor accelerates up to max speed.
 ### Spring Dampening
 With cordless honeycomb cellular shades, there a couple of different designs for the cordless mechanism. Mine is an
 older design, which just contains an axle that is connected to 2-3 spools to lift the shade via an internal cord.
-It has a tape-like spring also connected to the axle to prevent it from dropping when the shade is retracted. I would
-advise to keep it to prevent the shade from falling by itself when there is no holding current through the motor.
+It has a tape-like spring also connected to the axle to prevent the shade from dropping when the shade is retracted.
+I would advise to keep it to prevent the shade from falling by itself when the motor's holding current is cut.
 
-When you keep the spring, I've discovered that the shade will "overshoot" when opening if the shade is too light. One
-way to fix this issue is by leaving some of the weights in the shade so it dampens the bouncing effect when stopping,
-especially when retracting. If your motor is powerful enough to lift the cover without reduce the weight, then you
-should leave it as-is.
+With the spring, I've discovered that the shade will "overshoot" when opening if the shade is too light because the
+spring is pulling in the same direction as the motor and it causes a bouncing effect when the motor is stopping. One
+way to fix this issue is by adding weights in the shade so it dampens the bouncing effect. My shades all come with 2
+metal rods and 2 weights each at the bottom. I took out the weights so the motor requires less torque to lift the
+shades. If your motor is powerful enough to lift the cover without reducing the weight, leave it as-is; if your cover
+overshoots when retracting, add some weights.
 
 ### Sound Dampening
 I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper motor mounting
 bracket to reduce the vibration and provide a bit of sound dampening. Most of noise comes from the spring retracting
 and the bearings of the stepper motor, which is unavoidable. Also, the slower the speed is, the quieter the motorshade
-becomes.
+is.
 
 ### Installation
 Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
