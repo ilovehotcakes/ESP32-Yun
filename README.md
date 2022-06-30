@@ -44,19 +44,19 @@ manually solder the pads underneath.
 You can use this without StallGuard 4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
 when encountering a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
 homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
-**DIAG_PIN** and **TXD2** if you aren't planning to use SG.
+**DIAG_PIN** and **TXD2** if you don't planning on using SG.
 
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
 ### 2. Flashing Firmware
 #### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library/project. I'm using VSCode + PlatformIO so I need to add the libraries to my project as well.
+You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library. I'm using VSCode + PlatformIO so I need to add the libraries to my project as well.
 
 #### Adding WiFi/MQTT Credentials and Setting Motor Specs
 Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
 
 ### 3. Sending Commands via MQTT
-You will need a MQTT server/broker. You can run one on rpi4 or docker.
+You will need a MQTT server/broker. You can run one on rpi4 or a docker.
 * inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
 * outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
@@ -71,10 +71,10 @@ You will need a MQTT server/broker. You can run one on rpi4 or docker.
 
 ### 4. Tuning StallGuard 4 (Optional)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set the minimum RMS current to move your cover.
+* Set the minimum RMS current required to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
- moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
- to make sure the motor accelerates up to max speed.
+moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
+to make sure the motor accelerates up to max speed.
 * Adjust the sensitivity of SG by changing sgThreshold.
 
 ## Sample Use Case - Honeycomb Cellular Shades
