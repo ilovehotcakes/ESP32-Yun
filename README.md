@@ -44,7 +44,7 @@ manually solder the pads underneath.
 You can use this without StallGuard 4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
 when encountering a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
 homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
-DIAG_PIN and TXD2 if you aren't planning to use SG.
+**DIAG_PIN** and **TXD2** if you aren't planning to use SG.
 
 ![stallguard](images/esp32_motorcover_stallguard.png)
 ![no_stallguard](images/esp32_motorcover.png)
