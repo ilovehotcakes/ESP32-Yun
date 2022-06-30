@@ -16,16 +16,16 @@ silently within a reasonable budget.
 
 
 ## Parts List
-The exact parts I used to make 5 motorized shades. It was **~$92/unit** but if you own a 3D printer, some wires and
-screws, the cost can be lowered to **~$80/unit**. Since the motor requires to fit inside the top compartment of the 
-shades, NEMA 11 stepper motors with the 5.18:1 planetary gears is the optimal choice to be small and still have enough
-torque. If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit + free
-shipping. Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to 
+These are the exact parts I used to make 5 motorized shades. It was **~$92/unit** but if you own a 3D printer, some
+wires and screws, the cost can be lowered to **~$80/unit**. Since the motor requires to fit inside the top compartment
+of the shades, NEMA 11 stepper motors with the 5.18:1 planetary gears is the optimal choice to be small and still have
+enough torque. If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit +
+free shipping. Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to
 manually solder the pads underneath.
 
-|Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links  |
-|-----------------------------|---------------:|:------:|-------:|----------:|:-----:|
-|NEMA 11 bipolar stepper motor|          $33.34|       5|  $33.12|    $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
+|Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
+|-----------------------------|---------------:|:------:|-------:|----------:|:---:|
+|NEMA bipolar stepper motor   |          $33.34|       5|  $33.12|    $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
 |ESP32 node mcu               |          $12.10|       5|        |     $60.50|[[Amazon]](https://www.amazon.com/dp/B0718T232Z)|
 |Buck convertor               |           $5.95|       5|   $7.99|     $37.74|[[Mouser]](https://www.mouser.com/ProductDetail/485-4739)|
 |TMC2209 UART stepper driver  |          $34.12|       1|        |     $34.12|[[Amazon]](https://www.amazon.com/gp/product/B07YW7BM68)|
@@ -34,9 +34,9 @@ manually solder the pads underneath.
 |Solderless breadboard        |           $6.59|       1|        |      $6.59|[[Amazon]](https://www.amazon.com/gp/product/B07LF71ZTS)|
 |Power supply                 |          $17.51|       2|        |     $35.02|[[Amazon]](https://www.amazon.com/gp/product/B07N18XN84)|
 |Wires                        |          $14.86|       1|        |     $14.86|[[Amazon]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket (Shapeways) |           $6.04|       5|   $9.99|     $40.20|[[STL File]](resources/mounting_bracket_v3.stl)[[Mirrored File]](resources/mounting_bracket_v3_mirrored.stl)|
-|Screws                       |          $10.00|       1|        |        $10|       |
-|Total                        |                |        |        |**$460.63**|       |
+|Mounting bracket (Shapeways) |           $6.04|       5|   $9.99|     $40.20|[[STL File]](resources/mounting_bracket_v3.stl)[[Mirrored]](resources/mounting_bracket_v3_mirrored.stl)|
+|Screws                       |          $10.00|       1|        |        $10|     |
+|Total                        |                |        |        |**$460.63**|     |
 
 
 ## Usage
