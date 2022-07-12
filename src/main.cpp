@@ -30,7 +30,7 @@
 // States for the state machine
 enum CoverState { INITIALIZING, RECONNECTING_WIFI, CONNECTING_MQTT, READ_MQTT_MSG };
 // Commands recieved from MQTT
-enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_REBOOT=-99 };
+enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_RESET=-98, SYS_REBOOT=-99 };
 
 
 void core0Task(void * parameter);
@@ -164,6 +164,7 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   else if (command == COVER_CLOSE) motorMax();
   else if (command == COVER_SET_MAX) motorSetMax();
   else if (command == COVER_SET_MIN) motorSetMin();
+  else if (command == SYS_RESET) motorResetSettings();
   else if (command == SYS_REBOOT) ESP.restart();
 }
 
