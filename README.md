@@ -99,6 +99,11 @@ is.
 
 ### Installation
 Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
+![controller](images/assembled_controller.jpg)
+![mounts](images/mounts.jpg)
+![motor_in_mount](images/motor_in_mount.jpg)
+![motor_installed](images/motorr_installed.png)
+![controller_installed](images/controller_installed.jpg)
 
 ## Resources
 ### TMC2209 Info
