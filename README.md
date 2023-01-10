@@ -102,7 +102,7 @@ Here are some photos of the assembled controller using all off-the-shelf compone
 ![controller](images/assembled_controller.jpg)
 ![mounts](images/mounts.jpg)
 ![motor_in_mount](images/motor_in_mount.jpg)
-![motor_installed](images/motor_installed.png)
+![motor_installed](images/motor_installed.jpg)
 ![controller_installed](images/controller_installed.jpg)
 
 ## Resources
