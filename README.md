@@ -98,11 +98,11 @@ and the bearings of the stepper motor, which is unavoidable. Also, the slower th
 is.
 
 ### Installation
-Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
+Here are some photos of the assembled controller using all off-the-shelf components. The 3D file for the mounting bracket can be found under the resource folder.
 ![controller](images/assembled_controller.jpg)
 ![mounts](images/mounts.jpg)
 ![motor_in_mount](images/motor_in_mount.jpg)
-![motor_installed](images/motorr_installed.png)
+![motor_installed](images/motor_installed.png)
 ![controller_installed](images/controller_installed.jpg)
 
 ## Resources
