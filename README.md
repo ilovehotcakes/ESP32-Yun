@@ -4,6 +4,9 @@ is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://w
 cover provides the ability to control your covers via your choice of smarthome hub/system (HA, Alexa, etc.). Currently,
 the ESP32 motorcover interfaces via WiFi/MQTT. HTTP GET requests and ESP-now are coming in the near future.
 
+https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4
+
+
 
 ## Motivation
 Commercial available motorized honeycomb cellular shades start from $250-$400 per unit but the quality in terms of
@@ -98,7 +101,12 @@ and the bearings of the stepper motor, which is unavoidable. Also, the slower th
 is.
 
 ### Installation
-Hiding the power cables and adding cutouts of old mousepad between the window frame and the shade mounting brackets.
+Here are some photos of the assembled controller using all off-the-shelf components. The 3D file for the mounting bracket can be found under the resource folder.
+![controller](images/assembled_controller.jpg)
+![mounts](images/mounts.jpg)
+![motor_in_mount](images/motor_in_mount.jpg)
+![motor_installed](images/motor_installed.jpg)
+![controller_installed](images/controller_installed.jpg)
 
 ## Resources
 ### TMC2209 Info
