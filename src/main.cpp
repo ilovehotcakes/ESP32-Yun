@@ -18,7 +18,7 @@
 #include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
-#define DONTCOMPILELOGS
+// #define DONTCOMPILELOGS
 #include "logger.h"
 #include "motor.h"
 #if __has_include("ota.h")
@@ -30,11 +30,12 @@
 // States for the state machine
 enum CoverState { INITIALIZING, RECONNECTING_WIFI, CONNECTING_MQTT, READ_MQTT_MSG };
 // Commands recieved from MQTT
-enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_REBOOT=-99 };
+enum Command { COVER_STOP=-1, COVER_OPEN=-2, COVER_CLOSE=-3, COVER_SET_MIN=-4, COVER_SET_MAX=-5, SYS_RESET=-98, SYS_REBOOT=-99 };
 
 
 void core0Task(void * parameter);
 void startWifi();
+void connectWifi(WiFiEvent_t event, WiFiEventInfo_t info);
 void connectMqtt();
 void sendMqtt(String);
 
@@ -69,8 +70,8 @@ void setup() {
   xTaskCreatePinnedToCore(core0Task, "Core_0", 8192, NULL, 1, &C0, 0);
 
   // Start the WiFi connection
+  WiFi.onEvent(connectWifi, SYSTEM_EVENT_STA_DISCONNECTED);
   startWifi();
-  state = CONNECTING_MQTT;
 
   #if __has_include("ota.h")
   otaSetup();
@@ -98,7 +99,7 @@ void core0Task(void * parameter) {
       case RECONNECTING_WIFI:
         // Turn on LED to indicate disconnected
         digitalWrite(LED_PIN, HIGH);
-        
+
         // Wait for reconnection
         if (WiFi.status() == WL_CONNECTED)
           state = CONNECTING_MQTT;
@@ -146,8 +147,19 @@ void startWifi() {
 
   while (WiFi.begin(ssid.c_str(), pass.c_str()) != WL_CONNECTED)
     delay(5000);
-  
+
+  state = CONNECTING_MQTT;
+
   LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
+}
+
+
+void connectWifi(WiFiEvent_t event, WiFiEventInfo_t info) {
+  LOGI("Disconnected to WiFi");
+
+  WiFi.begin(ssid.c_str(), pass.c_str());
+
+  LOGI("Reconnected to WiFi");
 }
 
 
@@ -164,6 +176,7 @@ void readMqtt(char* topic, byte* buf, unsigned int len) {
   else if (command == COVER_CLOSE) motorMax();
   else if (command == COVER_SET_MAX) motorSetMax();
   else if (command == COVER_SET_MIN) motorSetMin();
+  else if (command == SYS_RESET) motorResetSettings();
   else if (command == SYS_REBOOT) ESP.restart();
 }
 

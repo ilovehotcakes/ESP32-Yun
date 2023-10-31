@@ -34,5 +34,12 @@
 const float gearboxRatio = 5.18;          // Use 1 if stepper motor doesn't have a gearbox
 const int microsteps = 8;                 // 8 microsteps per full step
 const int stepsPerRev = 200 * gearboxRatio * microsteps;  // NEMA motors have 200 full steps per rev
-const int maxSpeed = stepsPerRev * 1.2;   // Max speed in Hz
-const int acceleration = maxSpeed * 0.75; // Use lower value if using SG
+const int maxSpeed = stepsPerRev * 0.7;   // Max speed in Hz
+const int acceleration = maxSpeed * 0.6; // Use lower value if using SG
+
+bool flipDir = false;
+bool enableSG = true;  // Default false
+// bool quietMode = false;
+int sgThreshold = 10;
+int openingRMS = 550;
+int closingRMS = 200;  // 1, 3: 200; 2: 400; 4: 300

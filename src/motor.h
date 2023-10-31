@@ -29,12 +29,6 @@ int prevPos = 0;
 MotorState currState = MOTOR_IDLE;
 MotorState prevState = MOTOR_IDLE;
 bool isMotorRunning = false;
-bool flipDir = false;
-bool enableSG = true;  // Default false
-// bool quietMode = false;
-int sgThreshold = 10;
-int openingRMS = 475;
-int closingRMS = 475;
 
 
 void setMotorState(MotorState newState) {
@@ -47,19 +41,24 @@ void setMotorState(MotorState newState) {
 #ifdef DIAG_PIN
 void IRAM_ATTR stallguardInterrupt() {
   stepper->forceStop();
-  setMotorState(MOTOR_IDLE);
   LOGE("Motor stalled");
 }
 #endif
 
 
 // Load motor settings from flash
-void loadMotorSettings() {
+void motorLoadSettings() {
   motorSettings.begin("local", false);
   maxPos = motorSettings.getInt("maxPos", 30000);
   currPos = motorSettings.getInt("currPos", 0);
   stepper->setCurrentPosition(currPos);
   LOGI("Motor settings loaded(curr/max): %d/%d", currPos, maxPos);
+}
+
+
+void motorResetSettings() {
+  motorSettings.clear();
+  ESP.restart();
 }
 
 
@@ -73,7 +72,7 @@ void motorSetup() {
   driver.begin();                 // Begin sending data
   driver.toff(4);                 // Not used in StealthChop but required to enable the motor, 0=off
   driver.pdn_disable(true);       // PDN_UART input disabled; set this bit when using the UART interface
-  driver.rms_current(closingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
+  driver.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
   driver.pwm_autoscale(true);     // Needed for StealthChop
   driver.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
   driver.blank_time(24);          // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
@@ -84,7 +83,8 @@ void motorSetup() {
   #ifdef DIAG_PIN
   if (enableSG) {
     pinMode(DIAG_PIN, INPUT);
-    driver.semin(0);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
+    driver.semin(4);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
+    driver.semax(0);              // Refer to p58 of the datasheet
     driver.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
     driver.SGTHRS(sgThreshold);   // [0..255] the higher the more sensitive to stall
     attachInterrupt(DIAG_PIN, stallguardInterrupt, RISING);
@@ -106,7 +106,7 @@ void motorSetup() {
   }
 
   // Load current position and maximum position from motorSettings
-  loadMotorSettings();
+  motorLoadSettings();
   LOGI("Motor setup complete");
 }
 
@@ -122,7 +122,7 @@ int percentToSteps(int percent) {
 void motorMoveTo(int newPos) {
   if ((prevState == MOTOR_MAX && currState == MOTOR_MIN)
   || (prevState == MOTOR_MIN && currState == MOTOR_MAX))
-    stepper->forceStop();
+    stepper->stopMove();
   
   if (newPos != stepper->getCurrentPosition() && newPos <= maxPos) {
     stepper->moveTo(newPos);
@@ -133,6 +133,7 @@ void motorMoveTo(int newPos) {
 
 
 void motorMove(int percent) {
+  // if openingRMS vs closingRMS
   motorMoveTo(percentToSteps(percent));
 }
 
@@ -187,16 +188,15 @@ int motorCurrentPercentage() {
 void motorStop() {
   stepper->forceStop();
   stepper->moveTo(stepper->getCurrentPosition());
-  setMotorState(MOTOR_IDLE);
 }
 
 
 void updatePosition() {
-  if (prevState == MOTOR_SET_MAX) {
+  if (currState == MOTOR_SET_MAX) {
     maxPos = stepper->getCurrentPosition();
     motorSettings.putInt("maxPos", maxPos);
     LOGD("Set max position, new max position: %d", maxPos);
-  } else if (prevState == MOTOR_SET_MIN) {
+  } else if (currState == MOTOR_SET_MIN) {
     int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
     maxPos = maxPos + distanceTraveled - prevPos;
     motorSettings.putInt("maxPos", maxPos);
