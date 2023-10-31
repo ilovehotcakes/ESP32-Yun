@@ -40,7 +40,6 @@ void setMotorState(MotorState newState) {
 // For StallGuard
 #ifdef DIAG_PIN
 void IRAM_ATTR stallguardInterrupt() {
-  setMotorState(MOTOR_IDLE);
   stepper->forceStop();
   LOGE("Motor stalled");
 }
@@ -73,7 +72,7 @@ void motorSetup() {
   driver.begin();                 // Begin sending data
   driver.toff(4);                 // Not used in StealthChop but required to enable the motor, 0=off
   driver.pdn_disable(true);       // PDN_UART input disabled; set this bit when using the UART interface
-  driver.rms_current(closingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
+  driver.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
   driver.pwm_autoscale(true);     // Needed for StealthChop
   driver.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
   driver.blank_time(24);          // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
@@ -134,6 +133,7 @@ void motorMoveTo(int newPos) {
 
 
 void motorMove(int percent) {
+  // if openingRMS vs closingRMS
   motorMoveTo(percentToSteps(percent));
 }
 
@@ -188,16 +188,15 @@ int motorCurrentPercentage() {
 void motorStop() {
   stepper->forceStop();
   stepper->moveTo(stepper->getCurrentPosition());
-  setMotorState(MOTOR_IDLE);
 }
 
 
 void updatePosition() {
-  if (prevState == MOTOR_SET_MAX) {
+  if (currState == MOTOR_SET_MAX) {
     maxPos = stepper->getCurrentPosition();
     motorSettings.putInt("maxPos", maxPos);
     LOGD("Set max position, new max position: %d", maxPos);
-  } else if (prevState == MOTOR_SET_MIN) {
+  } else if (currState == MOTOR_SET_MIN) {
     int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
     maxPos = maxPos + distanceTraveled - prevPos;
     motorSettings.putInt("maxPos", maxPos);
