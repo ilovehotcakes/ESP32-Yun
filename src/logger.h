@@ -1,3 +1,4 @@
+#pragma once
 /**
   logger.h - A simple Serial.println wrapper
   Aurthor: Jason Chen, 2022
@@ -45,6 +46,7 @@ void printDbg(String, String, String, const char*, ...);
 
 void Logger(int baudRate, LogLevel ll) {
   Serial.begin(baudRate);
+  while(!Serial);  // Wait for serial port to connect
   logLevel = ll;
 }
 
