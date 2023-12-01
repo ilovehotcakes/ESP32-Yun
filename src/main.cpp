@@ -15,7 +15,6 @@
 #include "logger.h"
 #include "motor_task.h"
 #include "wireless_task.h"
-#include "peripheral_connections.h"
 
 // #if __has_include("ota.h")
 //     #include "ota.h"

@@ -11,7 +11,6 @@
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 #include "logger.h"
-#include "peripheral_connections.h"
 #include "secrets.h"
 
 
@@ -43,7 +42,7 @@ private:
     void sendMqtt(String message);
 
     WiFiClient  wifi_client_;
-    PubSubClient mqttClient_;
+    PubSubClient mqtt_client_;
     String   ssid_          = secretSSID;      // SSID (name) for WiFi
     String   password_      = secretPass;      // Network password for WiFi
     String   mqtt_id_       = secretMqttID;    // MQTT ID for PubSubClient
