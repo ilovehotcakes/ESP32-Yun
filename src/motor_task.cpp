@@ -187,16 +187,15 @@ void MotorTask::updatePosition() {
 
 void MotorTask::run() {
     Serial.println(stepper->getCurrentPosition());
-    stepper->move(20000);
+    stepper->move(-20000);
     Serial.println(stepper->targetPos());
 
     while (1) {
         if (is_motor_running_) {
-            vTaskDelay(1);
             if (!stepper->isRunning()) {
                 is_motor_running_ = false;
 
-                updatePosition();
+                // updatePosition();
 
                 // sendMqtt((String) motorCurrentPercentage());
             }
