@@ -1,8 +1,14 @@
 #pragma once
+/**
+    wireless_task.h - A class that contains all stepper motor attribute and controls.
+    Author: Jason Chen, 2023
 
+    WirelessTask establishes and maintains WiFi connection and MQTT connection.
+**/
 #include <Arduino.h>
 #include <WiFi.h>
 #include <PubSubClient.h> // Mqtt
+#include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 #include "logger.h"
 #include "peripheral_connections.h"
