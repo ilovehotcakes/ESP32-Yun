@@ -1,18 +1,20 @@
+#if DONTCOMPILELOGS  // if defined, exclude Serial.println statements when compiling
+
 #include "logger.h"
 
 
-LogLevel logLevel = LogLevel::DEBUG;
+LogLevel log_level = LogLevel::DEBUG;
 
 
-void Logger(int baudRate, LogLevel ll) {
-    Serial.begin(baudRate);
+void Logger(int baud_rate, LogLevel log_level) {
+    Serial.begin(baud_rate);
     while(!Serial);  // Wait for serial port to connect
-    logLevel = ll;
+    log_level = log_level;
 }
 
 
-void print(LogLevel ll, String s) {
-    if (ll <= logLevel) Serial.println(s);
+void print(LogLevel log_level, String s) {
+    if (log_level <= log_level) Serial.println(s);
 }
 
 
@@ -53,3 +55,5 @@ void printDbg(String file, String line, String func, const char* s, ...) {
 
 	print(LogLevel::DEBUG, prefix + String(buf));
 }
+
+#endif

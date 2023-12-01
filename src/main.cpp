@@ -12,7 +12,6 @@
     include it in the src folder to enable OTA updates. Useful for wireless updates.
 **/
 #include <Arduino.h>
-// #define DONTCOMPILELOGS
 #include "logger.h"
 #include "motor_task.h"
 #include "wireless_task.h"
