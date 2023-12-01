@@ -1,12 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
-#include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h> // Mqtt
-#include <FunctionalInterrupt.h>  // std:bind()
-#include "logger.h"
 #include "task.h"
+#include "logger.h"
 #include "peripheral_connections.h"
 #include "secrets.h"
 
