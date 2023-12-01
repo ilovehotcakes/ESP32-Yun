@@ -8,7 +8,10 @@ MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core
     current_state_ = MOTOR_IDLE;
     previous_state_ = MOTOR_IDLE;
     is_motor_running_ = false;
+}
 
+
+void MotorTask::run() {
     // TMCStepper driver setup
     pinMode(EN_PIN, OUTPUT);
     pinMode(DIR_PIN, OUTPUT);
@@ -39,20 +42,33 @@ MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core
     // FastAccelStepper setup
     engine.init();
     stepper = engine.stepperConnectToPin(STEP_PIN);
-    if (stepper) {
-        stepper->setEnablePin(EN_PIN);
-        stepper->setDirectionPin(DIR_PIN);
-        stepper->setSpeedInHz(maxSpeed);
-        stepper->setAcceleration(acceleration);
-        stepper->setAutoEnable(true);
-        stepper->setDelayToDisable(200);
-    } else {
-        // LOGE("Please use a different GPIO pin for STEP_PIN. The current pin is incompatible..");
-    }
+    assert("Failed to instantiate FastAccelStepper. Please try a different GPIO for STEP_PIN." && stepper);
+    stepper->setEnablePin(EN_PIN);
+    stepper->setDirectionPin(DIR_PIN);
+    stepper->setSpeedInHz(maxSpeed);
+    stepper->setAcceleration(acceleration);
+    stepper->setAutoEnable(true);
+    stepper->setDelayToDisable(200);
+
+    LOGI("Motor setup complete");
 
     // Load current position and maximum position from motor_setting_
     // loadSettings();
-    // LOGI("Motor setup complete");
+    Serial.println(stepper->getCurrentPosition());
+    stepper->move(-20000);
+    Serial.println(stepper->targetPos());
+
+    while (1) {
+        if (is_motor_running_) {
+            if (!stepper->isRunning()) {
+                is_motor_running_ = false;
+
+                updatePosition();
+
+                // sendMqtt((String) motorCurrentPercentage());
+            }
+        }
+    }
 }
 
 
@@ -60,7 +76,7 @@ MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core
 #ifdef DIAG_PIN
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
     stepper->forceStop();
-    // LOGE("Motor stalled");
+    LOGE("Motor stalled");
 }
 #endif
 
@@ -76,7 +92,7 @@ void MotorTask::loadSettings() {
     max_position_ = motor_setting_.getInt("max_position_", 30000);
     current_position_ = motor_setting_.getInt("current_position_", 0);
     stepper->setCurrentPosition(current_position_);
-    // LOGI("Motor settings loaded(curr/max): %d/%d", current_position_, max_position_);
+    LOGI("Motor settings loaded(curr/max): %d/%d", current_position_, max_position_);
 }
 
 
@@ -101,7 +117,7 @@ void MotorTask::moveTo(int newPos) {
     if (newPos != stepper->getCurrentPosition() && newPos <= max_position_) {
         stepper->moveTo(newPos);
         is_motor_running_ = true;
-        // LOGD("Motor moving(tar/curr/max): %d/%d/%d", newPos, stepper->getCurrentPosition(), max_position_);
+        LOGD("Motor moving(tar/curr/max): %d/%d/%d", newPos, stepper->getCurrentPosition(), max_position_);
     }
 }
 
@@ -134,7 +150,7 @@ void MotorTask::setMin() {
     stepper->setSpeedInHz(maxSpeed / 4);
     previous_position_ = stepper->getCurrentPosition();
     stepper->setCurrentPosition(INT_MAX);
-    // LOGD("Motor setting new min position");
+    LOGD("Motor setting new min position");
     moveTo(0);
 }
 
@@ -144,7 +160,7 @@ void MotorTask::setMax() {
     driver.rms_current(closingRMS);
     stepper->setSpeedInHz(maxSpeed / 4);
     max_position_ = INT_MAX;
-    // LOGD("Motor setting new max position");
+    LOGD("Motor setting new max position");
     moveTo(INT_MAX);
 }
 
@@ -169,36 +185,17 @@ void MotorTask::updatePosition() {
     if (current_state_ == MOTOR_SET_MAX) {
         max_position_ = stepper->getCurrentPosition();
         motor_setting_.putInt("max_position_", max_position_);
-        // LOGD("Set max position, new max position: %d", max_position_);
+        LOGD("Set max position, new max position: %d", max_position_);
     } else if (current_state_ == MOTOR_SET_MIN) {
         int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
         max_position_ = max_position_ + distanceTraveled - previous_position_;
         motor_setting_.putInt("max_position_", max_position_);
         stepper->setCurrentPosition(0);
-        // LOGD("Set min position, new max position: %d", max_position_);
+        LOGD("Set min position, new max position: %d", max_position_);
     }
 
     setMotorState(MOTOR_IDLE);
     current_position_ = stepper->getCurrentPosition();
     motor_setting_.putInt("current_position_", current_position_);
-    // LOGD("Motor stopped(curr/max): %d/%d", current_position_, max_position_);
-}
-
-
-void MotorTask::run() {
-    Serial.println(stepper->getCurrentPosition());
-    stepper->move(-20000);
-    Serial.println(stepper->targetPos());
-
-    while (1) {
-        if (is_motor_running_) {
-            if (!stepper->isRunning()) {
-                is_motor_running_ = false;
-
-                // updatePosition();
-
-                // sendMqtt((String) motorCurrentPercentage());
-            }
-        }
-    }
+    LOGD("Motor stopped(curr/max): %d/%d", current_position_, max_position_);
 }

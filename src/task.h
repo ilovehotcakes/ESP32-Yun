@@ -38,7 +38,7 @@ public:
 
     void init() {
         BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name, stackDepth, this, priority, &taskHandle, coreID);
-        assert("Failed to create task" && result == pdPASS);
+        assert("Failed to create task." && result == pdPASS);
     }
 
 private:
