@@ -32,7 +32,6 @@ void WirelessTask::run() {
 }
 
 
-// TODO: Add timeout and restart, watchdog timer
 void WirelessTask::connectWifi() {
     // Turn on LED to indicate disconnected
     digitalWrite(LED_PIN, HIGH);
@@ -51,7 +50,6 @@ void WirelessTask::connectWifi() {
 }
 
 
-// TODO: add timeout and restart, watchdog timer
 void WirelessTask::connectMqtt() {
     // Turn on LED to indicate disconnected
     digitalWrite(LED_PIN, HIGH);
@@ -63,7 +61,8 @@ void WirelessTask::connectMqtt() {
     while(!mqttClient_.connect(mqtt_id_.c_str(), mqtt_user_.c_str(), mqtt_password_.c_str()));
 
     mqttClient_.subscribe(in_topic_.c_str());
-    // mqttClient_.setCallback(readMqtt);
+    mqttClient_.setCallback(std::bind(&WirelessTask::readMqtt, this,
+                            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     LOGI("Connected to the MQTT broker, topic: %s", in_topic_.c_str());
 
@@ -73,10 +72,12 @@ void WirelessTask::connectMqtt() {
 
 void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
     String message = "";
-    for (int i = 0; i < len; i++) message += (char) buf[i];
+    for (int i = 0; i < len; i++) {
+        message += (char) buf[i];
+    }
     // int command = message.toInt();
 
-    // LOGI("Received message: %s", message);
+    LOGI("Received message: %s", message);
 
     // if (command >= 0) motor_task.move(command);
     // else if (command == COVER_STOP) motor_task.stop();
@@ -90,6 +91,6 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
 
 void WirelessTask::sendMqtt(String message) {
-    mqttClient_.publish(secretOutTopic.c_str(), message.c_str());
+    mqttClient_.publish(out_topic_.c_str(), message.c_str());
     LOGI("Sent message: %s", message);
 }
