@@ -58,12 +58,12 @@ private:
     FastAccelStepper *stepper = NULL;
     Preferences motor_setting_;
 
-    bool is_motor_running_;
-    uint32_t max_position_;
-    uint32_t current_position_;
-    uint32_t previous_position_;
-    MotorState current_state_;
-    MotorState previous_state_;
+    bool is_motor_running_ = false;
+    uint32_t max_position_ = 0;
+    uint32_t current_position_  = 0;
+    uint32_t previous_position_ = 0;
+    MotorState current_state_  = MOTOR_IDLE;
+    MotorState previous_state_ = MOTOR_IDLE;
 
     int percentToSteps(int percent) const; // Helper function to calculate position percentage to steps
     void loadSettings(); // Load motor settings from flash

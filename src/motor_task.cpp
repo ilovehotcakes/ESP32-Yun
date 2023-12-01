@@ -1,14 +1,7 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core} {
-    max_position_ = 0;
-    current_position_ = 0;
-    previous_position_ = 0;
-    current_state_ = MOTOR_IDLE;
-    previous_state_ = MOTOR_IDLE;
-    is_motor_running_ = false;
-}
+MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core} {}
 
 
 void MotorTask::run() {
@@ -59,14 +52,12 @@ void MotorTask::run() {
     Serial.println(stepper->targetPos());
 
     while (1) {
-        if (is_motor_running_) {
-            if (!stepper->isRunning()) {
-                is_motor_running_ = false;
+        if (is_motor_running_ && !stepper->isRunning()) {
+            is_motor_running_ = false;
 
-                updatePosition();
+            updatePosition();
 
-                // sendMqtt((String) motorCurrentPercentage());
-            }
+            // sendMqtt((String) motorCurrentPercentage());
         }
     }
 }
