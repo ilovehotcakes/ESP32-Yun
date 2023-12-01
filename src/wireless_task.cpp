@@ -3,26 +3,25 @@
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
         Task{"Wireless", 8192, 1, task_core},
-        mqttClient_(wifi_client_)
-{}
+        mqtt_client_(wifi_client_) {}
 
 
 void WirelessTask::run() {
     disableCore0WDT();  // Disable watchdog timer
 
     while (1) {
-        // Check wifi connection
+        // Check WiFi connection
         if (WiFi.status() != WL_CONNECTED) {
             connectWifi();
         }
 
-        // Check mqtt connection
-        if (!mqttClient_.connected()) {
+        // Check MQTT connection
+        if (!mqtt_client_.connected()) {
             connectMqtt();
         }
 
         // Use non blocking method to check for messages
-        mqttClient_.loop();
+        mqtt_client_.loop();
 
         // TODO
         // #if __has_include("ota.h")
@@ -39,7 +38,7 @@ void WirelessTask::connectWifi() {
     LOGI("Attempting to connect to WPA SSID: %s", ssid_.c_str());
 
     WiFi.disconnect();
-    WiFi.mode(WIFI_STA);
+    // WiFi.mode(WIFI_STA);
     WiFi.begin(ssid_.c_str(), password_.c_str());
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -56,12 +55,12 @@ void WirelessTask::connectMqtt() {
 
     LOGI("Attempting to connect to MQTT broker: %s", broker_ip_.c_str());
 
-    mqttClient_.setServer(broker_ip_.c_str(), broker_port_);
+    mqtt_client_.setServer(broker_ip_.c_str(), broker_port_);
     
-    while(!mqttClient_.connect(mqtt_id_.c_str(), mqtt_user_.c_str(), mqtt_password_.c_str()));
+    while(!mqtt_client_.connect(mqtt_id_.c_str(), mqtt_user_.c_str(), mqtt_password_.c_str()));
 
-    mqttClient_.subscribe(in_topic_.c_str());
-    mqttClient_.setCallback(std::bind(&WirelessTask::readMqtt, this,
+    mqtt_client_.subscribe(in_topic_.c_str());
+    mqtt_client_.setCallback(std::bind(&WirelessTask::readMqtt, this,
                             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     LOGI("Connected to the MQTT broker, topic: %s", in_topic_.c_str());
@@ -91,6 +90,6 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
 
 void WirelessTask::sendMqtt(String message) {
-    mqttClient_.publish(out_topic_.c_str(), message.c_str());
+    mqtt_client_.publish(out_topic_.c_str(), message.c_str());
     LOGI("Sent message: %s", message);
 }
