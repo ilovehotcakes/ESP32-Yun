@@ -30,11 +30,26 @@ enum MotorState {
 };
 
 
+// Commands recieved from MQTT
+enum Command {
+    COVER_STOP    = -1,
+    COVER_OPEN    = -2,
+    COVER_CLOSE   = -3,
+    COVER_SET_MIN = -4,
+    COVER_SET_MAX = -5,
+    SYS_RESET     = -98,
+    SYS_REBOOT    = -99
+};
+
+
 class MotorTask : public Task<MotorTask> {
     friend class Task<MotorTask>;
 
 public:
     MotorTask(const uint8_t task_core);
+    ~MotorTask();
+    void addListener(QueueHandle_t queue);
+    QueueHandle_t getMotorCommandQueue();
     void move(int percent);
     void stop();
     void min();
@@ -58,10 +73,13 @@ private:
     FastAccelStepper *stepper = NULL;
     Preferences motor_setting_;
 
+    QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
+    QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
+
     bool is_motor_running_ = false;
-    uint32_t max_position_ = 0;
-    uint32_t current_position_  = 0;
-    uint32_t previous_position_ = 0;
+    uint32_t max_pos_ = 0;
+    uint32_t current_pos_  = 0;
+    uint32_t previous_pos_ = 0;
     MotorState current_state_  = MOTOR_IDLE;
     MotorState previous_state_ = MOTOR_IDLE;
 

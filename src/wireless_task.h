@@ -14,23 +14,14 @@
 #include "secrets.h"
 
 
-// Commands recieved from MQTT
-enum Command {
-    COVER_STOP    = -1,
-    COVER_OPEN    = -2,
-    COVER_CLOSE   = -3,
-    COVER_SET_MIN = -4,
-    COVER_SET_MAX = -5,
-    SYS_RESET     = -98,
-    SYS_REBOOT    = -99
-};
-
-
 class WirelessTask : public Task<WirelessTask> {
     friend class Task<WirelessTask>;
 
 public:
     WirelessTask(const uint8_t task_core);
+    ~WirelessTask();
+    void addListener(QueueHandle_t queue);
+    QueueHandle_t getWirelessMessageQueue();
 
 protected:
     void run();
@@ -40,6 +31,9 @@ private:
     void connectMqtt();
     void readMqtt(char* topic, byte* buf, unsigned int len);
     void sendMqtt(String message);
+
+    QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
+    QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;

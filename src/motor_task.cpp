@@ -1,7 +1,15 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core} {}
+MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 4096, 1, task_core} {
+    motor_command_queue_ = xQueueCreate(1, sizeof(int));
+    assert("Failed to create motor_command_queue_" && motor_command_queue_ != NULL);
+}
+
+
+MotorTask::~MotorTask() {
+    vQueueDelete(motor_command_queue_);
+}
 
 
 void MotorTask::run() {
@@ -43,21 +51,29 @@ void MotorTask::run() {
     stepper->setAutoEnable(true);
     stepper->setDelayToDisable(200);
 
-    LOGI("Motor setup complete");
-
     // Load current position and maximum position from motor_setting_
-    // loadSettings();
-    Serial.println(stepper->getCurrentPosition());
-    stepper->move(-20000);
-    Serial.println(stepper->targetPos());
+    loadSettings();
 
     while (1) {
+        int command = -50;
+        if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
+            LOGD("MotorTask received command from motor_command_queue_: %i", command);
+            
+            if (command >= 0) move(command);
+            else if (command == COVER_STOP) stop();
+            else if (command == COVER_OPEN) min();
+            else if (command == COVER_CLOSE) max();
+            else if (command == COVER_SET_MAX) setMax();
+            else if (command == COVER_SET_MIN) setMin();
+            else if (command == SYS_RESET) resetSettings();
+            else if (command == SYS_REBOOT) ESP.restart();
+        }
         if (is_motor_running_ && !stepper->isRunning()) {
             is_motor_running_ = false;
 
             updatePosition();
 
-            // sendMqtt((String) motorCurrentPercentage());
+            // sendMqtt((String) motorCurrentPercentage()
         }
     }
 }
@@ -80,10 +96,10 @@ void MotorTask::setMotorState(MotorState newState) {
 
 void MotorTask::loadSettings() {
     motor_setting_.begin("local", false);
-    max_position_ = motor_setting_.getInt("max_position_", 30000);
-    current_position_ = motor_setting_.getInt("current_position_", 0);
-    stepper->setCurrentPosition(current_position_);
-    LOGI("Motor settings loaded(curr/max): %d/%d", current_position_, max_position_);
+    max_pos_ = motor_setting_.getInt("max_pos_", 30000);
+    previous_pos_ = motor_setting_.getInt("previous_pos_", 0);
+    stepper->setCurrentPosition(previous_pos_);
+    LOGI("Motor settings loaded(curr/max): %d/%d", previous_pos_, max_pos_);
 }
 
 
@@ -94,7 +110,7 @@ void MotorTask::resetSettings() {
 
 
 int MotorTask::percentToSteps(int percent) const {
-    float x = (float) percent * (float) max_position_ / 100.0;
+    float x = (float) percent * (float) max_pos_ / 100.0;
     return (int) round(x);
 }
 
@@ -105,10 +121,10 @@ void MotorTask::moveTo(int newPos) {
     || (previous_state_ == MOTOR_MIN && current_state_ == MOTOR_MAX))
         stepper->stopMove();
     
-    if (newPos != stepper->getCurrentPosition() && newPos <= max_position_) {
+    if (newPos != stepper->getCurrentPosition() && newPos <= max_pos_) {
         stepper->moveTo(newPos);
         is_motor_running_ = true;
-        LOGD("Motor moving(tar/curr/max): %d/%d/%d", newPos, stepper->getCurrentPosition(), max_position_);
+        LOGD("Motor moving(tar/curr/max): %d/%d/%d", newPos, stepper->getCurrentPosition(), max_pos_);
     }
 }
 
@@ -131,7 +147,7 @@ void MotorTask::max() {
     setMotorState(MOTOR_MAX);
     driver.rms_current(closingRMS);
     stepper->setSpeedInHz(maxSpeed);
-    moveTo(max_position_);
+    moveTo(max_pos_);
 }
 
 
@@ -139,7 +155,7 @@ void MotorTask::setMin() {
     setMotorState(MOTOR_SET_MIN);
     driver.rms_current(openingRMS);
     stepper->setSpeedInHz(maxSpeed / 4);
-    previous_position_ = stepper->getCurrentPosition();
+    current_pos_ = stepper->getCurrentPosition();
     stepper->setCurrentPosition(INT_MAX);
     LOGD("Motor setting new min position");
     moveTo(0);
@@ -150,7 +166,7 @@ void MotorTask::setMax() {
     setMotorState(MOTOR_SET_MAX);
     driver.rms_current(closingRMS);
     stepper->setSpeedInHz(maxSpeed / 4);
-    max_position_ = INT_MAX;
+    max_pos_ = INT_MAX;
     LOGD("Motor setting new max position");
     moveTo(INT_MAX);
 }
@@ -159,10 +175,10 @@ void MotorTask::setMax() {
 // Returns current rounded position percentage. 0 is open; 100 is closed.
 // TODO: add inaccuracy mode
 int MotorTask::currentPercentage() {
-    if (current_position_ == 0)
+    if (previous_pos_ == 0)
         return 0;
     else
-        return (int) round((float) current_position_ / (float) max_position_ * 100);
+        return (int) round((float) previous_pos_ / (float) max_pos_ * 100);
 }
 
 
@@ -174,19 +190,33 @@ void MotorTask::stop() {
 
 void MotorTask::updatePosition() {
     if (current_state_ == MOTOR_SET_MAX) {
-        max_position_ = stepper->getCurrentPosition();
-        motor_setting_.putInt("max_position_", max_position_);
-        LOGD("Set max position, new max position: %d", max_position_);
+        max_pos_ = stepper->getCurrentPosition();
+        motor_setting_.putInt("max_pos_", max_pos_);
+        LOGD("Set max position, new max position: %d", max_pos_);
     } else if (current_state_ == MOTOR_SET_MIN) {
         int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
-        max_position_ = max_position_ + distanceTraveled - previous_position_;
-        motor_setting_.putInt("max_position_", max_position_);
+        max_pos_ = max_pos_ + distanceTraveled - current_pos_;
+        motor_setting_.putInt("max_pos_", max_pos_);
         stepper->setCurrentPosition(0);
-        LOGD("Set min position, new max position: %d", max_position_);
+        LOGD("Set min position, new max position: %d", max_pos_);
     }
 
     setMotorState(MOTOR_IDLE);
-    current_position_ = stepper->getCurrentPosition();
-    motor_setting_.putInt("current_position_", current_position_);
-    LOGD("Motor stopped(curr/max): %d/%d", current_position_, max_position_);
+    previous_pos_ = stepper->getCurrentPosition();
+    motor_setting_.putInt("previous_pos_", previous_pos_);
+    LOGD("Motor stopped(curr/max): %d/%d", previous_pos_, max_pos_);
+
+    int current_precentage = currentPercentage();
+    if (xQueueSend(wireless_message_queue_, (void*) &current_precentage, 10) != pdTRUE) {
+        LOGE("Failed to send to wireless_message_queue_.");
+    }
+}
+
+
+void MotorTask::addListener(QueueHandle_t queue) {
+    wireless_message_queue_ = queue;
+}
+
+QueueHandle_t MotorTask::getMotorCommandQueue() {
+    return motor_command_queue_;
 }

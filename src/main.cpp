@@ -34,8 +34,10 @@ void setup() {
 
     // Start the WiFi connection
     wireless_task.init();
+    wireless_task.addListener(motor_task.getMotorCommandQueue());
 
     motor_task.init();
+    motor_task.addListener(wireless_task.getWirelessMessageQueue());
 
     // #if __has_include("ota.h")
     //     otaSetup();
