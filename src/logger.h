@@ -14,9 +14,9 @@
       2. LOG_INIT(baudRate, LogLevel) in setup()
       3. Use LOGE(msg), LOGI(msg), LOGD(msg) in-place of Serial.println() for different level of
         logs.
-      4. #define DONTCOMPILELOGS=1 omitts Serial.println() statements when compiling.
+      4. #define COMPILELOGS=1 omitts Serial.println() statements when compiling.
 **/
-#if DONTCOMPILELOGS  // if defined, exclude Serial.println statements when compiling
+#if COMPILELOGS  // if defined, exclude Serial.println statements when compiling
 
 #include <Arduino.h>
 #include <stdarg.h>

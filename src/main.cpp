@@ -16,10 +16,6 @@
 #include "motor_task.h"
 #include "wireless_task.h"
 
-// #if __has_include("ota.h")
-//     #include "ota.h"
-// #endif
-
 
 static MotorTask motor_task(1);
 static WirelessTask wireless_task(0);
@@ -39,11 +35,8 @@ void setup() {
     motor_task.init();
     motor_task.addListener(wireless_task.getWirelessMessageQueue());
 
-    // #if __has_include("ota.h")
-    //     otaSetup();
-    // #endif
-
-    // TODO: delete setup/loop task
+    // Delete setup/loop task
+    vTaskDelete(NULL);
 }
 
 
