@@ -13,6 +13,10 @@
 #include "logger.h"
 #include "secrets.h"
 
+#if COMPILEOTA
+    #include <ArduinoOTA.h>
+#endif
+
 
 class WirelessTask : public Task<WirelessTask> {
     friend class Task<WirelessTask>;

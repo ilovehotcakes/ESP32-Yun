@@ -1,4 +1,4 @@
-#if DONTCOMPILELOGS  // if defined, exclude Serial.println statements when compiling
+#if COMPILELOGS  // if defined, exclude Serial.println statements when compiling
 
 #include "logger.h"
 

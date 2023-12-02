@@ -17,6 +17,11 @@ WirelessTask::~WirelessTask() {
 
 void WirelessTask::run() {
     disableCore0WDT();  // Disable watchdog timer
+    connectWifi();      // Must connect to WiFi before setting up OTA
+
+    #if COMPILEOTA
+        ArduinoOTA.begin();
+    #endif
 
     while (1) {
         // Check WiFi connection
@@ -39,10 +44,9 @@ void WirelessTask::run() {
             sendMqtt((String) message);
         }
 
-        // TODO
-        // #if __has_include("ota.h")
-        // ArduinoOTA.handle();
-        // #endif
+        #if COMPILEOTA
+            ArduinoOTA.handle();
+        #endif
     }
 }
 
