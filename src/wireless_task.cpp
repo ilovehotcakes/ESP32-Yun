@@ -3,10 +3,9 @@
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
         Task{"Wireless", 8192, 1, task_core},
-        mqtt_client_(wifi_client_)
-{
+        mqtt_client_(wifi_client_) {
     wireless_message_queue_ = xQueueCreate(1, sizeof(int));
-    assert("Failed to create wireless_message_queue_" && wireless_message_queue_ != NULL);
+    assert(wireless_message_queue_ != NULL);
 }
 
 
@@ -81,7 +80,7 @@ void WirelessTask::connectMqtt() {
 
     mqtt_client_.subscribe(in_topic_.c_str());
     mqtt_client_.setCallback(std::bind(&WirelessTask::readMqtt, this,
-                            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+                             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     LOGI("Connected to the MQTT broker, topic: %s", in_topic_.c_str());
 
@@ -96,7 +95,7 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
     }
     int command = message.toInt();
 
-    LOGI("Received messagefrom MQTT server: %i", command);
+    LOGI("Received message from MQTT server: %i", command);
 
     if (xQueueSend(motor_command_queue_, (void*) &command, 10) != pdTRUE) {
         LOGE("Failed to send to motor_command_queue_.");
@@ -110,11 +109,9 @@ void WirelessTask::sendMqtt(String message) {
 }
 
 
-
 void WirelessTask::addListener(QueueHandle_t queue) {
     motor_command_queue_ = queue;
 }
-
 
 
 QueueHandle_t WirelessTask::getWirelessMessageQueue() {
