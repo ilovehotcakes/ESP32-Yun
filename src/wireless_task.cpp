@@ -50,6 +50,7 @@ void WirelessTask::run() {
 }
 
 
+// Restart on timeout
 void WirelessTask::connectWifi() {
     // Turn on LED to indicate disconnected
     digitalWrite(LED_PIN, HIGH);
