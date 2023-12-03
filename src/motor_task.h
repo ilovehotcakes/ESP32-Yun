@@ -15,6 +15,7 @@
 #include <Arduino.h>
 #include <TMCStepper.h>
 #include <FastAccelStepper.h>
+#include <AS5600.h>
 #include <Preferences.h>
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
@@ -71,17 +72,26 @@ private:
     // move/accelerate and stop/deccelerate the stepper motor
     FastAccelStepperEngine engine = FastAccelStepperEngine();
     FastAccelStepper *stepper = NULL;
+
+    AS5600 as5600;
+
     Preferences motor_setting_;
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
     QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
 
     bool is_motor_running_ = false;
-    uint32_t max_pos_ = 0;
-    uint32_t current_pos_  = 0;
-    uint32_t previous_pos_ = 0;
+    bool waiting_ = false;
+    int32_t encoder_curr_pos_ = 0;
+    int32_t encoder_prev_pos_ = 0;
+    int32_t motor_curr_pos_ = 0;
+    int32_t motor_prev_pos_ = 0;
+    int32_t motor_max_pos_  = 0;
+    uint8_t last_updated_percentage_ = 0;
     MotorState current_state_  = MOTOR_IDLE;
     MotorState previous_state_ = MOTOR_IDLE;
+    float motor_encoder_ratio_ = stepsPerRev / 4096.0;
+    float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
     int percentToSteps(int percent) const; // Helper function to calculate position percentage to steps
     void loadSettings(); // Load motor settings from flash
@@ -90,15 +100,12 @@ private:
     void stallguardInterrupt();
     int  currentPercentage();
     void updatePosition();
+    void readEncoderPosition();
 
     // TODO
     // void motorSetSpeed() {}
     // void motorSetQuietModeSpeed() {}
-    // void motorSetOpeningRMS() {}
-    // void motorSetclosingRMS() {}
     // void motorSetDirection() {}
     // void motorEnableQuietmode() {}
     // void motorDisableQuietmode() {}
-    // void motorEnableSG() {}
-    // void motorDisableSG() {}
 };
