@@ -57,10 +57,13 @@ void MotorTask::run() {
 
     loadSettings();
 
+    // TODO send initial percentage to MQTT
+
     while (1) {
         int command = -50;
         if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
             LOGD("MotorTask received command from motor_command_queue_: %i", command);
+            // TODO fix consecutive commands while motor is running
             switch (command) {
                 case COVER_STOP:
                     stop();
@@ -108,12 +111,6 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 #endif
 
 
-void MotorTask::setMotorState(MotorState newState) {
-    previous_state_ = current_state_;
-    current_state_ = newState;
-}
-
-
 void MotorTask::loadSettings() {
     motor_setting_.begin("local", false);
 
@@ -131,90 +128,62 @@ void MotorTask::loadSettings() {
 }
 
 
+// TODO move setting to it's own class and Interface Task
 void MotorTask::resetSettings() {
     motor_setting_.clear();
     ESP.restart();
 }
 
 
-// Motor must move first before is_motor_running_==true, else run will excute first before stepper stops
-void MotorTask::moveToPosition(int new_position) {
-    // if ((previous_state_ == MOTOR_MAX && current_state_ == MOTOR_MIN)
-    // || (previous_state_ == MOTOR_MIN && current_state_ == MOTOR_MAX))
-    //     stepper->stopMove();
-    
-    if (new_position != encod_curr_pos_) {
-        stepper->moveTo(positionToSteps(new_position));
-        is_motor_running_ = true;
-        LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_curr_pos_, encod_max_pos_, new_position);
-    }
-}
-
-
 void MotorTask::moveToPercent(int percent) {
+    int32_t new_position = (int) round((float) percent * (float) encod_max_pos_ / 100.0);
+    if (new_position == encod_curr_pos_) {
+        return;
+    }
+
+    stepper->setSpeedInHz(maxSpeed);
+
     if (percent > getPercentage()) {
         tmc2099.rms_current(closingRMS);
     } else {
         tmc2099.rms_current(openingRMS);
     }
-    moveToPosition((int) round((float) percent * (float) encod_max_pos_ / 100.0));
-}
 
+    // Motor must move first before is_motor_running_==true, else run will excute first before stepper stops
+    stepper->moveTo(positionToSteps(new_position));
+    is_motor_running_ = true;
 
-void MotorTask::setMin() {
-//     setMotorState(MOTOR_SET_MIN);
-//     tmc2099.rms_current(openingRMS);
-//     stepper->setSpeedInHz(maxSpeed / 4);
-//     motor_curr_pos_ = stepper->getCurrentPosition();
-//     stepper->setCurrentPosition(INT_MAX);
-//     LOGD("Motor setting new min position");
-//     moveTo(0);
-}
-
-
-void MotorTask::setMax() {
-//     setMotorState(MOTOR_SET_MAX);
-//     tmc2099.rms_current(closingRMS);
-//     stepper->setSpeedInHz(maxSpeed / 4);
-//     motor_max_pos_ = INT_MAX;
-//     LOGD("Motor setting new max position");
-//     moveTo(INT_MAX);
+    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_curr_pos_, encod_max_pos_, new_position);
 }
 
 
 // Returns current rounded position percentage. 0 is open; 100 is closed.
 int MotorTask::getPercentage() {
-    if (encod_curr_pos_ <= 0) {
-        return 0;
-    } 
-
-    if (encod_curr_pos_ >= encod_max_pos_) {
-        return 100;
-    }
-
     return (int) round((float) encod_curr_pos_ / (float) encod_max_pos_ * 100);
 }
 
 
 void MotorTask::stop() {
     stepper->forceStop();
+
+    if (set_min_) {
+        set_min_ = false;
+        encod_max_pos_ -= encod_curr_pos_;
+        as5600.resetCumulativePosition(0);
+        motor_setting_.putInt("encod_max_pos_", encod_max_pos_);
+        LOGD("Motor new min(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
+    }
+
+    if (set_max_) {
+        set_max_ = false;
+        encod_max_pos_ = as5600.getCumulativePosition();
+        motor_setting_.putInt("encod_max_pos_", encod_max_pos_);
+        LOGD("Motor new max(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
+    }
 }
 
 
 void MotorTask::updatePosition() {
-    // if (current_state_ == MOTOR_SET_MAX) {
-    //     motor_max_pos_ = stepper->getCurrentPosition();
-    //     motor_setting_.putInt("motor_max_pos_", motor_max_pos_);
-    //     LOGD("Set max position, new max position: %d", motor_max_pos_);
-    // } else if (current_state_ == MOTOR_SET_MIN) {
-    //     int distanceTraveled = INT_MAX - stepper->getCurrentPosition();
-    //     motor_max_pos_ = motor_max_pos_ + distanceTraveled - motor_curr_pos_;
-    //     motor_setting_.putInt("motor_max_pos_", motor_max_pos_);
-    //     stepper->setCurrentPosition(0);
-    //     LOGD("Set min position, new max position: %d", motor_max_pos_);
-    // }
-
-    setMotorState(MOTOR_IDLE);
     motor_setting_.putInt("encod_curr_pos_", encod_curr_pos_);
     LOGD("Motor stopped(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
 
@@ -230,6 +199,30 @@ void MotorTask::updatePosition() {
             LOGE("Failed to send to wireless_message_queue_.");
         }
     }
+}
+
+
+void MotorTask::setMin() {
+    LOGD("Motor setting new minimum position");
+
+    set_min_ = true;
+    tmc2099.rms_current(openingRMS);
+    stepper->setSpeedInHz(maxSpeed / 4);
+
+    stepper->runBackward();
+    is_motor_running_ = true;
+}
+
+
+void MotorTask::setMax() {
+    LOGD("Motor setting new maximum position");
+
+    set_max_ = true;
+    tmc2099.rms_current(closingRMS);
+    stepper->setSpeedInHz(maxSpeed / 4);
+
+    stepper->runForward();
+    is_motor_running_ = true;
 }
 
 

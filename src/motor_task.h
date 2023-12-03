@@ -22,15 +22,6 @@
 #include "logger.h"
 
 
-enum MotorState {
-    MOTOR_IDLE,
-    MOTOR_MIN,
-    MOTOR_MAX,
-    MOTOR_SET_MIN,
-    MOTOR_SET_MAX
-};
-
-
 // Commands recieved from MQTT
 enum Command {
     COVER_STOP    = -1,
@@ -77,13 +68,13 @@ private:
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
 
     bool is_motor_running_ = false;
-    bool waiting_to_send_ = false;
+    bool waiting_to_send_  = false;
+    bool set_min_ = false;
+    bool set_max_ = false;
     int32_t encod_curr_pos_ = 0;
     int32_t encod_prev_pos_ = 0;
     int32_t encod_max_pos_  = 0;
     uint8_t last_updated_percentage_ = 0;
-    MotorState current_state_  = MOTOR_IDLE;
-    MotorState previous_state_ = MOTOR_IDLE;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
     float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
@@ -93,8 +84,6 @@ private:
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
     void resetSettings();
-    void setMotorState(MotorState new_state);
-    void moveToPosition(int new_position);
     void moveToPercent(int percent);
     void updatePosition();
     int  getPercentage();
