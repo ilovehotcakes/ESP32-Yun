@@ -51,13 +51,6 @@ public:
     ~MotorTask();
     void addListener(QueueHandle_t queue);
     QueueHandle_t getMotorCommandQueue();
-    void move(int percent);
-    void stop();
-    void min();
-    void max();
-    void setMin();
-    void setMax();
-    void resetSettings();
 
 protected:
     void run();
@@ -65,41 +58,47 @@ protected:
 private:
     #include "motor_settings.h"
 
-    // TMCStepper library used for interfacing between MCU and stepper driver hardware
-    TMC2209Stepper driver = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
+    // TMCStepper library for interfacing MCU with stepper driver hardware
+    TMC2209Stepper tmc2099 = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 
-    // FastAccelStepper library used for sending commands to the stepper driver to
+    // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
     FastAccelStepperEngine engine = FastAccelStepperEngine();
     FastAccelStepper *stepper = NULL;
 
+    // Rotary encoder for keeping track of actual motor positions because motor could
+    // slip and cause the position to be incorrect
     AS5600 as5600;
 
+    // Saving positions and other attributes
     Preferences motor_setting_;
 
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
-    QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
+    QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
+    QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
 
     bool is_motor_running_ = false;
-    bool waiting_ = false;
-    int32_t encoder_curr_pos_ = 0;
-    int32_t encoder_prev_pos_ = 0;
-    int32_t motor_curr_pos_ = 0;
-    int32_t motor_prev_pos_ = 0;
-    int32_t motor_max_pos_  = 0;
+    bool waiting_to_send_ = false;
+    int32_t encod_curr_pos_ = 0;
+    int32_t encod_prev_pos_ = 0;
+    int32_t encod_max_pos_  = 0;
     uint8_t last_updated_percentage_ = 0;
     MotorState current_state_  = MOTOR_IDLE;
     MotorState previous_state_ = MOTOR_IDLE;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
     float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
-    int percentToSteps(int percent) const; // Helper function to calculate position percentage to steps
-    void loadSettings(); // Load motor settings from flash
-    void setMotorState(MotorState newState);
-    void moveTo(int newPos);
+    void stop();
+    void setMin();
+    void setMax();
     void stallguardInterrupt();
-    int  currentPercentage();
+    void loadSettings(); // Load motor settings from flash
+    void resetSettings();
+    void setMotorState(MotorState new_state);
+    void moveToPosition(int new_position);
+    void moveToPercent(int percent);
     void updatePosition();
+    int  getPercentage();
+    int  positionToSteps(int encoder_position);
     void readEncoderPosition();
 
     // TODO
