@@ -10,16 +10,11 @@
         5.18:1 planetary gearbox.
       - Check and modify stepper motor driver settings. 
 **/
-#include <math.h>
-
-// Stepper motor specifications (NEMA 11 with 5.18:1 planetary gearbox)
-float gearboxRatio = 5.18;          // Use 1 if stepper motor doesn't have a gearbox
-
 // TMC2209 driver settings
 int microsteps = 8;                 // 8 microsteps per full step
-int stepsPerRev = round(200 * gearboxRatio * microsteps);  // NEMA motors have 200 full steps/rev
-int maxSpeed = round(stepsPerRev * 0.7);   // Max speed in Hz
-int acceleration = round(maxSpeed * 0.6);  // Use lower value if using SG
+int stepsPerRev = 200 * microsteps;  // NEMA motors have 200 full steps/rev
+int maxSpeed = (int) stepsPerRev * 3.5;   // Max speed in Hz; Needs to be large enough to not trip SG
+int acceleration = (int) maxSpeed * 0.6;  // Use lower value if using SG
 
 bool flipDir = false;
 bool enableSG = true;  // Default false
