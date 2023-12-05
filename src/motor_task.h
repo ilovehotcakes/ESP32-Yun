@@ -66,6 +66,7 @@ private:
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
+    int command = -50;
 
     bool is_motor_running_ = false;
     bool waiting_to_send_  = false;
@@ -74,7 +75,7 @@ private:
     int32_t encod_curr_pos_ = 0;
     int32_t encod_prev_pos_ = 0;
     int32_t encod_max_pos_  = 0;
-    uint8_t last_updated_percentage_ = 0;
+    uint8_t last_updated_percentage_ = -100;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
     float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
