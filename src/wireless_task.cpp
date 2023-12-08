@@ -4,7 +4,7 @@
 WirelessTask::WirelessTask(const uint8_t task_core) : 
         Task{"Wireless", 8192, 1, task_core},
         mqtt_client_(wifi_client_) {
-    wireless_message_queue_ = xQueueCreate(1, sizeof(int));
+    wireless_message_queue_ = xQueueCreate(100, sizeof(int));
     assert(wireless_message_queue_ != NULL);
 }
 
