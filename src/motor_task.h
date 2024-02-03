@@ -68,8 +68,6 @@ private:
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
     int command = -50;
 
-    bool set_min_ = false;
-    bool set_max_ = false;
     int32_t encod_max_pos_  = 0;
     uint8_t last_updated_percent_ = -100;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
@@ -81,7 +79,6 @@ private:
     void stop();
     void setMin();
     void setMax();
-    void sendPercent();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
 

@@ -70,12 +70,12 @@ void MotorTask::run() {
                 case COVER_CLOSE:
                     moveToPercent(100);
                     break;
-                // case COVER_SET_MAX:
-                //     setMax();
-                //     break;
-                // case COVER_SET_MIN:
-                //     setMin();
-                //     break;
+                case COVER_SET_MAX:
+                    setMax();
+                    break;
+                case COVER_SET_MIN:
+                    setMin();
+                    break;
                 // case SYS_RESET:
                 //     motor_settings_.clear();
                 //     ESP.restart();
@@ -89,7 +89,17 @@ void MotorTask::run() {
         }
 
         if (!motor->isRunning()) {
-            sendPercent();
+            // Don't send message to wireless task if percent change is less than 2 to reduce
+            // wireless queue overhead.
+            int current_percent = getPercent();
+            if (abs(current_percent - last_updated_percent_) > 1
+                    && current_percent >= 0
+                    && current_percent <= 100) {
+                last_updated_percent_ = current_percent;
+                if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
+                    LOGE("Failed to send to wireless_message_queue_");
+                }
+            }
         }
     }
 }
@@ -145,60 +155,25 @@ void MotorTask::moveToPercent(int percent) {
 void MotorTask::stop() {
     motor->forceStop();
     LOGD("Motor stopped(curr/max): %d/%d", encoder.getCumulativePosition(), encod_max_pos_);
-
-    // if (set_min_) {
-    //     set_min_ = false;
-    //     encod_max_pos_ -= encod_curr_pos_;
-    //     encoder.resetCumulativePosition(0);
-    //     motor->setCurrentPosition(0);
-    //     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
-    //     LOGD("Motor new min(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-    // }
-
-    // if (set_max_) {
-    //     set_max_ = false;
-    //     encod_max_pos_ = encoder.getCumulativePosition();
-    //     motor->setCurrentPosition(positionToSteps(encod_curr_pos_));
-    //     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
-    //     LOGD("Motor new max(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-    // }
-}
-
-
-void MotorTask::sendPercent() {
-    // Don't send message to wireless task if percent change is less than 2 to reduce wireless
-    // queue overhead.
-    int current_percent = getPercent();
-    if (abs(current_percent - last_updated_percent_) > 1
-            && current_percent >= 0
-            && current_percent <= 100) {
-        last_updated_percent_ = current_percent;
-        if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
-            LOGE("Failed to send to wireless_message_queue_");
-        }
-    }
 }
 
 
 void MotorTask::setMin() {
-    LOGD("Motor setting new minimum position");
-
-    set_min_ = true;
-    tmc2099.rms_current(openingRMS);
-    motor->setSpeedInHz(maxSpeed / 4);
-
-    motor->runBackward();
+    encod_max_pos_ -= encoder.getCumulativePosition();
+    motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    encoder.resetCumulativePosition(0);
+    motor->setCurrentPosition(0);
+    last_updated_percent_ = -100;  // Needed to trigger send message
+    LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
 }
 
 
 void MotorTask::setMax() {
-    LOGD("Motor setting new maximum position");
-
-    set_max_ = true;
-    tmc2099.rms_current(closingRMS);
-    motor->setSpeedInHz(maxSpeed / 4);
-
-    motor->runForward();
+    encod_max_pos_ = encoder.getCumulativePosition();
+    motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    motor->setCurrentPosition(positionToSteps(encod_max_pos_));
+    last_updated_percent_ = -100;
+    LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
 }
 
 
