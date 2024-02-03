@@ -39,7 +39,7 @@ void WirelessTask::run() {
         // Check if there is message sent from the motor
         int message = -1;
         if (xQueueReceive(wireless_message_queue_, (void*) &message, 0) == pdTRUE) {
-            LOGD("WirelessTask received message from wireless_message_queue_: %i", message);
+            // LOGD("WirelessTask received message from wireless_message_queue_: %i", message);
             sendMqtt((String) message);
         }
 
