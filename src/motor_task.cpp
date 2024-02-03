@@ -32,10 +32,10 @@ void MotorTask::run() {
     #ifdef DIAG_PIN
     if (enableSG) {
         pinMode(DIAG_PIN, INPUT);
-        tmc2099.semin(4);              // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
-        tmc2099.semax(0);              // Refer to p58 of the datasheet
+        tmc2099.semin(4);            // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
+        tmc2099.semax(0);            // Refer to p58 of the datasheet
         tmc2099.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
-        tmc2099.SGTHRS(sgThreshold);   // [0..255] the higher the more sensitive to stall
+        tmc2099.SGTHRS(sgThreshold); // [0..255] the higher the more sensitive to stall
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
@@ -76,10 +76,10 @@ void MotorTask::run() {
                 case COVER_SET_MIN:
                     setMin();
                     break;
-                // case SYS_RESET:
-                //     motor_settings_.clear();
-                //     ESP.restart();
-                //     break;
+                case SYS_RESET:
+                    motor_settings_.clear();
+                    ESP.restart();
+                    break;
                 // case SYS_REBOOT:
                 //     ESP.restart();
                 //     break;
@@ -88,17 +88,19 @@ void MotorTask::run() {
             }
         }
 
-        if (!motor->isRunning()) {
-            // Don't send message to wireless task if percent change is less than 2 to reduce
-            // wireless queue overhead.
-            int current_percent = getPercent();
-            if (abs(current_percent - last_updated_percent_) > 1
-                    && current_percent >= 0
-                    && current_percent <= 100) {
-                last_updated_percent_ = current_percent;
-                if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
-                    LOGE("Failed to send to wireless_message_queue_");
-                }
+        if (motor->isRunning()) {
+            continue;
+        }
+
+        // Don't send message to wireless task if percent change is less than 2 to reduce
+        // wireless queue overhead.
+        int current_percent = getPercent();
+        if (abs(current_percent - last_updated_percent_) > 1
+                && current_percent >= 0
+                && current_percent <= 100) {
+            last_updated_percent_ = current_percent;
+            if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
+                LOGE("Failed to send to wireless_message_queue_");
             }
         }
     }
@@ -117,11 +119,10 @@ void MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     motor_settings_.begin("local", false);
 
-    // encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 455000);
     encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 10);
     int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
-    encoder.resetCumulativePosition(encod_curr_pos);  // Set as5600 to previous encoder position
-    motor->setCurrentPosition(positionToSteps(encod_curr_pos));
+    encoder.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
+    motor->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
 }
@@ -133,8 +134,7 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
-    if (abs(new_position - encoder.getCumulativePosition()) < 100) {
+    if (abs(last_updated_percent_ - getPercent()) < 2) {
         return;
     }
 
@@ -146,6 +146,7 @@ void MotorTask::moveToPercent(int percent) {
         tmc2099.rms_current(openingRMS);
     }
 
+    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
     motor->moveTo(positionToSteps(new_position));
 
     LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder.getCumulativePosition(), encod_max_pos_, new_position);
