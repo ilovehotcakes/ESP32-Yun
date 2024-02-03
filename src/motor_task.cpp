@@ -134,7 +134,7 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    if (abs(last_updated_percent_ - getPercent()) < 2) {
+    if (abs(percent - getPercent()) < 2) {
         return;
     }
 
