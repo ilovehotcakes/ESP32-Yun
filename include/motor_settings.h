@@ -13,8 +13,8 @@
 // TMC2209 driver settings
 int microsteps = 8;                 // 8 microsteps per full step
 int stepsPerRev = 200 * microsteps;  // NEMA motors have 200 full steps/rev
-int maxSpeed = (int) stepsPerRev * 3.5;   // Max speed in Hz; Needs to be large enough to not trip SG
-int acceleration = (int) maxSpeed * 0.6;  // Use lower value if using SG
+int maxSpeed = (int) stepsPerRev * 4;   // Max speed in Hz; Needs to be large enough to not trip SG
+int acceleration = (int) maxSpeed * 0.5;  // Use lower value if using SG
 
 bool flipDir = false;
 bool enableSG = true;  // Default false

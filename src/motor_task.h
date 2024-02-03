@@ -55,41 +55,35 @@ private:
     // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
     FastAccelStepperEngine engine = FastAccelStepperEngine();
-    FastAccelStepper *stepper = NULL;
+    FastAccelStepper *motor = NULL;
 
     // Rotary encoder for keeping track of actual motor positions because motor could
     // slip and cause the position to be incorrect
-    AS5600 as5600;
+    AS5600 encoder;
 
     // Saving positions and other attributes
-    Preferences motor_setting_;
+    Preferences motor_settings_;
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
     int command = -50;
 
-    bool is_motor_running_ = false;
-    bool waiting_to_send_  = false;
     bool set_min_ = false;
     bool set_max_ = false;
-    int32_t encod_curr_pos_ = 0;
-    int32_t encod_prev_pos_ = 0;
     int32_t encod_max_pos_  = 0;
-    uint8_t last_updated_percentage_ = -100;
+    uint8_t last_updated_percent_ = -100;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
     float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
+    void stallguardInterrupt();
+    void loadSettings(); // Load motor settings from flash
+    void moveToPercent(int percent);
     void stop();
     void setMin();
     void setMax();
-    void stallguardInterrupt();
-    void loadSettings(); // Load motor settings from flash
-    void resetSettings();
-    void moveToPercent(int percent);
-    void updatePosition();
-    int  getPercentage();
-    int  positionToSteps(int encoder_position);
-    void readEncoderPosition();
+    void sendPercent();
+    inline int getPercent();
+    inline int positionToSteps(int encoder_position);
 
     // TODO
     // void motorSetSpeed() {}

@@ -42,58 +42,55 @@ void MotorTask::run() {
 
     // FastAccelStepper setup
     engine.init();
-    stepper = engine.stepperConnectToPin(STEP_PIN);
-    assert("Failed to initialize FastAccelStepper. Please try a different GPIO for STEP_PIN." && stepper);
-    stepper->setEnablePin(EN_PIN);
-    stepper->setDirectionPin(DIR_PIN);
-    stepper->setSpeedInHz(maxSpeed);
-    stepper->setAcceleration(acceleration);
-    stepper->setAutoEnable(true);
-    stepper->setDelayToDisable(200);
+    motor = engine.stepperConnectToPin(STEP_PIN);
+    assert("Failed to initialize FastAccelStepper" && motor);
+    motor->setEnablePin(EN_PIN);
+    motor->setDirectionPin(DIR_PIN);
+    motor->setSpeedInHz(maxSpeed);
+    motor->setAcceleration(acceleration);
+    motor->setAutoEnable(true);
+    motor->setDelayToDisable(200);
 
     // AS5600 rotary encoder setup
-    as5600.begin(SDA_PIN, SCL_PIN);
-    assert("Failed to initialize AS5600 rotary encoder." && as5600.isConnected());
+    encoder.begin(SDA_PIN, SCL_PIN);
+    assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
 
     loadSettings();
 
     while (1) {
-        // if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
-        //     LOGD("MotorTask received command from motor_command_queue_: %i", command);
-        //     // TODO fix consecutive commands while motor is running
-        //     // Try updating encod_curr_pos before accepting another command
-        //     // if (command != COVER_STOP && is_motor_running_) {
-        //     //     stop();
-        //     //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-        //     // }
-        //     switch (command) {
-        //         case COVER_STOP:
-        //             stop();
-        //             break;
-        //         case COVER_OPEN:
-        //             moveToPercent(0);
-        //             break;
-        //         case COVER_CLOSE:
-        //             moveToPercent(100);
-        //             break;
-        //         case COVER_SET_MAX:
-        //             setMax();
-        //             break;
-        //         case COVER_SET_MIN:
-        //             setMin();
-        //             break;
-        //         case SYS_RESET:
-        //             resetSettings();
-        //             break;
-        //         case SYS_REBOOT:
-        //             ESP.restart();
-        //             break;
-        //         default:
-        //             moveToPercent(command);
-        //     }
-        // }
+        motor->setCurrentPosition(positionToSteps(encoder.getCumulativePosition()));
 
-        updatePosition();
+        if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
+            switch (command) {
+                case COVER_STOP:
+                    break;
+                case COVER_OPEN:
+                    moveToPercent(0);
+                    break;
+                case COVER_CLOSE:
+                    moveToPercent(100);
+                    break;
+                // case COVER_SET_MAX:
+                //     setMax();
+                //     break;
+                // case COVER_SET_MIN:
+                //     setMin();
+                //     break;
+                // case SYS_RESET:
+                //     motor_settings_.clear();
+                //     ESP.restart();
+                //     break;
+                // case SYS_REBOOT:
+                //     ESP.restart();
+                //     break;
+                default:
+                    moveToPercent(command);
+            }
+        }
+
+        if (!motor->isRunning()) {
+            sendPercent();
+        }
     }
 }
 
@@ -101,114 +98,83 @@ void MotorTask::run() {
 // For StallGuard
 #ifdef DIAG_PIN
 void MotorTask::stallguardInterrupt() {
-    stepper->forceStop();
+    motor->forceStop();
     LOGE("Motor stalled");
 }
 #endif
 
 
 void MotorTask::loadSettings() {
-    motor_setting_.begin("local", false);
+    motor_settings_.begin("local", false);
 
-    encod_curr_pos_ = motor_setting_.getInt("encod_curr_pos_", 0);
-    encod_prev_pos_ = encod_curr_pos_;  // Must initialize else would trigger readEncoderPosition()
-    as5600.resetCumulativePosition(encod_curr_pos_);  // Set as5600 to previous encoder position
+    // encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 455000);
+    encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 10);
+    int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
+    encoder.resetCumulativePosition(encod_curr_pos);  // Set as5600 to previous encoder position
+    motor->setCurrentPosition(positionToSteps(encod_curr_pos));
 
-    encod_max_pos_ = motor_setting_.getInt("encod_max_pos_", 455000);
-
-    stepper->setCurrentPosition(positionToSteps(encod_curr_pos_));
-
-    LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-}
-
-
-// TODO move setting to it's own class and Interface Task
-void MotorTask::resetSettings() {
-    motor_setting_.clear();
-    ESP.restart();
+    LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
 }
 
 
 void MotorTask::moveToPercent(int percent) {
-    int32_t new_position = (int) round((float) percent * (float) encod_max_pos_ / 100.0);
-    if (new_position == encod_curr_pos_) {
+    if (motor->isRunning()) {
+        stop();
         return;
     }
 
-    stepper->setSpeedInHz(maxSpeed);
+    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
+    if (abs(new_position - encoder.getCumulativePosition()) < 100) {
+        return;
+    }
 
-    if (percent > getPercentage()) {
+    motor->setSpeedInHz(maxSpeed);
+
+    if (percent > getPercent()) {
         tmc2099.rms_current(closingRMS);
     } else {
         tmc2099.rms_current(openingRMS);
     }
 
-    // Motor must move first before is_motor_running_==true, else run will excute first before stepper stops
-    stepper->moveTo(positionToSteps(new_position));
-    is_motor_running_ = true;
+    motor->moveTo(positionToSteps(new_position));
 
-    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_curr_pos_, encod_max_pos_, new_position);
-}
-
-
-// Returns current rounded position percentage. 0 is open; 100 is closed.
-int MotorTask::getPercentage() {
-    return (int) round((float) as5600.getCumulativePosition() / (float) encod_max_pos_ * 100);
+    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder.getCumulativePosition(), encod_max_pos_, new_position);
 }
 
 
 void MotorTask::stop() {
-    // is_motor_running_ = false;
-    stepper->forceStop();
-    encod_curr_pos_ = as5600.getCumulativePosition();
-    stepper->setCurrentPosition(encod_curr_pos_);
+    motor->forceStop();
+    LOGD("Motor stopped(curr/max): %d/%d", encoder.getCumulativePosition(), encod_max_pos_);
 
-    if (set_min_) {
-        set_min_ = false;
-        encod_max_pos_ -= encod_curr_pos_;
-        as5600.resetCumulativePosition(0);
-        stepper->setCurrentPosition(0);
-        motor_setting_.putInt("encod_max_pos_", encod_max_pos_);
-        LOGD("Motor new min(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-    }
+    // if (set_min_) {
+    //     set_min_ = false;
+    //     encod_max_pos_ -= encod_curr_pos_;
+    //     encoder.resetCumulativePosition(0);
+    //     motor->setCurrentPosition(0);
+    //     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    //     LOGD("Motor new min(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
+    // }
 
-    if (set_max_) {
-        set_max_ = false;
-        encod_max_pos_ = as5600.getCumulativePosition();
-        stepper->setCurrentPosition(positionToSteps(encod_curr_pos_));
-        motor_setting_.putInt("encod_max_pos_", encod_max_pos_);
-        LOGD("Motor new max(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-    }
+    // if (set_max_) {
+    //     set_max_ = false;
+    //     encod_max_pos_ = encoder.getCumulativePosition();
+    //     motor->setCurrentPosition(positionToSteps(encod_curr_pos_));
+    //     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    //     LOGD("Motor new max(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
+    // }
 }
 
 
-void MotorTask::readEncoderPosition() {
-    // encod_prev_pos_ = encod_curr_pos_;
-    // encod_curr_pos_ = as5600.getCumulativePosition();
-    // stepper->setCurrentPosition(positionToSteps(encod_curr_pos_));
-}
-
-
-int MotorTask::positionToSteps(int encoder_position) {
-    return (int) round(encoder_position * motor_encoder_ratio_);
-}
-
-
-void MotorTask::updatePosition() {
-    // if (is_motor_running_) return;
-    // motor_setting_.putInt("encod_curr_pos_", encod_curr_pos_);
-    // LOGD("Motor stopped(curr/max): %d/%d", encod_curr_pos_, encod_max_pos_);
-
-    // Don't send message to wireless task if percentage change is < 3 because it will
-    // overflow the wireless message queue. Also, the resolution for the UI graphic most
-    // is most likely in 1% increments.
-    int current_precentage = getPercentage();
-    if (abs(current_precentage - last_updated_percentage_) > 0
-            && current_precentage >= 0
-            && current_precentage <= 100) {
-        last_updated_percentage_ = current_precentage;
-        if (xQueueSend(wireless_message_queue_, (void*) &current_precentage, 10) != pdTRUE) {
-            LOGE("Failed to send to wireless_message_queue_.");
+void MotorTask::sendPercent() {
+    // Don't send message to wireless task if percent change is less than 2 to reduce wireless
+    // queue overhead.
+    int current_percent = getPercent();
+    if (abs(current_percent - last_updated_percent_) > 1
+            && current_percent >= 0
+            && current_percent <= 100) {
+        last_updated_percent_ = current_percent;
+        if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
+            LOGE("Failed to send to wireless_message_queue_");
         }
     }
 }
@@ -219,10 +185,9 @@ void MotorTask::setMin() {
 
     set_min_ = true;
     tmc2099.rms_current(openingRMS);
-    stepper->setSpeedInHz(maxSpeed / 4);
+    motor->setSpeedInHz(maxSpeed / 4);
 
-    stepper->runBackward();
-    is_motor_running_ = true;
+    motor->runBackward();
 }
 
 
@@ -231,10 +196,9 @@ void MotorTask::setMax() {
 
     set_max_ = true;
     tmc2099.rms_current(closingRMS);
-    stepper->setSpeedInHz(maxSpeed / 4);
+    motor->setSpeedInHz(maxSpeed / 4);
 
-    stepper->runForward();
-    is_motor_running_ = true;
+    motor->runForward();
 }
 
 
@@ -244,4 +208,15 @@ void MotorTask::addListener(QueueHandle_t queue) {
 
 QueueHandle_t MotorTask::getMotorCommandQueue() {
     return motor_command_queue_;
+}
+
+
+// 0 is open; 100 is closed.
+inline int MotorTask::getPercent() {
+    return static_cast<int>(static_cast<float>(encoder.getCumulativePosition()) / encod_max_pos_ * 100 + 0.5);
+}
+
+
+inline int MotorTask::positionToSteps(int encoder_position) {
+    return static_cast<int>(motor_encoder_ratio_ * encoder_position + 0.5);
 }
