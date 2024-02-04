@@ -69,7 +69,7 @@ private:
     int command = -50;
 
     int32_t encod_max_pos_  = 0;
-    uint8_t last_updated_percent_ = -100;
+    int8_t  last_updated_percent_ = -100;
     float motor_encoder_ratio_ = stepsPerRev / 4096.0;
     float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
 
