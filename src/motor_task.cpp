@@ -53,6 +53,10 @@ void MotorTask::run() {
 
     // AS5600 rotary encoder setup
     encoder.begin(SDA_PIN, SCL_PIN);
+    encoder.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
+    encoder.setHysteresis(3);  // Reduce sensitivity when in sleep mode
+    encoder.setSlowFilter(1);  // Reduce noise especially when stopping
+
     assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
 
     loadSettings();
@@ -63,6 +67,7 @@ void MotorTask::run() {
         if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
             switch (command) {
                 case COVER_STOP:
+                    stop();
                     break;
                 case COVER_OPEN:
                     moveToPercent(0);
@@ -85,6 +90,7 @@ void MotorTask::run() {
                 //     break;
                 default:
                     moveToPercent(command);
+                    break;
             }
         }
 
@@ -119,7 +125,7 @@ void MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     motor_settings_.begin("local", false);
 
-    encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 10);
+    encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 20);
     int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
     encoder.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
     motor->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
@@ -155,6 +161,11 @@ void MotorTask::moveToPercent(int percent) {
 
 void MotorTask::stop() {
     motor->forceStop();
+    // Without a slight delay, sometimes fastaccelstepper restarts after forceStop() is called.
+    // It is uncertain why but it might be due to the constant resetting of fastaccelstepper's
+    // position in the while loop. Author of fastaccelstepper recommends for ESP32 to only call
+    // setCurrentPosition when motor is in standstill.
+    vTaskDelay(2 / portTICK_PERIOD_MS);
     LOGD("Motor stopped(curr/max): %d/%d", encoder.getCumulativePosition(), encod_max_pos_);
 }
 
