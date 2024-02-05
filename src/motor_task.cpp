@@ -171,6 +171,9 @@ void MotorTask::stop() {
 
 
 void MotorTask::setMin() {
+    if (encoder.getCumulativePosition() >= encod_max_pos_) {
+        return;
+    }
     encod_max_pos_ -= encoder.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
     encoder.resetCumulativePosition(0);
@@ -181,6 +184,9 @@ void MotorTask::setMin() {
 
 
 void MotorTask::setMax() {
+    if (encoder.getCumulativePosition() < 0) {
+        return;
+    }
     encod_max_pos_ = encoder.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
     motor->setCurrentPosition(positionToSteps(encod_max_pos_));
