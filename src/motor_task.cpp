@@ -56,7 +56,6 @@ void MotorTask::run() {
     encoder.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder.setHysteresis(3);  // Reduce sensitivity when in sleep mode
     encoder.setSlowFilter(1);  // Reduce noise especially when stopping
-
     assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
 
     loadSettings();
