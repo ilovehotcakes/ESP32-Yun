@@ -14,11 +14,18 @@ MotorTask::~MotorTask() {
 
 void MotorTask::run() {
     // TMCStepper driver setup
-    pinMode(EN_PIN, OUTPUT);
+    pinMode(ENN_PIN, OUTPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
-    SERIAL_PORT.begin(115200, SERIAL_8N1, 16, TXD2); // Initialize HardwareSerial; RX: 16, RX: TXD2
-    tmc2209.begin();                 // Sets pdn_disable to 1: disables automatic standstill current reduction, needed for uart; sets mstep_reg_select to 1: use uart to set microsteps
+
+    // Initialize HardwareSerial; RX: 16, RX: TXD2
+    // TMC2209's uart interface automatically becomes enabeld when correct uart data is sent. It
+    // automatically adapts to ESP32's baud rate.
+    Serial1.begin(115200, SERIAL_8N1, 16, TXD2);
+
+    // Automatcially sets pdn_disable to 1: disables automatic standstill current reduction, needed
+    // for uart; also sets mstep_reg_select to 1: use uart to set microsteps
+    tmc2209.begin();
     tmc2209.toff(4);
     tmc2209.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
     tmc2209.pwm_autoscale(true);     // Needed for StealthChop, instead of manually setting
@@ -43,7 +50,7 @@ void MotorTask::run() {
     engine.init();
     motor = engine.stepperConnectToPin(STEP_PIN);
     assert("Failed to initialize FastAccelStepper" && motor);
-    motor->setEnablePin(EN_PIN);
+    motor->setEnablePin(ENN_PIN);
     motor->setDirectionPin(DIR_PIN);
     motor->setSpeedInHz(maxSpeed);
     motor->setAcceleration(acceleration);
