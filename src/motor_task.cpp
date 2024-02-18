@@ -17,25 +17,24 @@ void MotorTask::run() {
     pinMode(EN_PIN, OUTPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
-    SERIAL_PORT.begin(115200, SERIAL_8N1, 16, TXD2); // Initialize HardwareSerial for hardware UART driver; remapped TXD2 from GPIO 16 to GPIO 22
-    tmc2099.begin();                 // Begin sending data
-    tmc2099.toff(4);                 // Not used in StealthChop but required to enable the motor, 0=off
-    tmc2099.pdn_disable(true);       // PDN_UART input disabled; set this bit when using the UART interface
-    tmc2099.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
-    tmc2099.pwm_autoscale(true);     // Needed for StealthChop
-    tmc2099.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
-    tmc2099.blank_time(24);          // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
-    tmc2099.microsteps(microsteps);
-    tmc2099.shaft(flipDir);
+    SERIAL_PORT.begin(115200, SERIAL_8N1, 16, TXD2); // Initialize HardwareSerial; RX: 16, RX: TXD2
+    tmc2209.begin();                 // Sets pdn_disable to 1: disables automatic standstill current reduction, needed for uart; sets mstep_reg_select to 1: use uart to set microsteps
+    tmc2209.toff(4);
+    tmc2209.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
+    tmc2209.pwm_autoscale(true);     // Needed for StealthChop, instead of manually setting
+    tmc2209.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
+    tmc2209.blank_time(24);          // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
+    tmc2209.microsteps(microsteps);
+    tmc2209.shaft(flipDir);
 
     // TMCStepper StallGuard setup
     #ifdef DIAG_PIN
     if (enableSG) {
         pinMode(DIAG_PIN, INPUT);
-        tmc2099.semin(4);            // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
-        tmc2099.semax(0);            // Refer to p58 of the datasheet
-        tmc2099.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
-        tmc2099.SGTHRS(sgThreshold); // [0..255] the higher the more sensitive to stall
+        tmc2209.semin(4);            // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
+        tmc2209.semax(0);            // Refer to p58 of the datasheet
+        tmc2209.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
+        tmc2209.SGTHRS(sgThreshold); // [0..255] the higher the more sensitive to stall
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
@@ -55,7 +54,8 @@ void MotorTask::run() {
     encoder.begin(SDA_PIN, SCL_PIN);
     encoder.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder.setHysteresis(3);  // Reduce sensitivity when in sleep mode
-    encoder.setSlowFilter(1);  // Reduce noise especially when stopping
+    encoder.setSlowFilter(0);  // Reduce noise especially when stopping
+    encoder.setFastFilter(7);
     assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
 
     loadSettings();
@@ -84,9 +84,9 @@ void MotorTask::run() {
                     motor_settings_.clear();
                     ESP.restart();
                     break;
-                // case SYS_REBOOT:
-                //     ESP.restart();
-                //     break;
+                case SYS_REBOOT:
+                    ESP.restart();
+                    break;
                 default:
                     moveToPercent(command);
                     break;
@@ -146,9 +146,9 @@ void MotorTask::moveToPercent(int percent) {
     motor->setSpeedInHz(maxSpeed);
 
     if (percent > getPercent()) {
-        tmc2099.rms_current(closingRMS);
+        tmc2209.rms_current(closingRMS);
     } else {
-        tmc2099.rms_current(openingRMS);
+        tmc2209.rms_current(openingRMS);
     }
 
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
