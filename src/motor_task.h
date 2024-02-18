@@ -13,6 +13,7 @@
     max/min positions without reflashing firmware.
 **/
 #include <Arduino.h>
+#include <HardwareSerial.h>       // Hardwareserial for uart
 #include <TMCStepper.h>
 #include <FastAccelStepper.h>
 #include <AS5600.h>
@@ -50,7 +51,7 @@ private:
     #include "motor_settings.h"
 
     // TMCStepper library for interfacing MCU with stepper driver hardware
-    TMC2209Stepper tmc2209 = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
+    TMC2209Stepper tmc2209 = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
     // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
