@@ -11,7 +11,7 @@
       - Check and modify stepper motor driver settings. 
 **/
 // TMC2209 driver settings
-int microsteps   = 128;               // 128 microsteps per full step
+int microsteps   = 16;               // 128 microsteps per full step
 int stepsPerRev  = 200 * microsteps;  // NEMA motors have 200 full steps/rev
 int maxSpeed     = static_cast<int>(stepsPerRev * 5);  // Max speed in Hz; Needs to be large enough to not trip SG
 int acceleration = static_cast<int>(maxSpeed * 0.5);   // Use lower value if using SG
