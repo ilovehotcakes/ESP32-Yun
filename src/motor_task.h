@@ -49,23 +49,23 @@ protected:
 
 private:
     // TMCStepper library for interfacing MCU with stepper driver hardware
-    TMC2209Stepper driver = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
+    TMC2209Stepper driver_ = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 
     // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
-    FastAccelStepperEngine engine = FastAccelStepperEngine();
-    FastAccelStepper *motor = NULL;
+    FastAccelStepperEngine engine_ = FastAccelStepperEngine();
+    FastAccelStepper *motor_ = NULL;
 
     // Rotary encoder for keeping track of actual motor positions because motor could
     // slip and cause the position to be incorrect
-    AS5600 encoder;
+    AS5600 encoder_;
 
     // Saving positions and other attributes
     Preferences motor_settings_;
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
-    int command = -50;
+    int command_ = -50;
 
     // TMC2209 settings
     int microsteps_           = 16;

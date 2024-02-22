@@ -25,36 +25,36 @@ void MotorTask::run() {
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
     // sets mstep_reg_select=1: use UART to change microstepping settings.
-    driver.begin();
+    driver_.begin();
 
     // 0=disable driver; 1-15=enable driver in StealthChop
     // Sets the slow decay time (off time) [1... 15]. This setting also limit the maximum chopper
     // frequency. For operation with StealthChop, this parameter is not used, but it is required to
     // enable the motor. In case of operation with StealthChop only, any setting is OK.
-    driver.toff(0);
+    driver_.toff(0);
 
     // Set motor RMS current via UART, higher torque requires more current. The default holding
     // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
     // rms_current(1000, 0.3).
-    driver.rms_current(opening_current_);
+    driver_.rms_current(opening_current_);
 
     // Needed for StealthChop instead of manually setting PWM scaling factor
-    driver.pwm_autoscale(true);
+    driver_.pwm_autoscale(true);
 
     // true=enable SpreadCycle
     // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque. They can
     // be used together by setting a threshold when it switches from StealthChop to SpreadCycle.
-    driver.en_spreadCycle(false);
+    driver_.en_spreadCycle(false);
 
     // Number of microsteps [0, 2, 4, 8, 16, 32, 64, 126, 256] per full step
     // Set MRES register via UART
-    driver.microsteps(16);
+    driver_.microsteps(16);
 
     // Comparator blank time to [16, 24, 32, 40] clocks. The time needed to safely cover switching
     // events and the duration of ringing on sense resistor. For most applications, a setting of 16
     // or 24 is good. For highly capacitive loads, a setting of 32 or 40 will be required.
-    driver.blank_time(24);
-    driver.shaft(direction_);
+    driver_.blank_time(24);
+    driver_.shaft(direction_);
 
     // StallGuard setup
     #ifdef DIAG_PIN
@@ -64,52 +64,52 @@ void MotorTask::run() {
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
         // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
-        driver.semin(4);
+        driver_.semin(4);
 
         // CoolStep upper threshold [0... 15].
         // If SG is sampled equal to or above this threshold enough times, CoolStep decreases the
         // current to both coils.
-        driver.semax(0);
+        driver_.semax(0);
 
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)) * 1.5);
+        driver_.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)) * 1.5);
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more
         // sensitive and requires less torque to stall. The double of this value is compared to
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
-        driver.SGTHRS(stallguard_threshold_);
+        driver_.SGTHRS(stallguard_threshold_);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
 
     // FastAccelStepper setup
-    engine.init();
-    motor = engine.stepperConnectToPin(STEP_PIN);
-    assert("Failed to initialize FastAccelStepper" && motor);
-    motor->setEnablePin(100, false);
-    motor->setExternalEnableCall(std::bind(&MotorTask::enableDriver, this, std::placeholders::_1, std::placeholders::_2));
-    motor->setDirectionPin(DIR_PIN);
-    motor->setSpeedInHz(velocity_);
-    motor->setAcceleration(acceleration_);
-    motor->setAutoEnable(true);     // Automatically enable motor output when moving and vice versa
-    motor->setDelayToDisable(200);  // 200ms off delay
+    engine_.init();
+    motor_ = engine_.stepperConnectToPin(STEP_PIN);
+    assert("Failed to initialize FastAccelStepper" && motor_);
+    motor_->setEnablePin(100, false);
+    motor_->setExternalEnableCall(std::bind(&MotorTask::enableDriver, this, std::placeholders::_1, std::placeholders::_2));
+    motor_->setDirectionPin(DIR_PIN);
+    motor_->setSpeedInHz(velocity_);
+    motor_->setAcceleration(acceleration_);
+    motor_->setAutoEnable(true);     // Automatically enable motor output when moving and vice versa
+    motor_->setDelayToDisable(200);  // 200ms off delay
 
     // AS5600 rotary encoder setup
-    encoder.begin(SDA_PIN, SCL_PIN);
-    encoder.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
-    encoder.setHysteresis(3);  // Reduce sensitivity when in sleep mode
-    encoder.setSlowFilter(0);  // Reduce noise especially when stopping
-    encoder.setFastFilter(7);
-    assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
+    encoder_.begin(SDA_PIN, SCL_PIN);
+    encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
+    encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
+    encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
+    encoder_.setFastFilter(7);
+    assert("Failed to initialize AS5600 rotary encoder" && encoder_.isConnected());
 
     loadSettings();
 
     while (1) {
-        motor->setCurrentPosition(positionToSteps(encoder.getCumulativePosition()));
+        motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
 
-        if (xQueueReceive(motor_command_queue_, (void*) &command, 0) == pdTRUE) {
-            switch (command) {
+        if (xQueueReceive(motor_command_queue_, (void*) &command_, 0) == pdTRUE) {
+            switch (command_) {
                 case COVER_STOP:
                     stop();
                     break;
@@ -133,12 +133,12 @@ void MotorTask::run() {
                     ESP.restart();
                     break;
                 default:
-                    moveToPercent(command);
+                    moveToPercent(command_);
                     break;
             }
         }
 
-        if (motor->isRunning()) {
+        if (motor_->isRunning()) {
             continue;
         }
 
@@ -160,7 +160,7 @@ void MotorTask::run() {
 // For StallGuard
 #ifdef DIAG_PIN
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
-    motor->forceStop();
+    motor_->forceStop();
     vTaskDelay(1 / portTICK_PERIOD_MS);  // Added delay for motor to fully stop
 }
 #endif
@@ -171,15 +171,15 @@ void MotorTask::loadSettings() {
 
     encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 20);
     int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
-    encoder.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
-    motor->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
+    encoder_.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
+    motor_->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
 }
 
 
 void MotorTask::moveToPercent(int percent) {
-    if (motor->isRunning()) {
+    if (motor_->isRunning()) {
         stop();
         return;
     }
@@ -188,52 +188,52 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    motor->setSpeedInHz(velocity_);
+    motor_->setSpeedInHz(velocity_);
 
     if (percent > getPercent()) {
-        driver.rms_current(closing_current_);
+        driver_.rms_current(closing_current_);
     } else {
-        driver.rms_current(opening_current_);
+        driver_.rms_current(opening_current_);
     }
 
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
-    motor->moveTo(positionToSteps(new_position));
+    motor_->moveTo(positionToSteps(new_position));
 
-    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder.getCumulativePosition(), encod_max_pos_, new_position);
+    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder_.getCumulativePosition(), encod_max_pos_, new_position);
 }
 
 
 void MotorTask::stop() {
-    motor->forceStop();
+    motor_->forceStop();
     // Without a slight delay, sometimes fastaccelstepper restarts after forceStop() is called.
     // It is uncertain why but it might be due to the constant resetting of fastaccelstepper's
     // position in the while loop. Author of fastaccelstepper recommends for ESP32 to only call
     // setCurrentPosition when motor is in standstill.
     vTaskDelay(2 / portTICK_PERIOD_MS);
-    LOGD("Motor stopped(curr/max): %d/%d", encoder.getCumulativePosition(), encod_max_pos_);
+    LOGD("Motor stopped(curr/max): %d/%d", encoder_.getCumulativePosition(), encod_max_pos_);
 }
 
 
 void MotorTask::setMin() {
-    if (encoder.getCumulativePosition() >= encod_max_pos_) {
+    if (encoder_.getCumulativePosition() >= encod_max_pos_) {
         return;
     }
-    encod_max_pos_ -= encoder.getCumulativePosition();
+    encod_max_pos_ -= encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
-    encoder.resetCumulativePosition(0);
-    motor->setCurrentPosition(0);
+    encoder_.resetCumulativePosition(0);
+    motor_->setCurrentPosition(0);
     last_updated_percent_ = -100;  // Needed to trigger send message
     LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
 }
 
 
 void MotorTask::setMax() {
-    if (encoder.getCumulativePosition() < 0) {
+    if (encoder_.getCumulativePosition() < 0) {
         return;
     }
-    encod_max_pos_ = encoder.getCumulativePosition();
+    encod_max_pos_ = encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
-    motor->setCurrentPosition(positionToSteps(encod_max_pos_));
+    motor_->setCurrentPosition(positionToSteps(encod_max_pos_));
     last_updated_percent_ = -100;
     LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
 }
@@ -250,7 +250,7 @@ QueueHandle_t MotorTask::getMotorCommandQueue() {
 
 // 0 is open; 100 is closed.
 inline int MotorTask::getPercent() {
-    return static_cast<int>(static_cast<float>(encoder.getCumulativePosition()) / encod_max_pos_ * 100 + 0.5);
+    return static_cast<int>(static_cast<float>(encoder_.getCumulativePosition()) / encod_max_pos_ * 100 + 0.5);
 }
 
 
@@ -261,9 +261,9 @@ inline int MotorTask::positionToSteps(int encoder_position) {
 
 bool MotorTask::enableDriver(uint8_t enable_pin, uint8_t value) {
     if (value == HIGH) {
-        driver.toff(4);
+        driver_.toff(4);
     } else {
-        driver.toff(0);
+        driver_.toff(0);
     }
     return value;
 }
