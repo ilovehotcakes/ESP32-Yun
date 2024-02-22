@@ -1,31 +1,13 @@
 # ESP32 Motorcover
-A ESP32-based DIY motorcover solution for smarthomes. A [**cover**](https://www.home-assistant.io/integrations/cover/)
-is a rollershutter, blind, shade, window, etc. in [**Home Assistant**](https://www.home-assistant.io/). A motorized
-cover provides the ability to control your covers via your choice of smarthome hub/system (HA, Alexa, etc.). Currently,
-the ESP32 motorcover interfaces via WiFi/MQTT. HTTP GET requests and ESP-now are coming in the near future.
+A ESP32-based wireless stepper motor controller for smart homes. In [**Home Assistant**](https://www.home-assistant.io/),
+a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, 
+window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome 
+hub/system (HA, Google Home, Alexa, etc.) either through apps, voice control, or automations.
 
 https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4
 
 
-
-## Motivation
-Commercial available motorized honeycomb cellular shades start from $250-$400 per unit but the quality in terms of
-the speed, noise level, build material, and user expreience are below my expectations. On the other hand, premium
-honeycomb cellular shades are too expensive so I've decided DIY my existing cordless honeycomb shades. There're DIY
-projects for motorized roller shade/blind and tilting control for venetian blind but not for honeycomb shade. I
-believe the reason is that honeycomb shade is a heavier cover, therefore, more challenging to lift. This project
-focuses on using powerful (geared) NEMA motor and silent stepper driver TMC2209 to move heavier covers swiftly and
-silently within a reasonable budget.
-
-
-## Parts List
-These are the exact parts I used to make 5 motorized shades. It was **~$92/unit** but if you own a 3D printer, some
-wires and screws, the cost can be lowered to **~$80/unit**. Since the motor requires to fit inside the top compartment
-of the shades, NEMA 11 stepper motors with the 5.18:1 planetary gears is the optimal choice to be small and still have
-enough torque. If you don't need to conceal the motor, you can get bigger and cheaper motors on Amazon for ~$15/unit +
-free shipping. Note the UART version of the TMC2209 stepper driver comes with UART enabled already so you don't need to
-manually solder the pads underneath.
-
+## BOM
 |Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
 |-----------------------------|---------------:|:------:|-------:|----------:|:---:|
 |NEMA bipolar stepper motor   |          $33.34|       5|  $33.12|    $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
@@ -44,7 +26,7 @@ manually solder the pads underneath.
 
 ## Usage
 ### 1. Hardware Connections
-You can use this without StallGuard 4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
+You can use this without StallGuard4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
 when encountering a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
 homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
 **DIAG_PIN** and **TXD2** if you don't planning on using SG.
@@ -72,7 +54,7 @@ You will need a MQTT server/broker. You can run one on rpi4 or a docker.
     *  **-5  : set max position**
     *  **-99 : reboot system**
 
-### 4. Tuning StallGuard 4 (Optional)
+### 4. Tuning StallGuard4 (Optional)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
 * Set the minimum RMS current required to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts

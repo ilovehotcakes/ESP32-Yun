@@ -13,29 +13,72 @@ MotorTask::~MotorTask() {
 
 
 void MotorTask::run() {
-    // TMCStepper driver setup
-    pinMode(EN_PIN, OUTPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
-    SERIAL_PORT.begin(115200, SERIAL_8N1, 16, TXD2); // Initialize HardwareSerial for hardware UART driver; remapped TXD2 from GPIO 16 to GPIO 22
-    tmc2099.begin();                 // Begin sending data
-    tmc2099.toff(4);                 // Not used in StealthChop but required to enable the motor, 0=off
-    tmc2099.pdn_disable(true);       // PDN_UART input disabled; set this bit when using the UART interface
-    tmc2099.rms_current(openingRMS); // Motor RMS current "rms_current will by default set ihold to 50% of irun but you can set your own ratio with additional second argument; rms_current(1000, 0.3)."
-    tmc2099.pwm_autoscale(true);     // Needed for StealthChop
-    tmc2099.en_spreadCycle(false);   // Disable SpreadCycle; SpreadCycle is faster but louder
-    tmc2099.blank_time(24);          // Comparator blank time. Needed to safely cover the switching event and the duration of the ringing on the sense resistor.
-    tmc2099.microsteps(microsteps);
-    tmc2099.shaft(flipDir);
 
-    // TMCStepper StallGuard setup
+    // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
+    // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
+    // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
+    // can send settings to the driver via UART.
+    SERIAL_PORT.begin(115200, SERIAL_8N1, RXD1, TXD1);
+    while(!SERIAL_PORT);
+
+    // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
+    // sets mstep_reg_select=1: use UART to change microstepping settings.
+    driver.begin();
+
+    // 0=disable driver; 1-15=enable driver in StealthChop
+    // Sets the slow decay time (off time) [1... 15]. This setting also limit the maximum chopper
+    // frequency. For operation with StealthChop, this parameter is not used, but it is required to
+    // enable the motor. In case of operation with StealthChop only, any setting is OK.
+    driver.toff(0);
+
+    // Set motor RMS current via UART, higher torque requires more current. The default holding
+    // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
+    // rms_current(1000, 0.3).
+    driver.rms_current(openingRMS);
+
+    // Needed for StealthChop instead of manually setting PWM scaling factor
+    driver.pwm_autoscale(true);
+
+    // true=enable SpreadCycle
+    // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque. They can
+    // be used together by setting a threshold when it switches from StealthChop to SpreadCycle.
+    driver.en_spreadCycle(false);
+
+    // Number of microsteps [0, 2, 4, 8, 16, 32, 64, 126, 256] per full step
+    // Set MRES register via UART
+    driver.microsteps(16);
+
+    // Comparator blank time to [16, 24, 32, 40] clocks. The time needed to safely cover switching
+    // events and the duration of ringing on sense resistor. For most applications, a setting of 16
+    // or 24 is good. For highly capacitive loads, a setting of 32 or 40 will be required.
+    driver.blank_time(24);
+    driver.shaft(flipDir);
+
+    // StallGuard setup
     #ifdef DIAG_PIN
     if (enableSG) {
         pinMode(DIAG_PIN, INPUT);
-        tmc2099.semin(4);            // CoolStep/SmartEnergy 4-bit uint that sets lower threshold, 0=disable
-        tmc2099.semax(0);            // Refer to p58 of the datasheet
-        tmc2099.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);  // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG
-        tmc2099.SGTHRS(sgThreshold); // [0..255] the higher the more sensitive to stall
+
+        // 0=disable CoolStep
+        // CoolStep lower threshold [0... 15].
+        // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
+        driver.semin(4);
+
+        // CoolStep upper threshold [0... 15].
+        // If SG is sampled equal to or above this threshold enough times, CoolStep decreases the
+        // current to both coils.
+        driver.semax(0);
+
+        // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
+        driver.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);
+
+        // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
+        // specific characteristics and controls sensitivity. A higher value makes StallGuard more
+        // sensitive and requires less torque to stall. The double of this value is compared to
+        // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
+        driver.SGTHRS(sgThreshold);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
@@ -44,18 +87,20 @@ void MotorTask::run() {
     engine.init();
     motor = engine.stepperConnectToPin(STEP_PIN);
     assert("Failed to initialize FastAccelStepper" && motor);
-    motor->setEnablePin(EN_PIN);
+    motor->setEnablePin(100, false);
+    motor->setExternalEnableCall(std::bind(&MotorTask::enableDriver, this, std::placeholders::_1, std::placeholders::_2));
     motor->setDirectionPin(DIR_PIN);
     motor->setSpeedInHz(maxSpeed);
     motor->setAcceleration(acceleration);
-    motor->setAutoEnable(true);
-    motor->setDelayToDisable(200);
+    motor->setAutoEnable(true);     // Automatically enable motor output when moving and vice versa
+    motor->setDelayToDisable(200);  // 200ms off delay
 
     // AS5600 rotary encoder setup
     encoder.begin(SDA_PIN, SCL_PIN);
     encoder.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder.setHysteresis(3);  // Reduce sensitivity when in sleep mode
-    encoder.setSlowFilter(1);  // Reduce noise especially when stopping
+    encoder.setSlowFilter(0);  // Reduce noise especially when stopping
+    encoder.setFastFilter(7);
     assert("Failed to initialize AS5600 rotary encoder" && encoder.isConnected());
 
     loadSettings();
@@ -84,9 +129,9 @@ void MotorTask::run() {
                     motor_settings_.clear();
                     ESP.restart();
                     break;
-                // case SYS_REBOOT:
-                //     ESP.restart();
-                //     break;
+                case SYS_REBOOT:
+                    ESP.restart();
+                    break;
                 default:
                     moveToPercent(command);
                     break;
@@ -114,9 +159,9 @@ void MotorTask::run() {
 
 // For StallGuard
 #ifdef DIAG_PIN
-void MotorTask::stallguardInterrupt() {
+void IRAM_ATTR MotorTask::stallguardInterrupt() {
     motor->forceStop();
-    LOGE("Motor stalled");
+    vTaskDelay(1 / portTICK_PERIOD_MS);  // Added delay for motor to fully stop
 }
 #endif
 
@@ -146,9 +191,9 @@ void MotorTask::moveToPercent(int percent) {
     motor->setSpeedInHz(maxSpeed);
 
     if (percent > getPercent()) {
-        tmc2099.rms_current(closingRMS);
+        driver.rms_current(closingRMS);
     } else {
-        tmc2099.rms_current(openingRMS);
+        driver.rms_current(openingRMS);
     }
 
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
@@ -211,4 +256,14 @@ inline int MotorTask::getPercent() {
 
 inline int MotorTask::positionToSteps(int encoder_position) {
     return static_cast<int>(motor_encoder_ratio_ * encoder_position + 0.5);
+}
+
+
+bool MotorTask::enableDriver(uint8_t enable_pin, uint8_t value) {
+    if (value == HIGH) {
+        driver.toff(4);
+    } else {
+        driver.toff(0);
+    }
+    return value;
 }
