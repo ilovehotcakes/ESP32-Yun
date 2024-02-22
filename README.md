@@ -35,11 +35,12 @@ homing. It is also useful for protecting pets/children in the case of motorized 
 ![no_stallguard](images/esp32_motorcover.png)
 ### 2. Flashing Firmware
 #### Dependencies
-[TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper) <br>
-[PubSubClient@^2.8](https://github.com/knolleary/pubsubclient) <br>
-[FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper) <br>
-[robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600) <br>
-Your choice of development platform. I'm using VSCode + PlatformIO. For smart home hub, I'm using Home Assistant with MQTT integration.
+* espressif32@3.5.0
+* [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
+* [PubSubClient@^2.8](https://github.com/knolleary/pubsubclient)
+* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
+* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
+* Your choice of development platform. I'm using VSCode + PlatformIO. For smart home hub, I'm using Home Assistant with MQTT integration.
 
 #### Adding WiFi/MQTT Credentials and Setting Motor Specs
 Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
