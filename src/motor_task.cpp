@@ -36,7 +36,7 @@ void MotorTask::run() {
     // Set motor RMS current via UART, higher torque requires more current. The default holding
     // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
     // rms_current(1000, 0.3).
-    driver.rms_current(openingRMS);
+    driver.rms_current(opening_current_);
 
     // Needed for StealthChop instead of manually setting PWM scaling factor
     driver.pwm_autoscale(true);
@@ -54,11 +54,11 @@ void MotorTask::run() {
     // events and the duration of ringing on sense resistor. For most applications, a setting of 16
     // or 24 is good. For highly capacitive loads, a setting of 32 or 40 will be required.
     driver.blank_time(24);
-    driver.shaft(flipDir);
+    driver.shaft(direction_);
 
     // StallGuard setup
     #ifdef DIAG_PIN
-    if (enableSG) {
+    if (stallguard_enable_) {
         pinMode(DIAG_PIN, INPUT);
 
         // 0=disable CoolStep
@@ -72,13 +72,13 @@ void MotorTask::run() {
         driver.semax(0);
 
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver.TCOOLTHRS((3089838.00 * pow(float(maxSpeed), -1.00161534)) * 1.5);
+        driver.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)) * 1.5);
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more
         // sensitive and requires less torque to stall. The double of this value is compared to
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
-        driver.SGTHRS(sgThreshold);
+        driver.SGTHRS(stallguard_threshold_);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
@@ -90,8 +90,8 @@ void MotorTask::run() {
     motor->setEnablePin(100, false);
     motor->setExternalEnableCall(std::bind(&MotorTask::enableDriver, this, std::placeholders::_1, std::placeholders::_2));
     motor->setDirectionPin(DIR_PIN);
-    motor->setSpeedInHz(maxSpeed);
-    motor->setAcceleration(acceleration);
+    motor->setSpeedInHz(velocity_);
+    motor->setAcceleration(acceleration_);
     motor->setAutoEnable(true);     // Automatically enable motor output when moving and vice versa
     motor->setDelayToDisable(200);  // 200ms off delay
 
@@ -188,12 +188,12 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    motor->setSpeedInHz(maxSpeed);
+    motor->setSpeedInHz(velocity_);
 
     if (percent > getPercent()) {
-        driver.rms_current(closingRMS);
+        driver.rms_current(closing_current_);
     } else {
-        driver.rms_current(openingRMS);
+        driver.rms_current(opening_current_);
     }
 
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);

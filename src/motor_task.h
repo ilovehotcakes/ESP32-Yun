@@ -48,8 +48,6 @@ protected:
     void run();
 
 private:
-    #include "motor_settings.h"
-
     // TMCStepper library for interfacing MCU with stepper driver hardware
     TMC2209Stepper driver = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 
@@ -69,10 +67,21 @@ private:
     QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
     int command = -50;
 
-    int32_t encod_max_pos_  = 0;
+    // TMC2209 settings
+    int microsteps_           = 16;
+    int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
+    int velocity_             = static_cast<int>(steps_per_revolution_ * 5);
+    int acceleration_         = static_cast<int>(velocity_ * 0.5);
+    bool direction_           = false;
+    int opening_current_      = 550;
+    int closing_current_      = 200;  // 1, 3: 200; 2: 400; 4: 300
+    int stallguard_threshold_ = 10;
+
+    int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;
-    float motor_encoder_ratio_ = stepsPerRev / 4096.0;
-    float encoder_motor_ratio_ = 4096.0 / stepsPerRev;
+    float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;
+    float encoder_motor_ratio_    = 4096.0 / steps_per_revolution_;
+    bool stallguard_enable_       = true;
 
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
@@ -85,9 +94,12 @@ private:
     bool enableDriver(uint8_t enable_pin, uint8_t value);
 
     // TODO
-    // void motorSetSpeed() {}
-    // void motorSetQuietModeSpeed() {}
-    // void motorSetDirection() {}
-    // void motorEnableQuietmode() {}
-    // void motorDisableQuietmode() {}
+    // void setMicrosteps()
+    // void setVelocity() {}
+    // void setAcceleration() {}
+    // void setOpeningCurrent() {}
+    // void setClosingCurrent() {}
+    // void setDirection() {}
+    // void disableStallguard() {}
+    // void enableStallguard() {}
 };
