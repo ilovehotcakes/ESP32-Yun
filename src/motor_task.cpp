@@ -38,7 +38,7 @@ void MotorTask::run() {
     // rms_current(1000, 0.3).
     driver_.rms_current(opening_current_);
 
-    // Needed for StealthChop instead of manually setting PWM scaling factor
+    // Enable automatic current control
     driver_.pwm_autoscale(true);
 
     // true=enable SpreadCycle
