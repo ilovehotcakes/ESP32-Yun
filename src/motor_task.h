@@ -51,7 +51,7 @@ private:
     #include "motor_settings.h"
 
     // TMCStepper library for interfacing MCU with stepper driver hardware
-    TMC2209Stepper tmc2209 = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
+    TMC2209Stepper driver = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
 
     // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
@@ -82,6 +82,7 @@ private:
     void setMax();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
+    bool enableDriver(uint8_t enable_pin, uint8_t value);
 
     // TODO
     // void motorSetSpeed() {}
