@@ -13,10 +13,12 @@ MotorTask::~MotorTask() {
 
 
 void MotorTask::run() {
+    pinMode(DIAG_PIN, INPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
 
     // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
+    // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
     // can send settings to the driver via UART.
@@ -27,40 +29,48 @@ void MotorTask::run() {
     // sets mstep_reg_select=1: use UART to change microstepping settings.
     driver_.begin();
 
-    // 0=disable driver; 1-15=enable driver in StealthChop
-    // Sets the slow decay time (off time) [1... 15]. This setting also limit the maximum chopper
-    // frequency. For operation with StealthChop, this parameter is not used, but it is required to
-    // enable the motor. In case of operation with StealthChop only, any setting is OK.
-    driver_.toff(0);
+    // Use voltage reference from internal 5VOut instead of analog Vref for current scaling
+    driver_.I_scale_analog(0);
 
     // Set motor RMS current via UART, higher torque requires more current. The default holding
     // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
     // rms_current(1000, 0.3).
     driver_.rms_current(opening_current_);
 
-    // Enable automatic current control
-    driver_.pwm_autoscale(true);
-
-    // true=enable SpreadCycle
-    // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque. They can
-    // be used together by setting a threshold when it switches from StealthChop to SpreadCycle.
+    // 1=SpreadCycle only; 0=StealthChop PWM mode (below velocity threshold) + SpreadCycle (above
+    // velocity threshold); set register TPWMTHRS to determine the velocity threshold
+    // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque.
     driver_.en_spreadCycle(false);
+    driver_.TPWMTHRS(33);  // Based on 9V, 200mA
+
+    // Enable StealthChop voltage PWM mode: automatic scaling current control taking into account
+    // of the motor back EMF and velocity.
+    driver_.pwm_autoscale(true);
+    driver_.pwm_autograd(true);
 
     // Number of microsteps [0, 2, 4, 8, 16, 32, 64, 126, 256] per full step
     // Set MRES register via UART
     driver_.microsteps(16);
 
+    // 0=disable driver; 1-15=enable driver in StealthChop
+    // Sets the slow decay time (off time) [1... 15]. This setting also limit the maximum chopper
+    // frequency. For operation with StealthChop, this parameter is not used, but it is required to
+    // enable the motor. In case of operation with StealthChop only, any setting is OK.
+    driver_.toff(0);
+
     // Comparator blank time to [16, 24, 32, 40] clocks. The time needed to safely cover switching
     // events and the duration of ringing on sense resistor. For most applications, a setting of 16
     // or 24 is good. For highly capacitive loads, a setting of 32 or 40 will be required.
     driver_.blank_time(24);
+    // driver_.hstrt(4);
+    // driver_.hend(12);
+
+    // Inverse motor direction
     driver_.shaft(direction_);
 
-    // StallGuard setup
+    // StallGuard setup; refer to p73 of TMC2209's datasheet rev1.09 for tuning SG.
     #ifdef DIAG_PIN
     if (stallguard_enable_) {
-        pinMode(DIAG_PIN, INPUT);
-
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
         // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
