@@ -206,7 +206,7 @@ void MotorTask::moveToPercent(int percent) {
         driver_.rms_current(opening_current_);
     }
 
-    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100 + 0.5);
+    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
 
     LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder_.getCumulativePosition(), encod_max_pos_, new_position);
