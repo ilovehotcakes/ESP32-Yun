@@ -82,7 +82,7 @@ void MotorTask::run() {
         driver_.semax(0);
 
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver_.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)) * 1.5);
+        driver_.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)));
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more
@@ -171,7 +171,8 @@ void MotorTask::run() {
 #ifdef DIAG_PIN
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
     motor_->forceStop();
-    vTaskDelay(1 / portTICK_PERIOD_MS);  // Added delay for motor to fully stop
+    vTaskDelay(1);  // Added delay for motor to fully stop
+    // LOGE("Motor stalled");
 }
 #endif
 
