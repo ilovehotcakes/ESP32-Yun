@@ -76,6 +76,8 @@ private:
     int opening_current_      = 550;
     int closing_current_      = 200;  // 1, 3: 200; 2: 400; 4: 300
     int stallguard_threshold_ = 10;
+    volatile bool stalled_    = false;
+    portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
 
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;

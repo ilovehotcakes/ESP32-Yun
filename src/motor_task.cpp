@@ -13,7 +13,6 @@ MotorTask::~MotorTask() {
 
 
 void MotorTask::run() {
-    pinMode(DIAG_PIN, INPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
 
@@ -71,6 +70,7 @@ void MotorTask::run() {
     // StallGuard setup; refer to p73 of TMC2209's datasheet rev1.09 for tuning SG.
     #ifdef DIAG_PIN
     if (stallguard_enable_) {
+        pinMode(DIAG_PIN, INPUT);
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
         // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
@@ -94,7 +94,7 @@ void MotorTask::run() {
     #endif
 
     // FastAccelStepper setup
-    engine_.init();
+    engine_.init(1);
     motor_ = engine_.stepperConnectToPin(STEP_PIN);
     assert("Failed to initialize FastAccelStepper" && motor_);
     motor_->setEnablePin(100, false);
@@ -107,11 +107,11 @@ void MotorTask::run() {
 
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
+    assert("Failed to initialize AS5600 rotary encoder" && encoder_.isConnected());
     encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
     encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
     encoder_.setFastFilter(7);
-    assert("Failed to initialize AS5600 rotary encoder" && encoder_.isConnected());
 
     loadSettings();
 
@@ -148,16 +148,19 @@ void MotorTask::run() {
             }
         }
 
-        if (motor_->isRunning()) {
+        if (stalled_) {
+            stop();
+            stalled_ = false;
+        } else if (motor_->isRunning()) {
+            continue;
+        } else if (getPercent() == last_updated_percent_) {
             continue;
         }
 
         // Don't send message to wireless task if percent change is less than 2 to reduce
         // wireless queue overhead.
         int current_percent = getPercent();
-        if (abs(current_percent - last_updated_percent_) > 1
-                && current_percent >= 0
-                && current_percent <= 100) {
+        if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
             if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
                 LOGE("Failed to send to wireless_message_queue_");
@@ -170,9 +173,9 @@ void MotorTask::run() {
 // For StallGuard
 #ifdef DIAG_PIN
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
-    motor_->forceStop();
-    vTaskDelay(1);  // Added delay for motor to fully stop
-    // LOGE("Motor stalled");
+    portENTER_CRITICAL(&stalled_mux_);
+    stalled_ = true;
+    portEXIT_CRITICAL(&stalled_mux_);
 }
 #endif
 
