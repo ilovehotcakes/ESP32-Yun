@@ -49,7 +49,7 @@ void MotorTask::run() {
 
     // Number of microsteps [0, 2, 4, 8, 16, 32, 64, 126, 256] per full step
     // Set MRES register via UART
-    driver_.microsteps(16);
+    driver_.microsteps(microsteps_);
 
     // 0=disable driver; 1-15=enable driver in StealthChop
     // Sets the slow decay time (off time) [1... 15]. This setting also limit the maximum chopper
@@ -198,7 +198,7 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    if (abs(percent - getPercent()) < 2) {
+    if (percent == getPercent()) {
         return;
     }
 
