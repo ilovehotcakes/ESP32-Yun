@@ -68,13 +68,13 @@ private:
     int command_ = -50;
 
     // TMC2209 settings
-    int microsteps_           = 16;
+    int microsteps_           = 128;
     int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
-    int velocity_             = static_cast<int>(steps_per_revolution_ * 5);
+    int velocity_             = static_cast<int>(steps_per_revolution_ * 3);
     int acceleration_         = static_cast<int>(velocity_ * 0.5);
     bool direction_           = false;
-    int opening_current_      = 550;
-    int closing_current_      = 200;  // 1, 3: 200; 2: 400; 4: 300
+    int opening_current_      = 200;
+    int closing_current_      = 75;  // 1, 3: 200; 2: 400; 4: 300
     int stallguard_threshold_ = 10;
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
