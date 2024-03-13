@@ -162,7 +162,7 @@ void MotorTask::run() {
         int current_percent = getPercent();
         if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
-            if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 10) != pdTRUE) {
+            if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 0) != pdTRUE) {
                 LOGE("Failed to send to wireless_message_queue_");
             }
         }
