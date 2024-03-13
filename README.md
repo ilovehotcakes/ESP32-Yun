@@ -1,9 +1,9 @@
 # ESP32 Motorcover
-An affordable and reliable ESP32-based wireless stepper motor controller for smart homes. Works with NEMA stepper motors. Under active development.
+An affordable, reliable, and user-friendly wireless stepper motor controller for smart homes. Works with NEMA stepper motors and other bipolar stepper motors. Under active development.
 
 In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) either through apps, voice control, or automations.
 
-[[**Demo video**]](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4) [[**Schematic**]](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic_v1.0.svg)
+[[**Demo video**](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)] [[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic_v1.0.svg)]
 
 
 ## BOM
