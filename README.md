@@ -45,17 +45,18 @@ There are two ways to build your own: **(1)** directly order printed circuit boa
 
 
 #### Option 2 - breakout boards and breadboarding:
-This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please find the bill of materials [here](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv) and reference the [**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png) to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
+This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please find the bill of materials [here](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv) and reference the [schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png) to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
 
 
-### 2. Flashing Firmware
-#### Dependencies
+### 2. Firmware
+You can use your choice of IDE to program the firmware, such as [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode) plug-in.
+
+**Dependencies:**
 * espressif32@3.5.0
 * [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
 * [PubSubClient@^2.8](https://github.com/knolleary/pubsubclient)
 * [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
 * [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
-* Your choice of development platform. I'm using VSCode + PlatformIO. For smart home hub, I'm using Home Assistant with MQTT integration.
 
 #### Adding WiFi/MQTT Credentials and Setting Motor Specs
 Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
