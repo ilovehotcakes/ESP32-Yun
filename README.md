@@ -1,9 +1,9 @@
 # ESP32 Motorcover
 An open-source and DIY-friendly solution to motorize windows/blinds for your smart homes.
 
-ESP32 motorcover is an affordable, reliable, and user-friendly closed-loop wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
+ESP32 motorcover is an affordable, reliable, and user-friendly wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
 
-Under active development. **WARNING:** it requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
+Under active development. **WARNING:** requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
 
 
 ## Design
@@ -39,7 +39,7 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 3. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the pick-and-place and bom files, and toggle **"PCB Assembly"**. Click on **"Confirm"** to go the next page.
 4. Upload the bom and pick-and-place files. Click **"Process BOM & CPL"** and **"Continue"** when the error pops up. The error is for the missing connectors which will need to be manually solder once the PCBs arrive.
 5. Solder connectors J1-J4 and separate the AS5600 break-off board from the main board.
-6. Connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
+6. Crimp some 4-pin JST PH connectors and connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
 <p align="center">
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png" width="400"/>
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot.png" width="400">
@@ -49,7 +49,7 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 </p>
 
 #### Option 2 - Breadboarding with breakout modules:
-This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv)** and reference the **[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)** to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
+This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to this version of the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv)** and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
 
 ### 2. Firmware
 Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
@@ -63,13 +63,13 @@ Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.ardui
 
 #### Steps:
 1. Install the dependencies.
-2. Add WiFi and MQTT credentials to secrets.h.
-3. Double check shunt resistor value in platformio.ini.
-4. Set the motor specs, current, speed, and acceleration in motor.h.
-5. Set the USB-to-TTL serial adatper's voltage level to 3V3 using the jumper and plug it in to the computer.
-7. Keep holding the button on ESP32 motorcover and start flashing the firmware.
-8. Once the IDE start transmitting data, connect the four wires from ESP32 motorcover to the adapter: **RX->TXD**, **TX->RXD**, **+->VCC**, **-->GND**.
-9. Let go of the ESP32 motorcover button once the firmware starts uploading. Unplug ESP32 motorcover once the firmware is done uploading.
+2. Add WiFi and MQTT credentials to **secrets.h**.
+3. Double check and set proper current sense resistor value in **platformio.ini**.
+4. Set the motor specs, current, speed, and acceleration in **motor.h**.
+5. Set the USB-to-TTL serial adatper's voltage level to **3V3** and plug it in to the computer.
+6. Keep holding the button on ESP32 motorcover and start flashing the firmware.
+7. Once the IDE start transmitting data, connect the four wires from ESP32 motorcover to the adapter: **RX->TXD**, **TX->RXD**, **+->VCC**, **-->GND**.
+8. Let go of the ESP32 motorcover button once the firmware starts uploading. Unplug ESP32 motorcover once the firmware is done uploading.
 
 ### 3. Motor and mounting hardware
 It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the parts. You can find the stl and pre-sliced files under the **cad** folder.
