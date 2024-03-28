@@ -7,7 +7,7 @@ Under active development. **WARNING:** requires some soldering and electronic kn
 
 
 ## Design
-In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the **[[Demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)]** for example.
+In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the **[[demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)]** for full demonstration.
 
 ### **Features:**
 * Works with WiFi, no need for extra hub
@@ -94,12 +94,12 @@ It's helpful to own a 3D printer beause you can print a lot of parts needed for 
 ## Usage
 Currently, you will need a MQTT server to send commands to the ESP32 motorcover. You can either run one on a computer or a rasberry pi. An update that doesn't require a MQTT server is coming soon.
 
-### Sending Commands via MQTT
+### Sending commands via MQTT
 * *inTopic* is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to motorshade #1.
 * *outTopic* is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from motorshade #1.
 * Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/).
 
-### MQTT Commands:
+### MQTT commands:
 * **0~100: move to position(%);** 0 -> open, 100 -> close
 *  **-1  : stop**
 *  **-2  : open**
