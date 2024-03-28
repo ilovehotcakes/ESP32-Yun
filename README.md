@@ -31,7 +31,7 @@ There are three main components to consider: electronics, firmware, and motor + 
 ### 1. Electronics
 Here are two ways to acquire the electronics: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together on a breadboard.
 
-**[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)]**
+**[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/gerber.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/bom.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/pick_and_place.csv)]**
 
 #### Option 1 - Ordering PCB from JLCPCB:
 1. Download and upload the gerber files to [JLCPCB.com](https://jlcpcb.com/). The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
@@ -41,15 +41,15 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 5. Solder connectors J1-J4 and separate the AS5600 break-off board from the main board.
 6. Crimp some 4-pin JST PH connectors and connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_top.png" width="400"/>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_bot.png" width="400">
     </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top_3d.png" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot_3d.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_top.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_bot.png" width="400">
 </p>
 
 #### Option 2 - Breadboarding with breakout modules:
-This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to this version of the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv)** and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
+This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to this version of the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/prototype/bom.csv)** and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/prototype/assembled_controller.jpg).
 
 ### 2. Firmware
 Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
@@ -75,19 +75,19 @@ Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.ardui
 It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the parts. You can find the stl and pre-sliced files under the **cad** folder.
 
 #### Parts:
-* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)]
-* Nema 11 motor mount(generic): [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)] [[**mirrored stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)]
-* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
-* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)]
-* (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
+* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/nema_11_motor_mount.stl)]
+* Nema 11 motor mount(generic): [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/nema11_mount_v3.stl)] [[**mirrored stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/nema11_mount_v3_mirrored.stl)]
+* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/as5600_mount.stl)]
+* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/magnet_gluing_jig_v1.stl.stl)]
+* (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/coupling.stl)]
 * (Optional) pcb mount: coming soon
 
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_front.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_back.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400">
     </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/IMG_2195.jpg" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/IMG_2196.jpg" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2195.jpg" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2196.jpg" width="400">
 </p>
 
 
