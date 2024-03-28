@@ -1,103 +1,122 @@
 # ESP32 Motorcover
-A ESP32-based wireless stepper motor controller for smart homes. In [**Home Assistant**](https://www.home-assistant.io/),
-a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, 
-window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome 
-hub/system (HA, Google Home, Alexa, etc.) either through apps, voice control, or automations.
+An open-source and DIY-friendly solution to motorize windows/blinds for your smart homes.
 
-https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4
+ESP32 motorcover is an affordable, reliable, and user-friendly wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
+
+Under active development. **WARNING:** requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
 
 
-## BOM
-|Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
-|-----------------------------|---------------:|:------:|-------:|----------:|:---:|
-|NEMA bipolar stepper motor   |          $33.34|       5|  $33.12|    $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
-|ESP32 node mcu               |          $12.10|       5|        |     $60.50|[[Amazon]](https://www.amazon.com/dp/B0718T232Z)|
-|Buck convertor               |           $5.95|       5|   $7.99|     $37.74|[[Mouser]](https://www.mouser.com/ProductDetail/485-4739)|
-|TMC2209 UART stepper driver  |          $34.12|       1|        |     $34.12|[[Amazon]](https://www.amazon.com/gp/product/B07YW7BM68)|
-|Coupling                     |          $14.96|       1|        |     $14.96|[[Amazon]](https://www.amazon.com/gp/product/B07MPFJGZW)|
-|100uF capacitor              |           $6.82|       1|        |      $6.82|[[Amazon]](https://www.amazon.com/gp/product/B07Y3F194W)|
-|Solderless breadboard        |           $6.59|       1|        |      $6.59|[[Amazon]](https://www.amazon.com/gp/product/B07LF71ZTS)|
-|Power supply                 |          $17.51|       2|        |     $35.02|[[Amazon]](https://www.amazon.com/gp/product/B07N18XN84)|
-|Wires                        |          $14.86|       1|        |     $14.86|[[Amazon]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket (Shapeways) |           $6.04|       5|   $9.99|     $40.20|[[STL File]](resources/mounting_bracket_v3.stl)[[Mirrored]](resources/mounting_bracket_v3_mirrored.stl)|
-|Screws                       |          $10.00|       1|        |        $10|     |
-|Total                        |                |        |        |**$460.63**|     |
+## Design
+In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the **[[Demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)]** for example.
+
+### **Features:**
+* Works with WiFi, no need for extra hub
+* Closed-loop system, making the motor movements extremely precise and reliable
+* Automatic stalling detection and stopping, preventing injuries and protecting the motor
+* Extremely quiet, won't even wake a baby!
+* Few parts, cheap and easy to assemble
+
+
+## Building your own
+There are three main components to consider: electronics, firmware, and motor + mounting hardware.
+
+### Requirements:
+* Computer and [USB-to-TTL serial adatper](https://www.amazon.com/dp/B07WX2DSVB) to upload the firmware
+* [Soldering iron](https://www.amazon.com/dp/B096X6SG13/)
+* Wires and [JST PH connectors](https://www.amazon.com/dp/B0731MZCGF)/[crimper](https://www.amazon.com/dp/B00YGLKBSK)
+* Bipolar stepper motor, such as [Nema 11](https://www.amazon.com/dp/B00PNEPK94/)
+* Power supply: 3.3-24V, 1.2A max
+* (Optional) 3D printer for the motor mount and coupling
+
+### 1. Electronics
+Here are two ways to acquire the electronics: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together on a breadboard.
+
+**[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)]**
+
+#### Option 1 - Ordering PCB from JLCPCB:
+1. Download and upload the gerber files to [JLCPCB.com](https://jlcpcb.com/). The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
+2. If you prefer to manually assemble the PCB, please refer to the schematic and bom.
+3. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the pick-and-place and bom files, and toggle **"PCB Assembly"**. Click on **"Confirm"** to go the next page.
+4. Upload the bom and pick-and-place files. Click **"Process BOM & CPL"** and **"Continue"** when the error pops up. The error is for the missing connectors which will need to be manually solder once the PCBs arrive.
+5. Solder connectors J1-J4 and separate the AS5600 break-off board from the main board.
+6. Crimp some 4-pin JST PH connectors and connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
+<p align="center">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png" width="400"/>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot.png" width="400">
+    </br>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top_3d.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot_3d.png" width="400">
+</p>
+
+#### Option 2 - Breadboarding with breakout modules:
+This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to this version of the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv)** and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
+
+### 2. Firmware
+Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
+
+#### Dependencies:
+* espressif32@3.5.0
+* [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
+* [PubSubClient@^2.8](https://github.com/knolleary/pubsubclient)
+* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
+* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
+
+#### Steps:
+1. Install the dependencies.
+2. Add WiFi and MQTT credentials to **secrets.h**.
+3. Double check and set proper current sense resistor value in **platformio.ini**.
+4. Set the motor specs, current, speed, and acceleration in **motor.h**.
+5. Set the USB-to-TTL serial adatper's voltage level to **3V3** and plug it in to the computer.
+6. Keep holding the button on ESP32 motorcover and start flashing the firmware.
+7. Once the IDE start transmitting data, connect the four wires from ESP32 motorcover to the adapter: **RX->TXD**, **TX->RXD**, **+->VCC**, **-->GND**.
+8. Let go of the ESP32 motorcover button once the firmware starts uploading. Unplug ESP32 motorcover once the firmware is done uploading.
+
+### 3. Motor and mounting hardware
+It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the parts. You can find the stl and pre-sliced files under the **cad** folder.
+
+#### Parts:
+* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)]
+* Nema 11 motor mount(generic): [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)] [[**mirrored stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)]
+* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
+* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)]
+* (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
+* (Optional) pcb mount: coming soon
+
+<p align="center">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_front.png" width="400"/>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_back.png" width="400">
+    </br>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/IMG_2195.jpg" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/IMG_2196.jpg" width="400">
+</p>
 
 
 ## Usage
-### 1. Hardware Connections
-You can use this without StallGuard4. SG is a TMC2209 feature that enables the stepper motor to stop in an instance
-when encountering a resistance. SG is convenient for setting the minimum position for the shades, i.e. sensorless
-homing. It is also useful for protecting pets/children in the case of motorized windows. You don't need to connect
-**DIAG_PIN** and **TXD2** if you don't planning on using SG.
+Currently, you will need a MQTT server to send commands to the ESP32 motorcover. You can either run one on a computer or a rasberry pi. An update that doesn't require a MQTT server is coming soon.
 
-![stallguard](images/esp32_motorcover_stallguard.png)
-![no_stallguard](images/esp32_motorcover.png)
-### 2. Flashing Firmware
-#### Dependencies
-You will need to add [TMCStepper](https://github.com/teemuatlut/TMCStepper), [PubSubClient](https://github.com/knolleary/pubsubclient),	[FastAccelStepper](https://github.com/gin66/FastAccelStepper) to your library. I'm using VSCode + PlatformIO so I need to add the libraries to my project as well.
+### Sending Commands via MQTT
+* *inTopic* is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to motorshade #1.
+* *outTopic* is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from motorshade #1.
+* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/).
 
-#### Adding WiFi/MQTT Credentials and Setting Motor Specs
-Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
+### MQTT Commands:
+* **0~100: move to position(%);** 0 -> open, 100 -> close
+*  **-1  : stop**
+*  **-2  : open**
+*  **-3  : close**
+*  **-4  : set min position**
+*  **-5  : set max position**
+*  **-98 : reset system to default**
+*  **-99 : reboot system**
 
-### 3. Sending Commands via MQTT
-You will need a MQTT server/broker. You can run one on rpi4 or a docker.
-* inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
-* outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
-* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
-* **MQTT Commands:**
-    * **0~100: move to position(%);** 0 -> open, 100 -> close
-    *  **-1  : stop**
-    *  **-2  : open**
-    *  **-3  : close**
-    *  **-4  : set min position**
-    *  **-5  : set max position**
-    *  **-99 : reboot system**
+### (Optional) Tuning StallGuard4
+StallGuard4(SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working as intended. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
 
-### 4. Tuning StallGuard4 (Optional)
-If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set the minimum RMS current required to move your cover.
-* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
-moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
-to make sure the motor accelerates up to max speed.
-* Adjust the sensitivity of SG by changing sgThreshold.
 
-## Sample Use Case - Honeycomb Cellular Shades
-### Spring Dampening
-With cordless honeycomb cellular shades, there are a couple of different designs for the cordless mechanism. Mine is an
-older simpler design, which just contains an axle driving 2-3 spools to lift the shade via an internal cord. It has a
-tape-like spring connected to the axle to prevents the shade from dropping when it is retracted. I would advise to keep
-it to prevent the shade from falling by itself when the motor's holding current is cut.
-
-With the spring, I've discovered that the shade will "overshoot" when opening if the shade is too light because the
-spring is pulling in the same direction as the motor and causing a bouncing effect when the motor is stopped. One way
-to fix this issue is by adding weights at the bottom of the shade so it dampens the bouncing effect. My shades all come
-with 2 metal rods and weights each at the bottom. I took out the weights so the motor requires less torque to lift the
-shades. If your motor is powerful enough to lift the cover without reducing the weight, leave it as-is; if your cover
-overshoots when retracting, add some weights.
-
-### Sound/Vibration Dampening
-I have an old mousepad laying around so I cut it into small pieces and placed it underneath the stepper motor mounting
-bracket to reduce the vibration and provide a bit of sound dampening. Most of noise comes from the spring retracting
-and the bearings of the stepper motor, which is unavoidable. Also, the slower the speed is, the quieter the motorshade
-is.
-
-### Installation
-Here are some photos of the assembled controller using all off-the-shelf components. The 3D file for the mounting bracket can be found under the resource folder.
-![controller](images/assembled_controller.jpg)
-![mounts](images/mounts.jpg)
-![motor_in_mount](images/motor_in_mount.jpg)
-![motor_installed](images/motor_installed.jpg)
-![controller_installed](images/controller_installed.jpg)
-
-## Resources
-### TMC2209 Info
-* [Trinamic TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
-* [BigTreeTech TMC2209 V1.2 schematic](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/Schematic/TMC2209-V1.2.pdf)
-* [BigTreeTech TMC2209 V1.2 manual](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/manual/TMC2209-V1.2-manual.pdf)
-### StallGuard Info
-* [How to connect TMC2209 for UART (StallGuard)](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/14)
-* [How to connect TMC2209 for UART (StallGuard) 2](https://forum.arduino.cc/t/tmcstepper-arduino-tmc2209/956036/9)
-* [StallGuard example code](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
-### ESP-now (future feature)
-* [ESP-now scanning devices](https://circuitcellar.com/research-design-hub/design-solutions/using-esp-now-protocol-part-1/)
+## Coming soon
+* Remove the need for a MQTT server to send commands
+* Ability to change WiFi credentials and motor settings after flashing the firmware
+* Write custom drivers to reduce dependency
+* BLE support
+* Updating PCB so little to no soldering is required
+* Replace ESP32 WROOM 32E with ESP32-S3 so USB-to-TTL is not required

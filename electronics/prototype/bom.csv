@@ -1,0 +1,14 @@
+Item,Cost (incl. tax),Quantity,Shipping,Subtotal,Vendor,Links
+NEMA bipolar stepper motor,33.34,5,33.12,199.82,Stepperonline,https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5
+ESP32 node mcu ,12.1,5,,60.5,Amazon,https://www.amazon.com/dp/B0718T232Z
+Buck convertor,5.95,5,7.99,37.74,Mouser,https://www.mouser.com/ProductDetail/485-4739
+TMC2209 UART stepper driver,34.12,1,,34.12,Amazon,https://www.amazon.com/gp/product/B07YW7BM68
+Coupling,14.96,1,,14.96,Amazon,https://www.amazon.com/gp/product/B07MPFJGZW
+100uF capacitor,6.82,1,,6.82,Amazon,https://www.amazon.com/gp/product/B07Y3F194W
+Solderless breadboard,6.59,1,,6.59,Amazon,https://www.amazon.com/gp/product/B07LF71ZTS
+Power supply,17.51,2,,35.02,Amazon,https://www.amazon.com/gp/product/B07N18XN84
+Wires,14.86,1,,14.86,Amazon,https://www.amazon.com/gp/product/B07Z4W6V6R
+Mounting bracket (Shapeways),6.04,5,9.99,40.2,Shapeways,resources/mounting_bracket_v3.stl
+Screws,10,1,,10,,
+AS5600,16.99,,,16.99,Amazon,https://www.amazon.com/dp/B097QNG1CN
+Total,,,,477.62,,
