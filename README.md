@@ -68,11 +68,27 @@ Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.ardui
 
 
 ### Motor and mounting hardware
-It's helpful to own a 3D beause you can 
+It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the connection. You can find the stl files and sliced files under the **cad** folder.
+
+#### Parts:
+* Nema 11 motor mount: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)
+* Nema 11 motor mount(generic): [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)
+* AS5600 rotary encoder mount: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)
+* AS5600 magnet gluing jig: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)
+* (Optional) motor coupling: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)
+* (Optional) pcb mount: coming soon
+
+<p align="center">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_front.png" width="400"/>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/cad/v1_0/mount_v1_back.png" width="400">
+    </br>
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top_3d.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot_3d.png" width="400">
+</p>
 
 
 ## Usage
-### 1. Sending Commands via MQTT
+### Sending Commands via MQTT
 You will need a MQTT server/broker. You can run one on rpi4 or a docker.
 * inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
 * outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
@@ -86,7 +102,7 @@ You will need a MQTT server/broker. You can run one on rpi4 or a docker.
     *  **-5  : set max position**
     *  **-99 : reboot system**
 
-#### 4. Tuning StallGuard4 (Optional)
+### Tuning StallGuard4 (Optional)
 If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
 * Set the minimum RMS current required to move your cover.
 * Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
