@@ -84,7 +84,7 @@ It's helpful to own a 3D printer beause you can print a lot of parts needed for 
 
 <p align="center">
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400">
+    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_back.png" width="400">
     </br>
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2195.jpg" width="400">
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2196.jpg" width="400">
