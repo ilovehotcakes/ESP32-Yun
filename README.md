@@ -3,7 +3,7 @@ An open-source and DIY-friendly solution to motorize windows/blinds for your sma
 
 ESP32 motorcover is an affordable, reliable, and user-friendly closed-loop wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
 
-Under active development. **WARNING:** although it's a beginner-friendly DIY project, it still requires some soldering and electronic knowledge. Please follow the guide at your own risk. This project is being actively developed to further lower the barrier-to-entry.
+Under active development. **WARNING:** it requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
 
 
 ## Design
@@ -29,10 +29,7 @@ There are three main components to consider: electronics, firmware, and motor + 
 ### 1. Electronics
 Here are two ways to acquire the electronics: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together on a breadboard.
 
-[[**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)]
-[[**gerber files**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)]
-[[**bom**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)]
-[[**pick-and-place file**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)]
+[**[schematic]**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)[**[gerber files]**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)[**[bom]**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)[**[pick-and-place file]**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)
 
 
 #### Option 1 - Ordering PCB from JLCPCB:
