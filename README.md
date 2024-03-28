@@ -58,8 +58,25 @@ You can use your choice of IDE to program the firmware, such as [Arduino IDE](ht
 * [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
 * [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
 
-#### Adding WiFi/MQTT Credentials and Setting Motor Specs
-Clone this repo and follow the instructions in [motor_settings.h](include/motor_settings.h) and [secrets_example.h](include/secret_example.h). Flash the firmware to the ESP32 via your choice of IDE. It is handy to have the motor specifications for this part.
+#### Steps:
+1. Install dependencies.
+2. Add WiFi and MQTT credentials to secrets.h.
+3. Double check shunt resistor value in platformio.ini.
+4. Set the motor specs, current, speed, and acceleration.
+5. Connect computer -> USB-to-TTL serial adatper -> ESP32 motorcover. The four wires to connect are: RX->TX, TX->RX, 3V3->3V3, GND->GND.
+6. Flash the firmwares.
+
+### 4. Tuning StallGuard4 (Optional)
+If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
+* Set the minimum RMS current required to move your cover.
+* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
+moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
+to make sure the motor accelerates up to max speed.
+* Adjust the sensitivity of SG by changing sgThreshold.
+
+
+### Motor and mounting hardware
+3D printer.
 
 ### 3. Sending Commands via MQTT
 You will need a MQTT server/broker. You can run one on rpi4 or a docker.
@@ -75,25 +92,6 @@ You will need a MQTT server/broker. You can run one on rpi4 or a docker.
     *  **-5  : set max position**
     *  **-99 : reboot system**
 
-### 4. Tuning StallGuard4 (Optional)
-If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set the minimum RMS current required to move your cover.
-* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
-moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
-to make sure the motor accelerates up to max speed.
-* Adjust the sensitivity of SG by changing sgThreshold.
-
-
-### Motor and mounting hardware
-3D printer.
-
-### Installation
-Here are some photos of the assembled controller using all off-the-shelf components. The 3D file for the mounting bracket can be found under the resource folder.
-![controller](images/assembled_controller.jpg)
-![mounts](images/mounts.jpg)
-![motor_in_mount](images/motor_in_mount.jpg)
-![motor_installed](images/motor_installed.jpg)
-![controller_installed](images/controller_installed.jpg)
 
 ## Resources
 ### TMC2209 Info
