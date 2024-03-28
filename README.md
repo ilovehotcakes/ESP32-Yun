@@ -71,7 +71,8 @@ Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.ardui
 It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the connection. You can find the stl and pre-sliced files under the **cad** folder.
 
 #### Parts:
-* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)] [[**generic stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)]
+* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)]
+* Nema 11 motor mount(generic): [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)] [[**mirrored stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)]
 * AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
 * AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)]
 * (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
@@ -87,27 +88,25 @@ It's helpful to own a 3D printer beause you can print a lot of parts needed for 
 
 
 ## Usage
+Currently, you will need a MQTT server to send commands to the ESP32 motorcover. You can either run one on a computer or a rasberry pi. Working on an update that doesn't require a MQTT server.
+
 ### Sending Commands via MQTT
-You will need a MQTT server/broker. You can run one on rpi4 or a docker.
-* inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
-* outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
-* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/)
-* **MQTT Commands:**
+* inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to motorshade #1.
+* outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from motorshade #1.
+* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/).
+
+### MQTT Commands:
     * **0~100: move to position(%);** 0 -> open, 100 -> close
     *  **-1  : stop**
     *  **-2  : open**
     *  **-3  : close**
     *  **-4  : set min position**
     *  **-5  : set max position**
+    *  **-98 : reset system to default**
     *  **-99 : reboot system**
 
-### Tuning StallGuard4 (Optional)
-If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set the minimum RMS current required to move your cover.
-* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
-moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
-to make sure the motor accelerates up to max speed.
-* Adjust the sensitivity of SG by changing sgThreshold.
+### (Optional) tuning StallGuard4
+StallGuard4(SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working as intended. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
 
 
 ## TODO:
@@ -115,10 +114,3 @@ to make sure the motor accelerates up to max speed.
 * no need to add wifi creds when flashing firmware
 * reduce soldering wiring
 * remove MQTT dependency
-
-
-## Resources
-### TMC2209 and StallGuard Info
-* [Trinamic TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
-### ESP-now (future feature)
-* [ESP-now scanning devices](https://circuitcellar.com/research-design-hub/design-solutions/using-esp-now-protocol-part-1/)
