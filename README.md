@@ -24,8 +24,8 @@ There are three main components to consider: electronics, firmware, and motor + 
 * Computer and [USB-to-TTL serial adatper](https://www.amazon.com/dp/B07WX2DSVB) to upload the firmware
 * [Soldering iron](https://www.amazon.com/dp/B096X6SG13/)
 * Wires and [JST PH connectors](https://www.amazon.com/dp/B0731MZCGF)/[crimper](https://www.amazon.com/dp/B00YGLKBSK)
-* Bipolar stepper motor, such as Nema 11
-* Power supply
+* Bipolar stepper motor, such as [Nema 11](https://www.amazon.com/dp/B00PNEPK94/)
+* Power supply: 3.3-24V, 1.2A max
 * (Optional) 3D printer for the motor mount and coupling
 
 ### 1. Electronics
@@ -33,12 +33,13 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 
 **[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)]**
 
-
 #### Option 1 - Ordering PCB from JLCPCB:
 1. Download and upload the gerber files to [JLCPCB.com](https://jlcpcb.com/). The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
 2. If you prefer to manually assemble the PCB, please refer to the schematic and bom.
 3. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the pick-and-place and bom files, and toggle **"PCB Assembly"**. Click on **"Confirm"** to go the next page.
 4. Upload the bom and pick-and-place files. Click **"Process BOM & CPL"** and **"Continue"** when the error pops up. The error is for the missing connectors which will need to be manually solder once the PCBs arrive.
+5. Solder the connectors and separate the AS5600 break-off board from the main board.
+6. Connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
 <p align="center">
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png" width="400"/>
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot.png" width="400">
@@ -46,7 +47,6 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top_3d.png" width="400">
     <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot_3d.png" width="400">
 </p>
-
 
 #### Option 2 - Breadboarding with breakout modules:
 This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv)** and reference the **[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)** to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
