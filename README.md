@@ -18,11 +18,14 @@ In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://w
 
 
 ## Usage
-There are three main components to consider: electronics, firmware, and motor/mounting hardware.
+There are three main components to consider: electronics, firmware, and motor + mounting hardware.
 
-### Electronics:
-There are two ways to build your own but the easiest way is to .
-[[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic_v1.0.svg)]
+### Electronics
+There are two ways to build your own: directly order printed circuit boards from JLCPCB/PCBWay or buying parts from Amazon and put them together manually on a breadboard. The easier way is to order directly from JLCPCB which is what I used.
+
+**Ordering PCB:**
+1. Download the [[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)]
+[[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)]
 
 ## BOM
 |Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
