@@ -35,7 +35,9 @@ There are two ways to build your own: **(1)** directly order printed circuit boa
 3. If you prefer to manually assemble the PCB, please refer to the [[**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)] and bom.
 4. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the [[**pick-and-place file**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)] and then toggle **PCB Assembly**. Click on **Confirm** to go the next page.
 5. Upload the bom and pick-and-place files. Click **Process BOM & CPL** and **Continue** when the error pops up. The error is for the missing connectors which we will manually solder once we receive the pcbs.
-![image](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png)
+![pcb_top](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_top.png | width=400)
+![pcb_bot](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/v1_1/v1_1_bot.png | width=400)
+
 
 **Option 2 - breakout boards and breadboarding:**</br>
 This could be more approachable if you don't solder. Please find the list of materials [here](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv) and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg)
