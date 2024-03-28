@@ -1,10 +1,25 @@
 # ESP32 Motorcover
-An affordable, reliable, and user-friendly wireless stepper motor controller for smart homes. Works with NEMA stepper motors and other bipolar stepper motors. Under active development.
+ESP32 motorcover is an open-source and DIY-friendly solution to motorize windows/blinds/shades for your smart homes.
 
-In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) either through apps, voice control, or automations.
+An affordable, reliable, and user-friendly wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
 
-[[**Demo video**](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)] [[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic_v1.0.svg)]
+Under active development.
 
+
+## Designs
+In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the [[**Demo video**](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)] for examples.
+
+[**Features**]
+* Works with WiFi, no need for extra hub
+* Closed-loop system, making the motor movements extremely precise and repeatable
+* Automatic stalling detection and stopping, preventing injuries and protecting the motor
+* Extremely quiet, won't even wake up a baby!
+* Few parts, cheap and easy to assemble
+
+
+Building your own:
+There are two ways to build your own but the easiest way is to . 3D printer.
+[[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic_v1.0.svg)]
 
 ## BOM
 |Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
