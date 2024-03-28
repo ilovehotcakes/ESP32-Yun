@@ -3,10 +3,10 @@ An open-source and DIY-friendly solution to motorize windows/blinds for your sma
 
 ESP32 motorcover is an affordable, reliable, and user-friendly closed-loop wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
 
-Under active development.
+Under active development. **Warning:** although it's a beginner-friendly DIY project, it still requires some soldering and computer skills. Please follow the guide at your own risk. This project is being actively developed to further lower the barrier-to-entry.
 
 
-## Designs
+## Design
 In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the [[**Demo video**](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)] for example.
 
 ### **Features:**
@@ -29,7 +29,7 @@ There are three main components to consider: electronics, firmware, and motor + 
 ### 1. Electronics
 There are two ways to build your own: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together on a breadboard.
 
-#### Option 1 - ordering PCB from JLCPCB:
+#### Option (1) ordering PCB from JLCPCB:
 1. Download the [[**gerber files**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)] and [[**bom**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)].
 2. Go to [JLCPCB.com](https://jlcpcb.com/) and upload the gerber files. The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
 3. If you prefer to manually assemble the PCB, please refer to the [[**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)] and bom.
@@ -44,14 +44,14 @@ There are two ways to build your own: **(1)** directly order printed circuit boa
 </p>
 
 
-#### Option 2 - breakout boards and breadboarding:
+#### Option (2) breadboarding with breakout boards:
 This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please find the bill of materials [here](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv) and reference the [schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png) to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg).
 
 
 ### 2. Firmware
-You can use your choice of IDE to program the firmware, such as [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode) plug-in.
+Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
 
-**Dependencies:**
+#### Dependencies:
 * espressif32@3.5.0
 * [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
 * [PubSubClient@^2.8](https://github.com/knolleary/pubsubclient)
@@ -62,23 +62,17 @@ You can use your choice of IDE to program the firmware, such as [Arduino IDE](ht
 1. Install dependencies.
 2. Add WiFi and MQTT credentials to secrets.h.
 3. Double check shunt resistor value in platformio.ini.
-4. Set the motor specs, current, speed, and acceleration.
+4. Set the motor specs, current, speed, and acceleration in motor.h.
 5. Connect computer -> USB-to-TTL serial adatper -> ESP32 motorcover. The four wires to connect are: RX->TX, TX->RX, 3V3->3V3, GND->GND.
-6. Flash the firmwares.
-
-### 4. Tuning StallGuard4 (Optional)
-If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
-* Set the minimum RMS current required to move your cover.
-* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
-moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
-to make sure the motor accelerates up to max speed.
-* Adjust the sensitivity of SG by changing sgThreshold.
+6. Flash the firmware.
 
 
 ### Motor and mounting hardware
-3D printer.
+It's helpful to own a 3D beause you can 
 
-### 3. Sending Commands via MQTT
+
+## Usage
+### 1. Sending Commands via MQTT
 You will need a MQTT server/broker. You can run one on rpi4 or a docker.
 * inTopic is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to the motorshade.
 * outTopic is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from the motorshade.
@@ -92,15 +86,24 @@ You will need a MQTT server/broker. You can run one on rpi4 or a docker.
     *  **-5  : set max position**
     *  **-99 : reboot system**
 
+#### 4. Tuning StallGuard4 (Optional)
+If you decided to use SG, you will need some patience to tune it to be useable. Here are the steps:
+* Set the minimum RMS current required to move your cover.
+* Set acceleration together with voltage. The acceleration needs to be low enough to not trip SG when the motor starts
+moving. Sometimes the voltage is not high enough to accelerate the motor to max speed and trips SG. I had to use 12V
+to make sure the motor accelerates up to max speed.
+* Adjust the sensitivity of SG by changing sgThreshold.
+
+
+## TODO:
+* write my own drivers to reduce dependency
+* no need to add wifi creds when flashing firmware
+* reduce soldering wiring
+* remove MQTT dependency
+
 
 ## Resources
-### TMC2209 Info
+### TMC2209 and StallGuard Info
 * [Trinamic TMC2209 datasheet](https://www.trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC2209_Datasheet_V103.pdf)
-* [BigTreeTech TMC2209 V1.2 schematic](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/Schematic/TMC2209-V1.2.pdf)
-* [BigTreeTech TMC2209 V1.2 manual](https://github.com/bigtreetech/BIGTREETECH-TMC2209-V1.2/blob/master/manual/TMC2209-V1.2-manual.pdf)
-### StallGuard Info
-* [How to connect TMC2209 for UART (StallGuard)](https://forum.arduino.cc/t/using-a-tmc2209-silent-stepper-motor-driver-with-an-arduino/666992/14)
-* [How to connect TMC2209 for UART (StallGuard) 2](https://forum.arduino.cc/t/tmcstepper-arduino-tmc2209/956036/9)
-* [StallGuard example code](https://gist.github.com/metalinspired/dcfe07ed0b9f42870eb54dcf8e29c126)
 ### ESP-now (future feature)
 * [ESP-now scanning devices](https://circuitcellar.com/research-design-hub/design-solutions/using-esp-now-protocol-part-1/)
