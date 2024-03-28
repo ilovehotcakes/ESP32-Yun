@@ -20,28 +20,25 @@ In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://w
 ## Usage
 There are three main components to consider: electronics, firmware, and motor + mounting hardware.
 
+**Requirements:**
+* Computer to upload the firmware and [[**USB-to-TTL serial adatper**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)]
+* Soldering iron
+* Wires and connectors/crimper for JST PH connectors
+* (Optional) 3D printer for the motor mount and coupling
+
 ### Electronics
-There are two ways to build your own: directly order printed circuit boards from JLCPCB/PCBWay or buying parts from Amazon and put them together manually on a breadboard. The easier way is to order directly from JLCPCB which is what I used.
+There are two ways to build your own: (1) directly order printed circuit boards from JLCPCB/PCBWay or (2) buying parts from Amazon and put them together manually on a breadboard. The easier way is to order directly from JLCPCB.
 
-**Ordering PCB:**
-1. Download the [[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)]
-[[**Schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)]
+**Ordering PCB from JLCPCB:**
+1. Download the [[**gerber files**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)] and [[**bom**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)].
+2. Go to [[**JLCPCB.com**](https://jlcpcb.com/)] and upload the gerber files. The only setting that needs to be changed is the **Impedance Control**. Select **Yes** and choose **JLC0416H-3313** once the dialog pops up.
+3. If you prefer to manually assemble the PCB, please refer to the [[**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)] and bom.
+4. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the [[**pick-and-place file**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)] and then toggle **PCB Assembly**. Click on **Confirm** to go the next page.
+5. Upload the bom and pick-and-place files. Click **Process BOM & CPL** and **Continue** when the error pops up. The error is for the missing connectors which we will manually solder once we receive the pcbs.
 
-## BOM
-|Item                         |Cost (incl. tax)|Quantity|Shipping|Subtotal   |Links|
-|-----------------------------|---------------:|:------:|-------:|----------:|:---:|
-|NEMA bipolar stepper motor   |          $33.34|       5|  $33.12|    $199.82|[[Stepperonline]](https://www.omc-stepperonline.com/nema-11-stepper-motor-bipolar-l-45mm-w-gear-ratio-5-1-planetary-gearbox-11hs18-0674s-pg5)|
-|ESP32 node mcu               |          $12.10|       5|        |     $60.50|[[Amazon]](https://www.amazon.com/dp/B0718T232Z)|
-|Buck convertor               |           $5.95|       5|   $7.99|     $37.74|[[Mouser]](https://www.mouser.com/ProductDetail/485-4739)|
-|TMC2209 UART stepper driver  |          $34.12|       1|        |     $34.12|[[Amazon]](https://www.amazon.com/gp/product/B07YW7BM68)|
-|Coupling                     |          $14.96|       1|        |     $14.96|[[Amazon]](https://www.amazon.com/gp/product/B07MPFJGZW)|
-|100uF capacitor              |           $6.82|       1|        |      $6.82|[[Amazon]](https://www.amazon.com/gp/product/B07Y3F194W)|
-|Solderless breadboard        |           $6.59|       1|        |      $6.59|[[Amazon]](https://www.amazon.com/gp/product/B07LF71ZTS)|
-|Power supply                 |          $17.51|       2|        |     $35.02|[[Amazon]](https://www.amazon.com/gp/product/B07N18XN84)|
-|Wires                        |          $14.86|       1|        |     $14.86|[[Amazon]](https://www.amazon.com/gp/product/B07Z4W6V6R)|
-|Mounting bracket (Shapeways) |           $6.04|       5|   $9.99|     $40.20|[[STL File]](resources/mounting_bracket_v3.stl)[[Mirrored]](resources/mounting_bracket_v3_mirrored.stl)|
-|Screws                       |          $10.00|       1|        |        $10|     |
-|Total                        |                |        |        |**$460.63**|     |
+
+**Breadboard approach:**
+This could be more approachable if you don't know how to solder.
 
 
 ### Motor and mounting hardware
