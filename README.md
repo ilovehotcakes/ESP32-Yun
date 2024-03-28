@@ -23,11 +23,11 @@ There are three main components to consider: electronics, firmware, and motor + 
 **Requirements:**
 * Computer and [USB-to-TTL serial adatper](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv) to upload the firmware
 * Soldering iron
-* Wires and connectors/crimper for JST PH connectors
+* Wires and JST PH connectors/crimper
 * (Optional) 3D printer for the motor mount and coupling
 
 ### Electronics
-There are two ways to build your own: (1) directly order printed circuit boards from JLCPCB/PCBWay or (2) buying parts from Amazon and put them together manually on a breadboard.
+There are two ways to build your own: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together manually on a breadboard.
 
 **Option 1 - ordering PCB from JLCPCB:**
 1. Download the [[**gerber files**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)] and [[**bom**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)].
@@ -37,8 +37,8 @@ There are two ways to build your own: (1) directly order printed circuit boards 
 5. Upload the bom and pick-and-place files. Click **Process BOM & CPL** and **Continue** when the error pops up. The error is for the missing connectors which we will manually solder once we receive the pcbs.
 
 
-**Option 2 - breakout boards and breadboarding:**
-This could be more approachable if you don't know how to solder. Please find the list of materials 
+**Option 2 - breakout boards and breadboarding:**</br>
+This could be more approachable if you don't solder. Please find the list of materials [here](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/prototype/bom.csv) and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/images/electronics/prototype/assembled_controller.jpg)
 
 
 ### Motor and mounting hardware
