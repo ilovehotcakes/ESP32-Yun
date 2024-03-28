@@ -21,24 +21,24 @@ In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://w
 There are three main components to consider: electronics, firmware, and motor + mounting hardware.
 
 **Requirements:**
-* Computer to upload the firmware and [[**USB-to-TTL serial adatper**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)]
+* Computer and [USB-to-TTL serial adatper](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv) to upload the firmware
 * Soldering iron
 * Wires and connectors/crimper for JST PH connectors
 * (Optional) 3D printer for the motor mount and coupling
 
 ### Electronics
-There are two ways to build your own: (1) directly order printed circuit boards from JLCPCB/PCBWay or (2) buying parts from Amazon and put them together manually on a breadboard. The easier way is to order directly from JLCPCB.
+There are two ways to build your own: (1) directly order printed circuit boards from JLCPCB/PCBWay or (2) buying parts from Amazon and put them together manually on a breadboard.
 
-**Ordering PCB from JLCPCB:**
+**Option 1 - ordering PCB from JLCPCB:**
 1. Download the [[**gerber files**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Gerber_ESP32-Motorcover_PCB_ESP32-Motorcover_2024-03-27.zip)] and [[**bom**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/BOM_ESP32-Motorcover_2024-03-27.csv)].
-2. Go to [[**JLCPCB.com**](https://jlcpcb.com/)] and upload the gerber files. The only setting that needs to be changed is the **Impedance Control**. Select **Yes** and choose **JLC0416H-3313** once the dialog pops up.
+2. Go to [JLCPCB.com](https://jlcpcb.com/) and upload the gerber files. The only setting that needs to be changed is the **Impedance Control**. Select **Yes** and choose **JLC0416H-3313** once the dialog pops up.
 3. If you prefer to manually assemble the PCB, please refer to the [[**schematic**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/Schematic_ESP32-Motorcover_2024-03-27.png)] and bom.
 4. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the [[**pick-and-place file**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/electronics/v1_1/PickAndPlace_PCB_ESP32-Motorcover_2024-03-27.csv)] and then toggle **PCB Assembly**. Click on **Confirm** to go the next page.
 5. Upload the bom and pick-and-place files. Click **Process BOM & CPL** and **Continue** when the error pops up. The error is for the missing connectors which we will manually solder once we receive the pcbs.
 
 
-**Breadboard approach:**
-This could be more approachable if you don't know how to solder.
+**Option 2 - breakout boards and breadboarding:**
+This could be more approachable if you don't know how to solder. Please find the list of materials 
 
 
 ### Motor and mounting hardware
