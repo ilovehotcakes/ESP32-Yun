@@ -68,14 +68,13 @@ Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.ardui
 
 
 ### Motor and mounting hardware
-It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the connection. You can find the stl files and sliced files under the **cad** folder.
+It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the connection. You can find the stl and pre-sliced files under the **cad** folder.
 
 #### Parts:
-* Nema 11 motor mount: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)
-* Nema 11 motor mount(generic): [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)
-* AS5600 rotary encoder mount: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)
-* AS5600 magnet gluing jig: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)
-* (Optional) motor coupling: [**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)
+* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_motor_mount.stl)] [[**generic stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/nema11_mount_v3.stl)]
+* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
+* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/prototype/magnet_gluing_jig_v1.stl)]
+* (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/pcb-v1.0/cad/nema_11_coupling.stl)]
 * (Optional) pcb mount: coming soon
 
 <p align="center">
