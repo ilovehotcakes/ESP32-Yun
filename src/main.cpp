@@ -29,12 +29,10 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
     pinMode(BUTTON_PIN, INPUT);
 
-    delay(2000);
     // Start the WiFi connection
     wireless_task.init();
     wireless_task.addListener(motor_task.getMotorCommandQueue());
 
-    delay(2000);
     motor_task.init();
     motor_task.addListener(wireless_task.getWirelessMessageQueue());
 
