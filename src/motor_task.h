@@ -30,6 +30,8 @@ enum Command {
     COVER_CLOSE   = -3,
     COVER_SET_MIN = -4,
     COVER_SET_MAX = -5,
+    STBY_ON       = -6,
+    STBY_OFF      = -7,
     SYS_RESET     = -98,
     SYS_REBOOT    = -99
 };
@@ -68,7 +70,7 @@ private:
     int command_ = -50;
 
     // TMC2209 settings
-    int microsteps_           = 128;
+    int microsteps_           = 16;
     int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
     int velocity_             = static_cast<int>(steps_per_revolution_ * 3);
     int acceleration_         = static_cast<int>(velocity_ * 0.5);
@@ -93,7 +95,8 @@ private:
     void setMax();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
-    bool enableDriver(uint8_t enable_pin, uint8_t value);
+    bool driverEnable(uint8_t enable_pin, uint8_t value);
+    void driverStartup();
 
     // TODO
     // void setMicrosteps()
