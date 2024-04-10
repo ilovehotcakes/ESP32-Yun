@@ -1,21 +1,29 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core} {}
-MotorTask::~MotorTask() {}
+MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core} {
+    motor_message_queue_ = xQueueCreate(1, sizeof(int));
+    assert(motor_message_queue_ != NULL);
+}
+
+
+MotorTask::~MotorTask() {
+    vQueueDelete(motor_message_queue_);
+}
 
 
 void MotorTask::run() {
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
     pinMode(STBY_PIN, OUTPUT);
-    digitalWrite(STBY_PIN, LOW);
     #ifdef DIAG
     if (stallguard_enable_) {
         pinMode(DIAG_PIN, INPUT);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     #endif
+
+    driverStandby();
 
     // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
@@ -24,8 +32,6 @@ void MotorTask::run() {
     // can send settings to the driver via UART.
     Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
     while(!Serial1);
-
-    driverStartup();
 
     // FastAccelStepper setup
     engine_.init(1);
@@ -51,6 +57,36 @@ void MotorTask::run() {
 
     while (1) {
         motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
+
+        if (xQueueReceive(motor_message_queue_, (void*) &motor_command_, 0) == pdTRUE) {
+            LOGI("Task task received command: %d", motor_command_);
+            switch (motor_command_) {
+                case COVER_STOP:
+                    stop();
+                    break;
+                case COVER_OPEN:
+                    moveToPercent(0);
+                    break;
+                case COVER_CLOSE:
+                    moveToPercent(100);
+                    break;
+                case COVER_SET_MAX:
+                    setMax();
+                    break;
+                case COVER_SET_MIN:
+                    setMin();
+                    break;
+                case STBY_ON:
+                    driverStandby();
+                    break;
+                case STBY_OFF:
+                    driverStartup();
+                    break;
+                default:
+                    moveToPercent(motor_command_);
+                    break;
+            }
+        }
 
         if (stalled_) {
             stop();
@@ -158,8 +194,13 @@ bool MotorTask::setMax() {
 }
 
 
-void MotorTask::addListener(QueueHandle_t queue) {
+void MotorTask::addWirelessQueue(QueueHandle_t queue) {
     wireless_message_queue_ = queue;
+}
+
+
+QueueSetHandle_t MotorTask::getMotorCommandQueue() {
+    return motor_message_queue_;
 }
 
 
@@ -185,8 +226,8 @@ bool MotorTask::driverEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::driverStartup() {
-    LOGD("Taking driver out of standby");
-    // digitalWrite(STBY_PIN, LOW);
+    LOGI("Taking driver out of standby");
+    digitalWrite(STBY_PIN, LOW);
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
     // sets mstep_reg_select=1: use UART to change microstepping settings.
@@ -198,7 +239,7 @@ void MotorTask::driverStartup() {
     // Set motor RMS current via UART, higher torque requires more current. The default holding
     // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
     // rms_current(1000, 0.3).
-    driver_.rms_current(opening_current_);
+    driver_.rms_current(closing_current_);
 
     // 1=SpreadCycle only; 0=StealthChop PWM mode (below velocity threshold) + SpreadCycle (above
     // velocity threshold); set register TPWMTHRS to determine the velocity threshold
@@ -254,4 +295,9 @@ void MotorTask::driverStartup() {
         driver_.SGTHRS(stallguard_threshold_);
     }
     #endif
+}
+
+
+void MotorTask::driverStandby() {
+    digitalWrite(STBY_PIN, HIGH);
 }

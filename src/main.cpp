@@ -18,7 +18,7 @@
 #include "wireless_task.h"
 
 
-static SystemTask system_task(1);
+static SystemTask system_task(0);
 static MotorTask motor_task(1);
 static WirelessTask wireless_task(0);
 
@@ -30,16 +30,17 @@ void setup() {
     // Initialize LED
     pinMode(LED_PIN, OUTPUT);
 
-    // Start the WiFi connection
-    wireless_task.init();
-    wireless_task.addListener(system_task.getSystemMessageQueue());
-
     // Start system task that coordinates between all tasks
     system_task.init();
-    system_task.motor_task_ = &motor_task;
 
+    // Start the WiFi connection
+    wireless_task.init();
+    wireless_task.addSystemQueue(system_task.getSystemMessageQueue());
+    wireless_task.addMotorQueue(motor_task.getMotorCommandQueue());
+
+    delay(1000);
     motor_task.init();
-    motor_task.addListener(wireless_task.getWirelessMessageQueue());
+    motor_task.addWirelessQueue(wireless_task.getWirelessMessageQueue());
 
     // Delete setup/loop task
     vTaskDelete(NULL);

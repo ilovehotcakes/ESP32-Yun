@@ -24,7 +24,8 @@ class WirelessTask : public Task<WirelessTask> {
 public:
     WirelessTask(const uint8_t task_core);
     ~WirelessTask();
-    void addListener(QueueHandle_t queue);
+    void addSystemQueue(QueueHandle_t queue);
+    void addMotorQueue(QueueHandle_t queue);
     QueueHandle_t getWirelessMessageQueue();
 
 protected:
@@ -38,6 +39,7 @@ private:
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
     QueueHandle_t system_message_queue_;    // Used to send messages to system task
+    QueueHandle_t motor_message_queue_;     // Used to send messages to motor task
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;

@@ -98,8 +98,14 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
     LOGI("Received message from MQTT server: %i", command);
 
-    if (xQueueSend(system_message_queue_, (void*) &command, 0) != pdTRUE) {
-        LOGE("Failed to send to motor_command_queue_");
+    if (command > -10) {
+        if (xQueueSend(motor_message_queue_, (void*) &command, 0) != pdTRUE) {
+            LOGE("Failed to send to motor_message_queue_");
+        }
+    } else {
+        if (xQueueSend(system_message_queue_, (void*) &command, 0) != pdTRUE) {
+            LOGE("Failed to send to motor_message_queue_");
+        }
     }
 }
 
@@ -110,8 +116,13 @@ void WirelessTask::sendMqtt(String message) {
 }
 
 
-void WirelessTask::addListener(QueueHandle_t queue) {
+void WirelessTask::addSystemQueue(QueueHandle_t queue) {
     system_message_queue_ = queue;
+}
+
+
+void WirelessTask::addMotorQueue(QueueHandle_t queue) {
+    motor_message_queue_ = queue;
 }
 
 
