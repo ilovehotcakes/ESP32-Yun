@@ -13,10 +13,12 @@
 **/
 #include <Arduino.h>
 #include "logger.h"
+#include "system_task.h"
 #include "motor_task.h"
 #include "wireless_task.h"
 
 
+static SystemTask system_task(1);
 static MotorTask motor_task(1);
 static WirelessTask wireless_task(0);
 
@@ -25,13 +27,16 @@ void setup() {
     // Start logger
     LOG_INIT(9600, LogLevel::INFO);
 
-    // Initialize LED & BUTTON
+    // Initialize LED
     pinMode(LED_PIN, OUTPUT);
-    pinMode(BUTTON_PIN, INPUT);
 
     // Start the WiFi connection
     wireless_task.init();
-    wireless_task.addListener(motor_task.getMotorCommandQueue());
+    wireless_task.addListener(system_task.getSystemMessageQueue());
+
+    // Start system task that coordinates between all tasks
+    system_task.init();
+    system_task.motor_task_ = &motor_task;
 
     motor_task.init();
     motor_task.addListener(wireless_task.getWirelessMessageQueue());
