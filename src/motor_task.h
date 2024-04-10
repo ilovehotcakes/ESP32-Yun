@@ -23,20 +23,6 @@
 #include "logger.h"
 
 
-// Commands recieved from MQTT
-enum Command {
-    COVER_STOP    = -1,
-    COVER_OPEN    = -2,
-    COVER_CLOSE   = -3,
-    COVER_SET_MIN = -4,
-    COVER_SET_MAX = -5,
-    STBY_ON       = -6,
-    STBY_OFF      = -7,
-    SYS_RESET     = -98,
-    SYS_REBOOT    = -99
-};
-
-
 class MotorTask : public Task<MotorTask> {
     friend class Task<MotorTask>;
 
@@ -44,14 +30,18 @@ public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
     void addListener(QueueHandle_t queue);
-    QueueHandle_t getMotorCommandQueue();
+    void driverStartup();
+    void moveToPercent(int percent);
+    void stop();
+    bool setMin();
+    bool setMax();
 
 protected:
     void run();
 
 private:
     // TMCStepper library for interfacing MCU with stepper driver hardware
-    TMC2209Stepper driver_ = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
+    TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
     // FastAccelStepper library for sending commands to the stepper driver to
     // move/accelerate and stop/deccelerate the stepper motor
@@ -65,9 +55,7 @@ private:
     // Saving positions and other attributes
     Preferences motor_settings_;
 
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
-    QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
-    int command_ = -50;
+    QueueHandle_t wireless_message_queue_;  // Used to send messages to wireless task
 
     // TMC2209 settings
     int microsteps_           = 16;
@@ -89,14 +77,9 @@ private:
 
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
-    void moveToPercent(int percent);
-    void stop();
-    void setMin();
-    void setMax();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
     bool driverEnable(uint8_t enable_pin, uint8_t value);
-    void driverStartup();
 
     // TODO
     // void setMicrosteps()
