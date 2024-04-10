@@ -37,7 +37,7 @@ private:
     void sendMqtt(String message);
 
     QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
-    QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
+    QueueHandle_t system_message_queue_;    // Used to send messages to system task
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;
