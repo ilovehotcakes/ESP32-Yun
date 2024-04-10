@@ -1,15 +1,8 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core} {
-    motor_command_queue_ = xQueueCreate(1, sizeof(int));
-    assert(motor_command_queue_ != NULL);
-}
-
-
-MotorTask::~MotorTask() {
-    vQueueDelete(motor_command_queue_);
-}
+MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core} {}
+MotorTask::~MotorTask() {}
 
 
 void MotorTask::run() {
@@ -17,18 +10,20 @@ void MotorTask::run() {
     pinMode(STEP_PIN, OUTPUT);
     pinMode(STBY_PIN, OUTPUT);
     digitalWrite(STBY_PIN, LOW);
+    #ifdef DIAG
     if (stallguard_enable_) {
         pinMode(DIAG_PIN, INPUT);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
+    #endif
 
     // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
     // can send settings to the driver via UART.
-    SERIAL_PORT.begin(115200, SERIAL_8N1, RXD1, TXD1);
-    while(!SERIAL_PORT);
+    Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
+    while(!Serial1);
 
     driverStartup();
 
@@ -57,45 +52,10 @@ void MotorTask::run() {
     while (1) {
         motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
 
-        if (xQueueReceive(motor_command_queue_, (void*) &command_, 0) == pdTRUE) {
-            switch (command_) {
-                case COVER_STOP:
-                    stop();
-                    break;
-                case COVER_OPEN:
-                    moveToPercent(0);
-                    break;
-                case COVER_CLOSE:
-                    moveToPercent(100);
-                    break;
-                case COVER_SET_MAX:
-                    setMax();
-                    break;
-                case COVER_SET_MIN:
-                    setMin();
-                    break;
-                case SYS_RESET:
-                    motor_settings_.clear();
-                    ESP.restart();
-                    break;
-                case SYS_REBOOT:
-                    ESP.restart();
-                    break;
-                case STBY_ON:
-                    digitalWrite(STBY_PIN, HIGH);
-                    break;
-                case STBY_OFF:
-                    driverStartup();
-                    break;
-                default:
-                    moveToPercent(command_);
-                    break;
-            }
-        }
-
         if (stalled_) {
             stop();
             stalled_ = false;
+            LOGD("Motor stalled");
         } else if (motor_->isRunning()) {
             continue;
         } else if (getPercent() == last_updated_percent_) {
@@ -116,13 +76,11 @@ void MotorTask::run() {
 
 
 // For StallGuard
-#ifdef DIAG_PIN
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
     portENTER_CRITICAL(&stalled_mux_);
     stalled_ = true;
     portEXIT_CRITICAL(&stalled_mux_);
 }
-#endif
 
 
 void MotorTask::loadSettings() {
@@ -173,9 +131,9 @@ void MotorTask::stop() {
 }
 
 
-void MotorTask::setMin() {
+bool MotorTask::setMin() {
     if (encoder_.getCumulativePosition() >= encod_max_pos_) {
-        return;
+        return false;
     }
     encod_max_pos_ -= encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
@@ -183,27 +141,25 @@ void MotorTask::setMin() {
     motor_->setCurrentPosition(0);
     last_updated_percent_ = -100;  // Needed to trigger send message
     LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
+    return true;
 }
 
 
-void MotorTask::setMax() {
+bool MotorTask::setMax() {
     if (encoder_.getCumulativePosition() < 0) {
-        return;
+        return false;
     }
     encod_max_pos_ = encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
     motor_->setCurrentPosition(positionToSteps(encod_max_pos_));
     last_updated_percent_ = -100;
     LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
+    return true;
 }
 
 
 void MotorTask::addListener(QueueHandle_t queue) {
     wireless_message_queue_ = queue;
-}
-
-QueueHandle_t MotorTask::getMotorCommandQueue() {
-    return motor_command_queue_;
 }
 
 
@@ -229,7 +185,8 @@ bool MotorTask::driverEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::driverStartup() {
-    digitalWrite(STBY_PIN, LOW);
+    LOGD("Taking driver out of standby");
+    // digitalWrite(STBY_PIN, LOW);
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
     // sets mstep_reg_select=1: use UART to change microstepping settings.
@@ -275,6 +232,7 @@ void MotorTask::driverStartup() {
     driver_.shaft(direction_);
 
     // StallGuard setup; refer to p73 of TMC2209's datasheet rev1.09 for tuning SG.
+    #ifdef DIAG
     if (stallguard_enable_) {
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
@@ -295,4 +253,5 @@ void MotorTask::driverStartup() {
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
         driver_.SGTHRS(stallguard_threshold_);
     }
+    #endif
 }
