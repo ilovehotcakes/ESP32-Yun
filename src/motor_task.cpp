@@ -16,7 +16,7 @@ void MotorTask::run() {
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
     pinMode(STBY_PIN, OUTPUT);
-    if (stallguard_enable_) {
+    if (stallguard_enabled_) {
         pinMode(DIAG_PIN, INPUT);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
@@ -275,8 +275,8 @@ void MotorTask::driverStartup() {
     // Inverse motor direction
     driver_.shaft(direction_);
 
-    // StallGuard setup; refer to p73 of TMC2209's datasheet rev1.09 for tuning SG.
-    if (stallguard_enable_) {
+    // StallGuard setup; refer to p29 and p73 of TMC2209's datasheet rev1.09 for tuning SG.
+    if (stallguard_enabled_) {
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
         // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
@@ -288,7 +288,7 @@ void MotorTask::driverStartup() {
         driver_.semax(0);
 
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver_.TCOOLTHRS((3089838.00 * pow(float(velocity_), -1.00161534)));
+        driver_.TCOOLTHRS(3089838.00 * pow(float(velocity_), -1.00161534));
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more

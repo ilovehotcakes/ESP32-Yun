@@ -84,7 +84,7 @@ private:
     int8_t  last_updated_percent_ = -100;
     float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;
     float encoder_motor_ratio_    = 4096.0 / steps_per_revolution_;
-    bool stallguard_enable_       = false;
+    bool stallguard_enabled_       = false;
 
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
