@@ -38,7 +38,6 @@ void setup() {
     wireless_task.addSystemQueue(system_task.getSystemMessageQueue());
     wireless_task.addMotorQueue(motor_task.getMotorCommandQueue());
 
-    delay(1000);
     motor_task.init();
     motor_task.addWirelessQueue(wireless_task.getWirelessMessageQueue());
 

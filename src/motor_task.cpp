@@ -16,12 +16,10 @@ void MotorTask::run() {
     pinMode(DIR_PIN, OUTPUT);
     pinMode(STEP_PIN, OUTPUT);
     pinMode(STBY_PIN, OUTPUT);
-    #ifdef DIAG
     if (stallguard_enable_) {
         pinMode(DIAG_PIN, INPUT);
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
-    #endif
 
     driverStandby();
 
@@ -59,7 +57,7 @@ void MotorTask::run() {
         motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
 
         if (xQueueReceive(motor_message_queue_, (void*) &motor_command_, 0) == pdTRUE) {
-            LOGI("Task task received command: %d", motor_command_);
+            LOGD("Task task received command: %d", motor_command_);
             switch (motor_command_) {
                 case COVER_STOP:
                     stop();
@@ -92,14 +90,17 @@ void MotorTask::run() {
             stop();
             stalled_ = false;
             LOGD("Motor stalled");
-        } else if (motor_->isRunning()) {
-            continue;
-        } else if (getPercent() == last_updated_percent_) {
+        }
+
+        if (!driver_standby_ && !motor_->isRunning()) {
+            driverStandby();
+        }
+
+        if (motor_->isRunning() || getPercent() == last_updated_percent_) {
             continue;
         }
 
-        // Don't send message to wireless task if percent change is less than 2 to reduce
-        // wireless queue overhead.
+        // Send new position % if it has changed 
         int current_percent = getPercent();
         if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
@@ -140,6 +141,8 @@ void MotorTask::moveToPercent(int percent) {
     if (percent == getPercent()) {
         return;
     }
+
+    driverStartup();
 
     motor_->setSpeedInHz(velocity_);
 
@@ -273,7 +276,6 @@ void MotorTask::driverStartup() {
     driver_.shaft(direction_);
 
     // StallGuard setup; refer to p73 of TMC2209's datasheet rev1.09 for tuning SG.
-    #ifdef DIAG
     if (stallguard_enable_) {
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
@@ -294,10 +296,12 @@ void MotorTask::driverStartup() {
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
         driver_.SGTHRS(stallguard_threshold_);
     }
-    #endif
+
+    driver_standby_ = false;
 }
 
 
 void MotorTask::driverStandby() {
     digitalWrite(STBY_PIN, HIGH);
+    driver_standby_ = true;
 }

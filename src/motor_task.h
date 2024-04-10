@@ -78,12 +78,13 @@ private:
     int stallguard_threshold_ = 10;
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
+    bool driver_standby_      = true;
 
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;
     float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;
     float encoder_motor_ratio_    = 4096.0 / steps_per_revolution_;
-    bool stallguard_enable_       = true;
+    bool stallguard_enable_       = false;
 
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
@@ -91,11 +92,11 @@ private:
     void stop();
     bool setMin();
     bool setMax();
-    inline int getPercent();
-    inline int positionToSteps(int encoder_position);
     bool driverEnable(uint8_t enable_pin, uint8_t value);
     void driverStartup();
     void driverStandby();
+    inline int getPercent();
+    inline int positionToSteps(int encoder_position);
 
     // TODO
     // void setMicrosteps()
