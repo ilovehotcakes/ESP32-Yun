@@ -15,10 +15,23 @@ SystemTask::~SystemTask() {
 void SystemTask::run() {
     pinMode(BUTTON_PIN, INPUT);
 
-    // If button is not pressed for within the first few seconds, don't enter setup mode
-    // todo..
+    long xStart = xTaskGetTickCount();
 
-    while(1) {
+    // vTaskDelay(500);
+
+    // If button is not pressed for within the first few seconds, don't enter setup mode
+    // Todo: if not first boot, skip this part (for deep sleep)
+    while (digitalRead(BUTTON_PIN) == LOW)
+
+    if (xTaskGetTickCount() - xStart > 5000) {
+        Serial.println("......triggered setup function.......");
+    }
+
+    if (xTaskGetTickCount() - xStart > 20000) {
+        Serial.println("......triggered hard reset.......");
+    }
+
+    while (1) {
         if (xQueueReceive(system_message_queue_, (void*) &system_command_, 0) == pdTRUE) {
             LOGI("System task received command: %d", system_command_);
             switch (system_command_) {

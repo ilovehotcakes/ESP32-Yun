@@ -21,8 +21,6 @@ void MotorTask::run() {
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
-    driverStandby();
-
     // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
@@ -30,6 +28,8 @@ void MotorTask::run() {
     // can send settings to the driver via UART.
     Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
     while(!Serial1);
+
+    driverStartup();
 
     // FastAccelStepper setup
     engine_.init(1);
@@ -92,9 +92,9 @@ void MotorTask::run() {
             LOGD("Motor stalled");
         }
 
-        if (!driver_standby_ && !motor_->isRunning()) {
-            driverStandby();
-        }
+        // if (!driver_standby_ && !motor_->isRunning()) {
+        //     driverStandby();
+        // }
 
         if (motor_->isRunning() || getPercent() == last_updated_percent_) {
             continue;
@@ -142,7 +142,7 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    driverStartup();
+    // driverStartup();
 
     motor_->setSpeedInHz(velocity_);
 

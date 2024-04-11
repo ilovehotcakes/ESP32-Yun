@@ -27,7 +27,7 @@ void setup() {
     // Start logger
     LOG_INIT(9600, LogLevel::INFO);
 
-    setCpuFrequencyMhz(80);
+    // setCpuFrequencyMhz(80);
 
     // Initialize LED
     pinMode(LED_PIN, OUTPUT);
