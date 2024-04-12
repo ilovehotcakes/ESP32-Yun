@@ -21,6 +21,8 @@ void MotorTask::run() {
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
+    driverStandby();
+
     // TMC2209 stepper motor driver setup using UART mode + STEP/DIR
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
@@ -28,8 +30,6 @@ void MotorTask::run() {
     // can send settings to the driver via UART.
     Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
     while(!Serial1);
-
-    driverStartup();
 
     // FastAccelStepper setup
     engine_.init(1);
@@ -50,11 +50,24 @@ void MotorTask::run() {
     encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
     encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
     encoder_.setFastFilter(7);
+    // encoder_.setOutputMode(0);
+    // pinMode(36, INPUT);
 
     loadSettings();
 
     while (1) {
         motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
+
+        // Serial.println(analogRead(36));
+        // int temp = analogRead(36);
+        // if (abs(analog - temp) > 200) {
+        //     Serial.println("hi");
+        //     analog = temp;
+        // }
+
+        // if (temp > amax) amax = temp;
+        // else if (temp < amin) amin = temp;
+        // LOGD("%d    %d    %d", amin, temp, amax);
 
         if (xQueueReceive(motor_message_queue_, (void*) &motor_command_, 0) == pdTRUE) {
             LOGD("Task task received command: %d", motor_command_);
@@ -91,10 +104,6 @@ void MotorTask::run() {
             stalled_ = false;
             LOGD("Motor stalled");
         }
-
-        // if (!driver_standby_ && !motor_->isRunning()) {
-        //     driverStandby();
-        // }
 
         if (motor_->isRunning() || getPercent() == last_updated_percent_) {
             continue;
@@ -141,8 +150,6 @@ void MotorTask::moveToPercent(int percent) {
     if (percent == getPercent()) {
         return;
     }
-
-    // driverStartup();
 
     motor_->setSpeedInHz(velocity_);
 
@@ -229,7 +236,11 @@ bool MotorTask::driverEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::driverStartup() {
-    LOGI("Taking driver out of standby");
+    if (!driver_standby_) {
+        return;
+    }
+
+    // Pull standby pin low to disable driver standby.
     digitalWrite(STBY_PIN, LOW);
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
@@ -298,10 +309,13 @@ void MotorTask::driverStartup() {
     }
 
     driver_standby_ = false;
+
+    LOGD("Driver has started");
 }
 
 
 void MotorTask::driverStandby() {
     digitalWrite(STBY_PIN, HIGH);
     driver_standby_ = true;
+    LOGD("Driver in standby");
 }
