@@ -2,14 +2,11 @@
     ESP32 Motorcover
     Aurthor: Jason Chen, 2022
 
-    A simple ESP32 program that let's user control powerful and quiet stepper motors via MQTT. You
-    use it to open/close blinds, shades, etc. Can be used with Alexa or Home Assistant.
+    An ESP32-based low-powered wireless motor controller that works with bipolar stepper motors.
+    It is a closed-loop system so it is capable of keeping track of its position while the motor is
+    off.
 
-    This program utilizes TMC2209 drivers for the stepper motor and it drives NEMA stepper motors.
-
-    You can copy the BasicOTA example from the Arduino example library and paste it into a file
-    named "ota.h". Exlude the wifi setup and "loop()"; rename "setup()"" to "otaSetup()" and
-    include it in the src folder to enable OTA updates. Useful for wireless updates.
+    You can use it to motorize and automate the opening & closing of blinds/shades/windows etc.
 **/
 #include <Arduino.h>
 #include "logger.h"
@@ -18,28 +15,27 @@
 #include "wireless_task.h"
 
 
-static SystemTask system_task(0);
-static MotorTask motor_task(1);
-static WirelessTask wireless_task(0);
+static WirelessTask wireless_task(0);  // Running on core0
+static SystemTask system_task(0);      // Running on core0
+static MotorTask motor_task(1);        // Running on core1
 
 
 void setup() {
-    // Start logger
+    // Initializing serial output if compiled
     LOG_INIT(9600, LogLevel::INFO);
 
-    // setCpuFrequencyMhz(80);
-
-    // Initialize LED
+    // Initializing LED
     pinMode(LED_PIN, OUTPUT);
 
-    // Start system task that coordinates between all tasks
+    // The system task performs coordination between all tasks
     system_task.init();
 
-    // Start the WiFi connection
     wireless_task.init();
     wireless_task.addSystemQueue(system_task.getSystemMessageQueue());
     wireless_task.addMotorQueue(motor_task.getMotorCommandQueue());
 
+    // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
+    // position.
     motor_task.init();
     motor_task.addWirelessQueue(wireless_task.getWirelessMessageQueue());
 
