@@ -23,6 +23,11 @@ protected:
 
 private:
     QueueHandle_t system_message_queue_;
+    TimerHandle_t system_standby_timer_;
+
+    void systemStandby(TimerHandle_t timer);
 
     int system_command_ = -50;
+    int system_wake_time_ = 5000;
+    bool sleep_enabled_ = false;
 };

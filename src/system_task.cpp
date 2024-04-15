@@ -4,11 +4,21 @@
 SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_core} {
     system_message_queue_ = xQueueCreate(10, sizeof(int));
     assert(system_message_queue_ != NULL);
+
+    // FreeRTOS implemented in C so can't use std::bind
+    auto on_timer = [](TimerHandle_t timer) {
+        SystemTask *temp_system_ptr = static_cast<SystemTask*>(pvTimerGetTimerID(timer));
+        assert(temp_system_ptr != NULL);
+        temp_system_ptr->systemStandby(timer);
+    };
+    system_standby_timer_ = xTimerCreate("Motor standby", system_wake_time_, pdFALSE, this, on_timer);
+    assert(system_standby_timer_ != NULL);
 }
 
 
 SystemTask::~SystemTask() {
     vQueueDelete(system_message_queue_);
+    xTimerDelete(system_standby_timer_, portMAX_DELAY);
 }
 
 
@@ -44,7 +54,14 @@ void SystemTask::run() {
                     break;
             }
         }
+
+        // xTimerStart(system_standby_timer_, portMAX_DELAY);
     }
+}
+
+
+void SystemTask::systemStandby(TimerHandle_t timer) {
+    // Deep sleep routine
 }
 
 
