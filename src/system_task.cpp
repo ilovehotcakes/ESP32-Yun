@@ -45,6 +45,9 @@ void SystemTask::run() {
         if (xQueueReceive(system_message_queue_, (void*) &system_command_, 0) == pdTRUE) {
             LOGI("System task received command: %d", system_command_);
             switch (system_command_) {
+                case SYS_STANDBY:
+                    systemStandby(system_standby_timer_);
+                    break;
                 case SYS_RESET:
                     // motor_settings_.clear();
                     ESP.restart();
@@ -55,16 +58,39 @@ void SystemTask::run() {
             }
         }
 
-        // xTimerStart(system_standby_timer_, portMAX_DELAY);
+        if (uxSemaphoreGetCount(motor_running_semaphore_) == 1
+            || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
+            xTimerStart(system_standby_timer_, portMAX_DELAY);
+        }
     }
 }
 
 
 void SystemTask::systemStandby(TimerHandle_t timer) {
-    // Deep sleep routine
+    // Standby motor driver
+    int standby_driver = -4;
+    if (xQueueSend(motor_message_queue_, (void*) &standby_driver, 10) != pdTRUE) {
+        LOGE("Failed to send to motor_message_queue_");
+    }
+    // gpio_hold_en(STBY_PIN);
+    // gpio_deep_sleep_hold_en();
+
+    // ULP I2C
+    // Sleep; TODO wait till driver is in standby
+    // ESP.deepSleep(system_sleep_time_);
 }
 
 
 QueueHandle_t SystemTask::getSystemMessageQueue() {
     return system_message_queue_;
+}
+
+
+void SystemTask::addMotorMessageQueue(QueueHandle_t queue) {
+    motor_message_queue_ = queue;
+}
+
+
+void SystemTask::addMotorRunningSemaphore(SemaphoreHandle_t semaphore) {
+    motor_running_semaphore_ = semaphore;
 }

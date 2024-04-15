@@ -7,12 +7,16 @@ MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core
 
     motor_standby_sem_ = xSemaphoreCreateBinary();
     assert(motor_standby_sem_ != NULL);
+
+    motor_running_sem_ = xSemaphoreCreateBinary();
+    assert(motor_running_sem_ != NULL);
 }
 
 
 MotorTask::~MotorTask() {
     vQueueDelete(motor_message_queue_);
     vSemaphoreDelete(motor_standby_sem_);
+    vSemaphoreDelete(motor_running_sem_);
 }
 
 
@@ -21,8 +25,6 @@ void MotorTask::run() {
     pinMode(STEP_PIN, OUTPUT);
     pinMode(STBY_PIN, OUTPUT);
     pinMode(DIAG_PIN, INPUT);
-
-    driverStandby();
 
     // Using UART to read/write data to/from TMC2209 stepper motor driver
     Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
@@ -39,6 +41,8 @@ void MotorTask::run() {
     motor_->setAcceleration(acceleration_);
     motor_->setAutoEnable(true);     // Automatically enable/disable motor output when moving
     motor_->setDelayToDisable(200);  // 200ms off delay
+
+    driverStandby();
 
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
@@ -82,16 +86,18 @@ void MotorTask::run() {
             stop();
             stalled_ = false;
             LOGD("Motor stalled");
-        } else if (motor_->isRunning()) {
-            continue;
-        } else if (last_updated_percent_ == getPercent()) {
-            continue;
         }
 
-        // Condition needs to be right after motor is running
-        // if () {
-        //     // motor_running_sem_
-        // }
+        if (motor_->isRunning()) {
+            continue;
+        } else if (!motor_stopped_) {
+            motor_stopped_ = true;
+            xSemaphoreTake(motor_running_sem_, portMAX_DELAY);
+        }
+
+        if (last_updated_percent_ == getPercent()) {
+            continue;
+        }
 
         // Send new position % if it has changed 
         int current_percent = getPercent();
@@ -143,8 +149,10 @@ void MotorTask::moveToPercent(int percent) {
         driver_.rms_current(opening_current_);
     }
 
+    xSemaphoreGive(motor_running_sem_);
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
+    motor_stopped_ = false;
 
     LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder_.getCumulativePosition(), encod_max_pos_, new_position);
 }
@@ -199,6 +207,11 @@ QueueSetHandle_t MotorTask::getMotorMessageQueue() {
 
 SemaphoreHandle_t MotorTask::getMotorStandbySemaphore(){
     return motor_standby_sem_;
+}
+
+
+SemaphoreHandle_t MotorTask::getMotorRunningSemaphore() {
+    return motor_running_sem_;
 }
 
 
@@ -313,11 +326,10 @@ void MotorTask::driverStandby() {
     if (uxSemaphoreGetCount(motor_standby_sem_) == 1) {
         LOGD("Driver already in standby");
         return;
+    } else if (motor_->isRunning()) {
+        LOGD("Driver can't be put in standby while motor is running");
+        return;
     }
-    //  else if (motor_->isRunning()) {
-    //     LOGD("Driver can't be put in standby while motor is running");
-    //     return;
-    // }
 
     // Need to disable StallGuard or else it will stall the motor when disabling the driver
     detachInterrupt(DIAG_PIN);

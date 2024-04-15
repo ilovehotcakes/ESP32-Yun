@@ -38,6 +38,7 @@ public:
     void addWirelessQueue(QueueHandle_t queue);
     QueueHandle_t getMotorMessageQueue();
     SemaphoreHandle_t getMotorStandbySemaphore();
+    SemaphoreHandle_t getMotorRunningSemaphore();
 
 protected:
     void run();
@@ -78,6 +79,7 @@ private:
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
     bool stallguard_enabled_  = true;
+    bool motor_stopped_       = true;
 
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;

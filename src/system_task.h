@@ -5,8 +5,9 @@
 
 // Commands recieved from MQTT
 enum SystemCommand {
-    SYS_RESET     = -98,
-    SYS_REBOOT    = -99
+    SYS_STANDBY = -97,
+    SYS_RESET   = -98,
+    SYS_REBOOT  = -99
 };
 
 
@@ -17,17 +18,22 @@ public:
     SystemTask(const uint8_t task_core);
     ~SystemTask();
     QueueHandle_t getSystemMessageQueue();
+    void addMotorMessageQueue(QueueHandle_t queue);
+    void addMotorRunningSemaphore(SemaphoreHandle_t semaphore);
 
 protected:
     void run();
 
 private:
     QueueHandle_t system_message_queue_;
+    QueueHandle_t motor_message_queue_;
     TimerHandle_t system_standby_timer_;
+    SemaphoreHandle_t motor_running_semaphore_;
 
     void systemStandby(TimerHandle_t timer);
 
     int system_command_ = -50;
-    int system_wake_time_ = 5000;
+    int system_wake_time_ = 5000;      // mSec
+    int system_sleep_time_ = 5000000;  // uSec
     bool sleep_enabled_ = false;
 };
