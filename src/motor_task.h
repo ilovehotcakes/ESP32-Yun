@@ -1,16 +1,12 @@
 #pragma once
 /**
-    motor_task.h - A class that contains all stepper motor attribute and controls.
+    motor_task.h - A class that contains all functions to control a stepper motor.
     Author: Jason Chen, 2022
 
-    This class contains all stepper motor controls, which includes, initializing the stepper driver
-    (TMCStepper), stepper motor control (FastAccelStepper), as well as recalling its previous
-    position and maximum position on reboot. It also sends current position via MQTT after it
-    stops.
-
-    It also gives the user the option to set the maximum and minimum stepper motor positions via
-    MQTT. (1) User doesn't have to pre-calculate the max/min travel distance (2) User can re-adjust
-    max/min positions without reflashing firmware.
+    The way to control the stepper motor is sending PWM to the stepper motor driver, TMC2209. To
+    operate the TMC2209: (1) need to start the driver (take it out of STANDBY), and (2) ENABLE the
+    motor by energizing the motor coils. Both are done automatically: (1) is by the wireless task
+    and (2) is by FastAccelStepper.
 **/
 #include <Arduino.h>
 #include <HardwareSerial.h>       // Hardwareserial for uart
@@ -26,12 +22,10 @@
 // Commands recieved from MQTT
 enum MotorCommand {
     COVER_STOP    = -1,
-    COVER_OPEN    = -2,
-    COVER_CLOSE   = -3,
-    COVER_SET_MIN = -4,
-    COVER_SET_MAX = -5,
-    STBY_ON       = -6,
-    STBY_OFF      = -7
+    COVER_SET_MIN = -2,
+    COVER_SET_MAX = -3,
+    STBY_ON       = -4,
+    STBY_OFF      = -5
 };
 
 
@@ -42,29 +36,33 @@ public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
     void addWirelessQueue(QueueHandle_t queue);
-    QueueHandle_t getMotorCommandQueue();
+    QueueHandle_t getMotorMessageQueue();
+    SemaphoreHandle_t getMotorStandbySemaphore();
 
 protected:
     void run();
 
 private:
-    // TMCStepper library for interfacing MCU with stepper driver hardware
+    // TMCStepper library for interfacing with stepper motor driver hardware, mainly reading and
+    // writing registers for setting speed, acceleration, current, etc.
     TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
-    // FastAccelStepper library for sending commands to the stepper driver to
-    // move/accelerate and stop/deccelerate the stepper motor
+    // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
+    // and stop/deccelerate the stepper motor.
     FastAccelStepperEngine engine_ = FastAccelStepperEngine();
     FastAccelStepper *motor_ = NULL;
 
-    // Rotary encoder for keeping track of actual motor positions because motor could
-    // slip and cause the position to be incorrect
+    // Rotary encoder for keeping track of the actual motor position because motor could slip and
+    // cause the position to be incorrect, i.e. closed-loop system.
     AS5600 encoder_;
 
-    // Saving positions and other attributes
+    // Saving motor settings, such as motor's max position and other attributes
     Preferences motor_settings_;
 
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
-    QueueHandle_t motor_message_queue_;     // Used to send messages to wireless task
+    QueueHandle_t wireless_message_queue_;  // To receive messages from wireless task
+    QueueHandle_t motor_message_queue_;     // To send messages to wireless task
+    xSemaphoreHandle motor_running_sem_;    // To signal to system task that motor is running
+    xSemaphoreHandle motor_standby_sem_;    // To signal to wireless task that driver is in standby
     int motor_command_ = -50;
 
     // TMC2209 settings
@@ -76,10 +74,10 @@ private:
     int opening_current_      = 200;
     int closing_current_      = 75;  // 1, 3: 200; 2: 400; 4: 300
     int stallguard_threshold_ = 10;
+
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
-    bool driver_standby_      = true;
-    bool stallguard_enabled_       = true;
+    bool stallguard_enabled_  = true;
 
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;
@@ -93,15 +91,16 @@ private:
     bool setMin();
     bool setMax();
     bool driverEnable(uint8_t enable_pin, uint8_t value);
+    // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
+    // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
+    // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
+    // can send settings to the driver via UART.
     void driverStartup();
     void driverStandby();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
-    int analog = 4096;
-    // int amin = 4096;
-    // int amax = -1;
 
-    // TODO
+    // TODO set/get
     // void setMicrosteps()
     // void setVelocity() {}
     // void setAcceleration() {}
