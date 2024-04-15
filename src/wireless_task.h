@@ -7,7 +7,7 @@
 **/
 #include <Arduino.h>
 #include <WiFi.h>
-#include <PubSubClient.h> // Mqtt
+#include <PubSubClient.h>         // Mqtt
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 #include "logger.h"
@@ -26,6 +26,7 @@ public:
     ~WirelessTask();
     void addSystemQueue(QueueHandle_t queue);
     void addMotorQueue(QueueHandle_t queue);
+    void addMotorStandbySemaphore(SemaphoreHandle_t semaphore);
     QueueHandle_t getWirelessMessageQueue();
 
 protected:
@@ -40,6 +41,7 @@ private:
     QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
     QueueHandle_t system_message_queue_;    // Used to send messages to system task
     QueueHandle_t motor_message_queue_;     // Used to send messages to motor task
+    SemaphoreHandle_t motor_standby_sem_;   // Used to signal to motor driver to startup
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;

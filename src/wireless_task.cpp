@@ -98,18 +98,22 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
     LOGI("Received message from MQTT server: %i", command);
 
-    if (command > -10) {
-        if (command == -3) {
-            int special_command = -7;
-            xQueueSend(motor_message_queue_, (void*) &special_command, 0);
-            vTaskDelay(20);
+    if (command > -10) {  // Messages intended for motor task
+        // For moving commands, need to startup driver first if it's in standby
+        int start_driver = -5;
+        if (command > -1) {
+            if (xQueueSend(motor_message_queue_, (void*) &start_driver, 10) != pdTRUE) {
+                LOGE("Failed to send to motor_message_queue_");
+            }
+            vTaskDelay(20);  // Wait for driver to startup
         }
+
         if (xQueueSend(motor_message_queue_, (void*) &command, 0) != pdTRUE) {
             LOGE("Failed to send to motor_message_queue_");
         }
-    } else {
+    } else {  // Messages inteded for system task
         if (xQueueSend(system_message_queue_, (void*) &command, 0) != pdTRUE) {
-            LOGE("Failed to send to motor_message_queue_");
+            LOGE("Failed to send to system_message_queue_");
         }
     }
 }
@@ -128,6 +132,10 @@ void WirelessTask::addSystemQueue(QueueHandle_t queue) {
 
 void WirelessTask::addMotorQueue(QueueHandle_t queue) {
     motor_message_queue_ = queue;
+}
+
+void WirelessTask::addMotorStandbySemaphore(SemaphoreHandle_t semaphore) {
+    motor_standby_sem_ = semaphore;
 }
 
 

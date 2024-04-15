@@ -1,6 +1,7 @@
 /**
     ESP32 Motorcover
     Aurthor: Jason Chen, 2022
+    Licence: TODO
 
     An ESP32-based low-powered wireless motor controller that works with bipolar stepper motors.
     It is a closed-loop system so it is capable of keeping track of its position while the motor is
@@ -32,7 +33,8 @@ void setup() {
 
     wireless_task.init();
     wireless_task.addSystemQueue(system_task.getSystemMessageQueue());
-    wireless_task.addMotorQueue(motor_task.getMotorCommandQueue());
+    wireless_task.addMotorQueue(motor_task.getMotorMessageQueue());
+    wireless_task.addMotorStandbySemaphore(motor_task.getMotorStandbySemaphore());
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position.
