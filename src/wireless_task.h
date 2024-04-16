@@ -11,6 +11,7 @@
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 #include "logger.h"
+#include "commands.h"
 #include "secrets.h"
 
 #if COMPILEOTA

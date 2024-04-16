@@ -50,12 +50,13 @@ void SystemTask::run() {
                     break;
                 case SYS_REBOOT:
                     ESP.restart();
+                    LOGD("");
                     break;
             }
         }
 
-        if (uxSemaphoreGetCount(motor_running_semaphore_) == 1
-            || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
+        if (uxSemaphoreGetCount(motor_running_semaphore_) == 1) {
+            // || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
             xTimerStart(system_standby_timer_, portMAX_DELAY);
         }
     }
@@ -64,7 +65,7 @@ void SystemTask::run() {
 
 void SystemTask::systemStandby(TimerHandle_t timer) {
     // Standby motor driver
-    int standby_driver = -4;
+    int standby_driver = STBY_ON;
     if (xQueueSend(motor_task_queue_, (void*) &standby_driver, 10) != pdTRUE) {
         LOGE("Failed to send to motor_message_queue_");
     }

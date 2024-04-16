@@ -17,16 +17,7 @@
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 #include "logger.h"
-
-
-// Commands recieved from MQTT
-enum MotorCommand {
-    COVER_STOP    = -1,
-    COVER_SET_MIN = -2,
-    COVER_SET_MAX = -3,
-    STBY_ON       = -4,
-    STBY_OFF      = -5
-};
+#include "commands.h"
 
 
 class MotorTask : public Task<MotorTask> {

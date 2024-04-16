@@ -94,7 +94,7 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
     if (command > -10) {  // Messages intended for motor task
         // For moving commands, need to startup driver first if it's in standby
-        int start_driver = -5;
+        int start_driver = STBY_OFF;
         if (command > -1) {
             if (xQueueSend(motor_task_queue_, (void*) &start_driver, 10) != pdTRUE) {
                 LOGE("Failed to send to motor_task_queue_");

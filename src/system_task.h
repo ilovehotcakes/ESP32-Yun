@@ -1,15 +1,7 @@
 #pragma once
 #include "task.h"
 #include "logger.h"
-#include "motor_task.h"
-
-
-// Commands recieved from MQTT
-enum SystemCommand {
-    SYS_STANDBY = -97,
-    SYS_RESET   = -98,
-    SYS_REBOOT  = -99
-};
+#include "commands.h"
 
 
 class SystemTask: public Task<SystemTask> {
