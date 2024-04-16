@@ -53,7 +53,6 @@ private:
     QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
     xSemaphoreHandle motor_running_sem_;  // To signal to system task that motor is running
     xSemaphoreHandle motor_standby_sem_;  // To signal to wireless task that driver is in standby
-    int motor_command_ = -50;
 
     // TMC2209 settings
     int microsteps_           = 16;

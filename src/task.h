@@ -16,8 +16,15 @@
 
     Modified by Jason Chen, 2024
 **/
-
 #include <Arduino.h>
+
+
+struct Message {
+    Message(int command, int parameter = -404) : command(command), parameter(parameter) {}
+    int command;
+    int parameter;
+};
+
 
 // Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete implementations
 // should implement a run() method.
@@ -28,11 +35,12 @@ public:
     Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
          const BaseType_t core_id = tskNO_AFFINITY, int queue_length = 1) :
             name_ {name},
+            inbox_(-404, -404),
             stack_depth_ {stack_depth},
             priority_ {priority},
             core_id_ {core_id} {
-        queue_ = xQueueCreate(queue_length, sizeof(int));
-        assert(queue_ != NULL && "Failed to create task_queue_.");
+        queue_ = xQueueCreate(queue_length, sizeof(Message));
+        assert(queue_ != NULL && "Failed to create task_queue_");
     }
 
     virtual ~Task() {
@@ -49,11 +57,13 @@ public:
 
     void init() {
         BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_, this, priority_, &task_handle_, core_id_);
-        assert(result == pdPASS && "Failed to create task.");
+        assert(result == pdPASS && "Failed to create task");
     }
 
 protected:
+    const char* const name_;
     QueueHandle_t queue_;
+    Message inbox_;
 
 private:
     static void taskFunction(void* params) {
@@ -61,7 +71,6 @@ private:
         t->run();
     }
 
-    const char* const name_;
     uint32_t stack_depth_;
     UBaseType_t priority_;
     TaskHandle_t task_handle_;

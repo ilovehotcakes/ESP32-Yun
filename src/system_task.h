@@ -23,7 +23,6 @@ private:
 
     void systemStandby(TimerHandle_t timer);
 
-    int system_command_ = -50;
     int system_wake_time_ = 5000;      // mSec
     int system_sleep_time_ = 5000000;  // uSec
     bool sleep_enabled_ = false;

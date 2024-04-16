@@ -1,7 +1,8 @@
 #include "system_task.h"
 
 
-SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_core, 10} {
+SystemTask::SystemTask(const uint8_t task_core) : 
+        Task{"SystemTask", 8192, 1, task_core, 2} {
     // FreeRTOS implemented in C so can't use std::bind
     auto on_timer = [](TimerHandle_t timer) {
         SystemTask *temp_system_ptr = static_cast<SystemTask*>(pvTimerGetTimerID(timer));
@@ -9,7 +10,7 @@ SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_c
         temp_system_ptr->systemStandby(timer);
     };
     system_standby_timer_ = xTimerCreate("Motor standby", system_wake_time_, pdFALSE, this, on_timer);
-    assert(system_standby_timer_ != NULL && "Failed to create system_standby_timer_.");
+    assert(system_standby_timer_ != NULL && "Failed to create system_standby_timer_");
 }
 
 
@@ -38,9 +39,9 @@ void SystemTask::run() {
     }
 
     while (1) {
-        if (xQueueReceive(queue_, (void*) &system_command_, 0) == pdTRUE) {
-            LOGI("System task received command: %d", system_command_);
-            switch (system_command_) {
+        if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
+            LOGI("System task received command: %i, %i", inbox_.command, inbox_.parameter);
+            switch (inbox_.command) {
                 case SYS_STANDBY:
                     systemStandby(system_standby_timer_);
                     break;
@@ -65,9 +66,9 @@ void SystemTask::run() {
 
 void SystemTask::systemStandby(TimerHandle_t timer) {
     // Standby motor driver
-    int standby_driver = STBY_ON;
-    if (xQueueSend(motor_task_queue_, (void*) &standby_driver, 10) != pdTRUE) {
-        LOGE("Failed to send to motor_message_queue_");
+    Message standby(STBY_ON);
+    if (xQueueSend(motor_task_queue_, (void*) &standby, 10) != pdTRUE) {
+        LOGE("Failed to send to motor_task queue_");
     }
     // gpio_hold_en(STBY_PIN);
     // gpio_deep_sleep_hold_en();

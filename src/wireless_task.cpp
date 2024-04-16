@@ -2,7 +2,7 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"Wireless", 8192, 1, task_core, 10}, mqtt_client_(wifi_client_) {}
+        Task{"WirelessTask", 8192, 1, task_core, 99}, mqtt_client_(wifi_client_) {}
 
 
 WirelessTask::~WirelessTask() {}
@@ -31,10 +31,9 @@ void WirelessTask::run() {
         mqtt_client_.loop();
 
         // Check if there is message sent from the motor
-        int message = -1;
-        if (xQueueReceive(queue_, (void*) &message, 0) == pdTRUE) {
-            // LOGD("WirelessTask received message from wireless_message_queue_: %i", message);
-            sendMqtt((String) message);
+        if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
+            // LOGD("WirelessTask received message: %i", message);
+            sendMqtt(static_cast<String>(inbox_.command));
         }
 
         #if COMPILEOTA
@@ -84,30 +83,30 @@ void WirelessTask::connectMqtt() {
 
 
 void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
-    String message = "";
+    String buffer = "";
     for (int i = 0; i < len; i++) {
-        message += (char) buf[i];
+        buffer += (char) buf[i];
     }
-    int command = message.toInt();
+    Message outbox(buffer.toInt());
 
-    LOGI("Received message from MQTT server: %i", command);
+    LOGI("Received message from MQTT server: %i, %i", outbox.command, outbox.parameter);
 
-    if (command > -10) {  // Messages intended for motor task
+    if (outbox.command > -10) {  // Messages intended for motor task
         // For moving commands, need to startup driver first if it's in standby
-        int start_driver = STBY_OFF;
-        if (command > -1 && uxSemaphoreGetCount(motor_standby_sem_) == 1) {
-            if (xQueueSend(motor_task_queue_, (void*) &start_driver, 10) != pdTRUE) {
-                LOGE("Failed to send to motor_task_queue_");
+        if (outbox.command > -1 && uxSemaphoreGetCount(motor_standby_sem_) == 1) {
+            Message startup(STBY_OFF);
+            if (xQueueSend(motor_task_queue_, (void*) &startup, 10) != pdTRUE) {
+                LOGE("Failed to send to motor_task queue_");
             }
-            vTaskDelay(20);  // Wait for driver to startup
+            vTaskDelay(5);  // Wait for driver to startup
         }
 
-        if (xQueueSend(motor_task_queue_, (void*) &command, 0) != pdTRUE) {
-            LOGE("Failed to send to motor_task_queue_");
+        if (xQueueSend(motor_task_queue_, (void*) &outbox.command, 0) != pdTRUE) {
+            LOGE("Failed to send to motor_task queue_");
         }
     } else {  // Messages inteded for system task
-        if (xQueueSend(system_task_queue_, (void*) &command, 0) != pdTRUE) {
-            LOGE("Failed to send to system_task_queue_");
+        if (xQueueSend(system_task_queue_, (void*) &outbox.command, 0) != pdTRUE) {
+            LOGE("Failed to send to system_task queue_");
         }
     }
 }
