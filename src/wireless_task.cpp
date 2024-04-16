@@ -95,7 +95,7 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
     if (command > -10) {  // Messages intended for motor task
         // For moving commands, need to startup driver first if it's in standby
         int start_driver = STBY_OFF;
-        if (command > -1) {
+        if (command > -1 && uxSemaphoreGetCount(motor_standby_sem_) == 1) {
             if (xQueueSend(motor_task_queue_, (void*) &start_driver, 10) != pdTRUE) {
                 LOGE("Failed to send to motor_task_queue_");
             }
@@ -115,7 +115,7 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
 
 void WirelessTask::sendMqtt(String message) {
     mqtt_client_.publish(out_topic_.c_str(), message.c_str());
-    LOGI("Sent message: %s", message);
+    LOGI("Sent MQTT message: %s", message);
 }
 
 

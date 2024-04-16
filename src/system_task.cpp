@@ -49,8 +49,8 @@ void SystemTask::run() {
                     ESP.restart();
                     break;
                 case SYS_REBOOT:
-                    ESP.restart();
                     LOGD("");
+                    ESP.restart();
                     break;
             }
         }

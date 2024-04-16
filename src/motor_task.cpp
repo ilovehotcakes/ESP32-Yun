@@ -233,6 +233,7 @@ void MotorTask::driverStartup() {
         LOGD("Driver already started");
         return;
     }
+
     // Take the 'motor running semaphore' to signal that driver isn't in standby anymore to prevent
     // redundant restarting of the driver.
     xSemaphoreTake(motor_standby_sem_, portMAX_DELAY);
