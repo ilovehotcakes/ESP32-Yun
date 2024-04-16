@@ -29,7 +29,7 @@ void MotorTask::run() {
     // FastAccelStepper setup
     engine_.init(1);
     motor_ = engine_.stepperConnectToPin(STEP_PIN);
-    assert(motor_ && "Failed to initialize FastAccelStepper.");
+    assert(motor_ && "Failed to initialize FastAccelStepper");
     motor_->setEnablePin(100, false);
     motor_->setExternalEnableCall(std::bind(&MotorTask::driverEnable, this, std::placeholders::_1, std::placeholders::_2));
     motor_->setDirectionPin(DIR_PIN);
@@ -42,7 +42,7 @@ void MotorTask::run() {
 
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
-    // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder.");
+    // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder");
     encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
     encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
