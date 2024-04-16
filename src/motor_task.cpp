@@ -1,20 +1,16 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core} {
-    motor_message_queue_ = xQueueCreate(2, sizeof(int));
-    assert(motor_message_queue_ != NULL);
-
+MotorTask::MotorTask(const uint8_t task_core) : Task{"Motor", 8192, 1, task_core, 2} {
     motor_standby_sem_ = xSemaphoreCreateBinary();
-    assert(motor_standby_sem_ != NULL);
+    assert(motor_standby_sem_ != NULL && "Failed to create motor_standby_sem_.");
 
     motor_running_sem_ = xSemaphoreCreateBinary();
-    assert(motor_running_sem_ != NULL);
+    assert(motor_running_sem_ != NULL && "Failed to create motor_running_sem_.");
 }
 
 
 MotorTask::~MotorTask() {
-    vQueueDelete(motor_message_queue_);
     vSemaphoreDelete(motor_standby_sem_);
     vSemaphoreDelete(motor_running_sem_);
 }
@@ -33,7 +29,7 @@ void MotorTask::run() {
     // FastAccelStepper setup
     engine_.init(1);
     motor_ = engine_.stepperConnectToPin(STEP_PIN);
-    assert("Failed to initialize FastAccelStepper" && motor_);
+    assert(motor_ && "Failed to initialize FastAccelStepper.");
     motor_->setEnablePin(100, false);
     motor_->setExternalEnableCall(std::bind(&MotorTask::driverEnable, this, std::placeholders::_1, std::placeholders::_2));
     motor_->setDirectionPin(DIR_PIN);
@@ -46,7 +42,7 @@ void MotorTask::run() {
 
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
-    // assert("Failed to initialize AS5600 rotary encoder" && encoder_.isConnected());
+    // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder.");
     encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
     encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
@@ -58,7 +54,7 @@ void MotorTask::run() {
     while (1) {
         motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
 
-        if (xQueueReceive(motor_message_queue_, (void*) &motor_command_, 0) == pdTRUE) {
+        if (xQueueReceive(queue_, (void*) &motor_command_, 0) == pdTRUE) {
             LOGD("Motor task received command: %d", motor_command_);
             switch (motor_command_) {
                 case COVER_STOP:
@@ -103,7 +99,7 @@ void MotorTask::run() {
         int current_percent = getPercent();
         if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
-            if (xQueueSend(wireless_message_queue_, (void*) &current_percent, 0) != pdTRUE) {
+            if (xQueueSend(wireless_task_queue_, (void*) &current_percent, 0) != pdTRUE) {
                 LOGE("Failed to send to wireless_message_queue_");
             }
         }
@@ -196,14 +192,10 @@ bool MotorTask::setMax() {
 }
 
 
-void MotorTask::addWirelessQueue(QueueHandle_t queue) {
-    wireless_message_queue_ = queue;
+void MotorTask::addWirelessTaskQueue(QueueHandle_t queue) {
+    wireless_task_queue_ = queue;
 }
 
-
-QueueSetHandle_t MotorTask::getMotorMessageQueue() {
-    return motor_message_queue_;
-}
 
 SemaphoreHandle_t MotorTask::getMotorStandbySemaphore(){
     return motor_standby_sem_;

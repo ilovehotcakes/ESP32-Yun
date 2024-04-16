@@ -1,10 +1,7 @@
 #include "system_task.h"
 
 
-SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_core} {
-    system_message_queue_ = xQueueCreate(10, sizeof(int));
-    assert(system_message_queue_ != NULL);
-
+SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_core, 10} {
     // FreeRTOS implemented in C so can't use std::bind
     auto on_timer = [](TimerHandle_t timer) {
         SystemTask *temp_system_ptr = static_cast<SystemTask*>(pvTimerGetTimerID(timer));
@@ -12,12 +9,11 @@ SystemTask::SystemTask(const uint8_t task_core) : Task{"System", 8192, 1, task_c
         temp_system_ptr->systemStandby(timer);
     };
     system_standby_timer_ = xTimerCreate("Motor standby", system_wake_time_, pdFALSE, this, on_timer);
-    assert(system_standby_timer_ != NULL);
+    assert(system_standby_timer_ != NULL && "Failed to create system_standby_timer_.");
 }
 
 
 SystemTask::~SystemTask() {
-    vQueueDelete(system_message_queue_);
     xTimerDelete(system_standby_timer_, portMAX_DELAY);
 }
 
@@ -42,7 +38,7 @@ void SystemTask::run() {
     }
 
     while (1) {
-        if (xQueueReceive(system_message_queue_, (void*) &system_command_, 0) == pdTRUE) {
+        if (xQueueReceive(queue_, (void*) &system_command_, 0) == pdTRUE) {
             LOGI("System task received command: %d", system_command_);
             switch (system_command_) {
                 case SYS_STANDBY:
@@ -69,7 +65,7 @@ void SystemTask::run() {
 void SystemTask::systemStandby(TimerHandle_t timer) {
     // Standby motor driver
     int standby_driver = -4;
-    if (xQueueSend(motor_message_queue_, (void*) &standby_driver, 10) != pdTRUE) {
+    if (xQueueSend(motor_task_queue_, (void*) &standby_driver, 10) != pdTRUE) {
         LOGE("Failed to send to motor_message_queue_");
     }
     // gpio_hold_en(STBY_PIN);
@@ -81,13 +77,8 @@ void SystemTask::systemStandby(TimerHandle_t timer) {
 }
 
 
-QueueHandle_t SystemTask::getSystemMessageQueue() {
-    return system_message_queue_;
-}
-
-
-void SystemTask::addMotorMessageQueue(QueueHandle_t queue) {
-    motor_message_queue_ = queue;
+void SystemTask::addMotorTaskQueue(QueueHandle_t queue) {
+    motor_task_queue_ = queue;
 }
 
 

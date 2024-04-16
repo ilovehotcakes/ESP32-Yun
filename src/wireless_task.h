@@ -24,10 +24,9 @@ class WirelessTask : public Task<WirelessTask> {
 public:
     WirelessTask(const uint8_t task_core);
     ~WirelessTask();
-    void addSystemQueue(QueueHandle_t queue);
-    void addMotorQueue(QueueHandle_t queue);
+    void addSystemTaskQueue(QueueHandle_t queue);
+    void addMotorTaskQueue(QueueHandle_t queue);
     void addMotorStandbySemaphore(SemaphoreHandle_t semaphore);
-    QueueHandle_t getWirelessMessageQueue();
 
 protected:
     void run();
@@ -38,10 +37,9 @@ private:
     void readMqtt(char* topic, byte* buf, unsigned int len);
     void sendMqtt(String message);
 
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
-    QueueHandle_t system_message_queue_;    // Used to send messages to system task
-    QueueHandle_t motor_message_queue_;     // Used to send messages to motor task
-    SemaphoreHandle_t motor_standby_sem_;   // Used to signal to motor driver to startup
+    QueueHandle_t system_task_queue_;      // Used to send messages to system task
+    QueueHandle_t motor_task_queue_;       // Used to send messages to motor task
+    SemaphoreHandle_t motor_standby_sem_;  // Used to signal to motor driver to startup
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;

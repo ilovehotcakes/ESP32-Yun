@@ -1,5 +1,6 @@
 #pragma once
 #include "task.h"
+#include "logger.h"
 #include "motor_task.h"
 
 
@@ -17,16 +18,14 @@ class SystemTask: public Task<SystemTask> {
 public:
     SystemTask(const uint8_t task_core);
     ~SystemTask();
-    QueueHandle_t getSystemMessageQueue();
-    void addMotorMessageQueue(QueueHandle_t queue);
+    void addMotorTaskQueue(QueueHandle_t queue);
     void addMotorRunningSemaphore(SemaphoreHandle_t semaphore);
 
 protected:
     void run();
 
 private:
-    QueueHandle_t system_message_queue_;
-    QueueHandle_t motor_message_queue_;
+    QueueHandle_t motor_task_queue_;
     TimerHandle_t system_standby_timer_;
     SemaphoreHandle_t motor_running_semaphore_;
 

@@ -2,16 +2,10 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"Wireless", 8192, 1, task_core},
-        mqtt_client_(wifi_client_) {
-    wireless_message_queue_ = xQueueCreate(10, sizeof(int));
-    assert(wireless_message_queue_ != NULL);
-}
+        Task{"Wireless", 8192, 1, task_core, 10}, mqtt_client_(wifi_client_) {}
 
 
-WirelessTask::~WirelessTask() {
-    vQueueDelete(wireless_message_queue_);
-}
+WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
@@ -38,7 +32,7 @@ void WirelessTask::run() {
 
         // Check if there is message sent from the motor
         int message = -1;
-        if (xQueueReceive(wireless_message_queue_, (void*) &message, 0) == pdTRUE) {
+        if (xQueueReceive(queue_, (void*) &message, 0) == pdTRUE) {
             // LOGD("WirelessTask received message from wireless_message_queue_: %i", message);
             sendMqtt((String) message);
         }
@@ -102,18 +96,18 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
         // For moving commands, need to startup driver first if it's in standby
         int start_driver = -5;
         if (command > -1) {
-            if (xQueueSend(motor_message_queue_, (void*) &start_driver, 10) != pdTRUE) {
-                LOGE("Failed to send to motor_message_queue_");
+            if (xQueueSend(motor_task_queue_, (void*) &start_driver, 10) != pdTRUE) {
+                LOGE("Failed to send to motor_task_queue_");
             }
             vTaskDelay(20);  // Wait for driver to startup
         }
 
-        if (xQueueSend(motor_message_queue_, (void*) &command, 0) != pdTRUE) {
-            LOGE("Failed to send to motor_message_queue_");
+        if (xQueueSend(motor_task_queue_, (void*) &command, 0) != pdTRUE) {
+            LOGE("Failed to send to motor_task_queue_");
         }
     } else {  // Messages inteded for system task
-        if (xQueueSend(system_message_queue_, (void*) &command, 0) != pdTRUE) {
-            LOGE("Failed to send to system_message_queue_");
+        if (xQueueSend(system_task_queue_, (void*) &command, 0) != pdTRUE) {
+            LOGE("Failed to send to system_task_queue_");
         }
     }
 }
@@ -125,20 +119,15 @@ void WirelessTask::sendMqtt(String message) {
 }
 
 
-void WirelessTask::addSystemQueue(QueueHandle_t queue) {
-    system_message_queue_ = queue;
+void WirelessTask::addSystemTaskQueue(QueueHandle_t queue) {
+    system_task_queue_ = queue;
 }
 
 
-void WirelessTask::addMotorQueue(QueueHandle_t queue) {
-    motor_message_queue_ = queue;
+void WirelessTask::addMotorTaskQueue(QueueHandle_t queue) {
+    motor_task_queue_ = queue;
 }
 
 void WirelessTask::addMotorStandbySemaphore(SemaphoreHandle_t semaphore) {
     motor_standby_sem_ = semaphore;
-}
-
-
-QueueHandle_t WirelessTask::getWirelessMessageQueue() {
-    return wireless_message_queue_;
 }

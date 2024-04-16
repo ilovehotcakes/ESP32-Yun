@@ -35,8 +35,7 @@ class MotorTask : public Task<MotorTask> {
 public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
-    void addWirelessQueue(QueueHandle_t queue);
-    QueueHandle_t getMotorMessageQueue();
+    void addWirelessTaskQueue(QueueHandle_t queue);
     SemaphoreHandle_t getMotorStandbySemaphore();
     SemaphoreHandle_t getMotorRunningSemaphore();
 
@@ -60,10 +59,9 @@ private:
     // Saving motor settings, such as motor's max position and other attributes
     Preferences motor_settings_;
 
-    QueueHandle_t wireless_message_queue_;  // To receive messages from wireless task
-    QueueHandle_t motor_message_queue_;     // To send messages to wireless task
-    xSemaphoreHandle motor_running_sem_;    // To signal to system task that motor is running
-    xSemaphoreHandle motor_standby_sem_;    // To signal to wireless task that driver is in standby
+    QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
+    xSemaphoreHandle motor_running_sem_;  // To signal to system task that motor is running
+    xSemaphoreHandle motor_standby_sem_;  // To signal to wireless task that driver is in standby
     int motor_command_ = -50;
 
     // TMC2209 settings
