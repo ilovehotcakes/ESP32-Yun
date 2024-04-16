@@ -13,6 +13,8 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+    Modified by Jason Chen, 2024
 **/
 
 #include <Arduino.h>
@@ -23,23 +25,35 @@
 template<class T>
 class Task {
 public:
-    Task(const char* const name, uint32_t stackDepth, UBaseType_t priority, const BaseType_t coreID = tskNO_AFFINITY) :
-            name {name},
-            stackDepth {stackDepth},
-            priority {priority},
-            coreID {coreID}
-    {}
+    Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
+         const BaseType_t core_id = tskNO_AFFINITY, int queue_length = 1) :
+            name_ {name},
+            stack_depth_ {stack_depth},
+            priority_ {priority},
+            core_id_ {core_id} {
+        queue_ = xQueueCreate(queue_length, sizeof(int));
+        assert(queue_ != NULL && "Failed to create task_queue_.");
+    }
 
-    virtual ~Task() {}
+    virtual ~Task() {
+        vQueueDelete(queue_);
+    }
 
     TaskHandle_t getTaskHandle() {
-        return taskHandle;
+        return task_handle_;
+    }
+
+    QueueHandle_t getQueue() {
+        return queue_;
     }
 
     void init() {
-        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name, stackDepth, this, priority, &taskHandle, coreID);
-        assert("Failed to create task." && result == pdPASS);
+        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_, this, priority_, &task_handle_, core_id_);
+        assert(result == pdPASS && "Failed to create task.");
     }
+
+protected:
+    QueueHandle_t queue_;
 
 private:
     static void taskFunction(void* params) {
@@ -47,9 +61,9 @@ private:
         t->run();
     }
 
-    const char* const name;
-    uint32_t stackDepth;
-    UBaseType_t priority;
-    TaskHandle_t taskHandle;
-    const BaseType_t coreID;
+    const char* const name_;
+    uint32_t stack_depth_;
+    UBaseType_t priority_;
+    TaskHandle_t task_handle_;
+    const BaseType_t core_id_;
 };
