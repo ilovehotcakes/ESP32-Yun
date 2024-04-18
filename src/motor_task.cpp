@@ -39,10 +39,12 @@ void MotorTask::run() {
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
     // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder");
+    Wire.setClock(1000000);
     encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
     encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
-    encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
-    encoder_.setFastFilter(7);
+    encoder_.setConfigure(0x900);  // fast filter 111=10LSBs, slow filter 01=8x
+    // encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
+    // encoder_.setFastFilter(7);
     LOGD("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
