@@ -41,6 +41,9 @@
         "cinttypes": "cpp",
         "utility": "cpp",
         "typeinfo": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "bitset": "cpp",
+        "list": "cpp",
+        "regex": "cpp"
     }
 }
