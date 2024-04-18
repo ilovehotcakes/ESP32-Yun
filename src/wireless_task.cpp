@@ -92,6 +92,7 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
     LOGI("Received message from MQTT server: %i, %i", outbox.command, outbox.parameter);
 
     if (outbox.command > -10) {  // Messages intended for motor task
+        xTimerStart(system_sleep_timer_, portMAX_DELAY);
         // For moving commands, need to startup driver first if it's in standby
         if (outbox.command > -1 && uxSemaphoreGetCount(motor_standby_sem_) == 1) {
             Message startup(STBY_OFF);
@@ -101,11 +102,11 @@ void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
             vTaskDelay(5);  // Wait for driver to startup
         }
 
-        if (xQueueSend(motor_task_queue_, (void*) &outbox.command, 0) != pdTRUE) {
+        if (xQueueSend(motor_task_queue_, (void*) &outbox, 0) != pdTRUE) {
             LOGE("Failed to send to motor_task queue_");
         }
     } else {  // Messages inteded for system task
-        if (xQueueSend(system_task_queue_, (void*) &outbox.command, 0) != pdTRUE) {
+        if (xQueueSend(system_task_queue_, (void*) &outbox, 0) != pdTRUE) {
             LOGE("Failed to send to system_task queue_");
         }
     }
@@ -120,6 +121,11 @@ void WirelessTask::sendMqtt(String message) {
 
 void WirelessTask::addSystemTaskQueue(QueueHandle_t queue) {
     system_task_queue_ = queue;
+}
+
+
+void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
+    system_sleep_timer_ = timer;
 }
 
 

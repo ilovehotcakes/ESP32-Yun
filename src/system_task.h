@@ -12,14 +12,14 @@ public:
     ~SystemTask();
     void addMotorTaskQueue(QueueHandle_t queue);
     void addMotorRunningSemaphore(SemaphoreHandle_t semaphore);
+    TimerHandle_t getSystemSleepTimer();
 
 protected:
     void run();
 
 private:
     QueueHandle_t motor_task_queue_;
-    TimerHandle_t system_standby_timer_;
-    SemaphoreHandle_t motor_running_semaphore_;
+    TimerHandle_t system_sleep_timer_;
 
     void systemStandby(TimerHandle_t timer);
 

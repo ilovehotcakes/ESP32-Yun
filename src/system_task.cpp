@@ -9,13 +9,13 @@ SystemTask::SystemTask(const uint8_t task_core) :
         assert(temp_system_ptr != NULL);
         temp_system_ptr->systemStandby(timer);
     };
-    system_standby_timer_ = xTimerCreate("Motor standby", system_wake_time_, pdFALSE, this, on_timer);
-    assert(system_standby_timer_ != NULL && "Failed to create system_standby_timer_");
+    system_sleep_timer_ = xTimerCreate("System sleep", system_wake_time_, pdFALSE, this, on_timer);
+    assert(system_sleep_timer_ != NULL && "Failed to create system_sleep_timer_");
 }
 
 
 SystemTask::~SystemTask() {
-    xTimerDelete(system_standby_timer_, portMAX_DELAY);
+    xTimerDelete(system_sleep_timer_, portMAX_DELAY);
 }
 
 
@@ -43,7 +43,7 @@ void SystemTask::run() {
             LOGI("System task received command: %i, %i", inbox_.command, inbox_.parameter);
             switch (inbox_.command) {
                 case SYS_STANDBY:
-                    systemStandby(system_standby_timer_);
+                    systemStandby(system_sleep_timer_);
                     break;
                 case SYS_RESET:
                     // motor_settings_.clear();
@@ -56,10 +56,10 @@ void SystemTask::run() {
             }
         }
 
-        if (uxSemaphoreGetCount(motor_running_semaphore_) == 1) {
-            // || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
-            xTimerStart(system_standby_timer_, portMAX_DELAY);
-        }
+        // if (uxSemaphoreGetCount(motor_running_sem_) == 1) {
+        //     // || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
+        //     xTimerStart(system_sleep_timer_, portMAX_DELAY);
+        // }
     }
 }
 
@@ -84,6 +84,6 @@ void SystemTask::addMotorTaskQueue(QueueHandle_t queue) {
 }
 
 
-void SystemTask::addMotorRunningSemaphore(SemaphoreHandle_t semaphore) {
-    motor_running_semaphore_ = semaphore;
+TimerHandle_t SystemTask::getSystemSleepTimer() {
+    return system_sleep_timer_;
 }

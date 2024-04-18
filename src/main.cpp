@@ -23,7 +23,7 @@ static MotorTask motor_task(1);        // Running on core1
 
 void setup() {
     // Initializing serial output if compiled
-    LOG_INIT(9600, LogLevel::INFO);
+    LOG_INIT(115200, LogLevel::INFO);
 
     // Initializing LED
     pinMode(LED_PIN, OUTPUT);
@@ -31,10 +31,10 @@ void setup() {
     // The system task performs coordination between all tasks
     system_task.init();
     system_task.addMotorTaskQueue(motor_task.getQueue());
-    system_task.addMotorRunningSemaphore(motor_task.getMotorRunningSemaphore());
 
     wireless_task.init();
     wireless_task.addSystemTaskQueue(system_task.getQueue());
+    wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
     wireless_task.addMotorTaskQueue(motor_task.getQueue());
     wireless_task.addMotorStandbySemaphore(motor_task.getMotorStandbySemaphore());
 
@@ -42,6 +42,7 @@ void setup() {
     // position. TODO not start motor task on wake to reduce boot time
     motor_task.init();
     motor_task.addWirelessTaskQueue(wireless_task.getQueue());
+    motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // Delete setup/loop task
     vTaskDelete(NULL);

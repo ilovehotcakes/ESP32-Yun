@@ -26,6 +26,7 @@ public:
     WirelessTask(const uint8_t task_core);
     ~WirelessTask();
     void addSystemTaskQueue(QueueHandle_t queue);
+    void addSystemSleepTimer(TimerHandle_t timer);
     void addMotorTaskQueue(QueueHandle_t queue);
     void addMotorStandbySemaphore(SemaphoreHandle_t semaphore);
 
@@ -38,9 +39,10 @@ private:
     void readMqtt(char* topic, byte* buf, unsigned int len);
     void sendMqtt(String message);
 
-    QueueHandle_t system_task_queue_;      // Used to send messages to system task
-    QueueHandle_t motor_task_queue_;       // Used to send messages to motor task
-    SemaphoreHandle_t motor_standby_sem_;  // Used to signal to motor driver to startup
+    TimerHandle_t system_sleep_timer_;     // Keep system from sleeping between driver startup and motor running
+    QueueHandle_t system_task_queue_;      // To send messages to system task
+    QueueHandle_t motor_task_queue_;       // To send messages to motor task
+    SemaphoreHandle_t motor_standby_sem_;  // To signal to motor driver to startup
 
     WiFiClient  wifi_client_;
     PubSubClient mqtt_client_;

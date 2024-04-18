@@ -27,8 +27,8 @@ public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
     void addWirelessTaskQueue(QueueHandle_t queue);
+    void addSystemSleepTimer(xTimerHandle timer);
     SemaphoreHandle_t getMotorStandbySemaphore();
-    SemaphoreHandle_t getMotorRunningSemaphore();
 
 protected:
     void run();
@@ -51,10 +51,10 @@ private:
     Preferences motor_settings_;
 
     QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
-    xSemaphoreHandle motor_running_sem_;  // To signal to system task that motor is running
-    xSemaphoreHandle motor_standby_sem_;  // To signal to wireless task that driver is in standby
+    xSemaphoreHandle motor_standby_sem_;  // To signal to wireless task that motor is in standby
+    xTimerHandle system_sleep_timer_;     // To prevent system from sleeping before motor stops
 
-    // TMC2209 settings
+    // User adjustable TMC2209 motor driver settings
     int microsteps_           = 16;
     int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
     int velocity_             = static_cast<int>(steps_per_revolution_ * 3);
@@ -67,7 +67,6 @@ private:
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
     bool stallguard_enabled_  = true;
-    bool motor_stopped_       = true;
 
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;

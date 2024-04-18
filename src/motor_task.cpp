@@ -1,18 +1,14 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core, 2} {
+MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1 , task_core, 2} {
     motor_standby_sem_ = xSemaphoreCreateBinary();
     assert(motor_standby_sem_ != NULL && "Failed to create motor_standby_sem_");
-
-    motor_running_sem_ = xSemaphoreCreateBinary();
-    assert(motor_running_sem_ != NULL && "Failed to create motor_running_sem_");
 }
 
 
 MotorTask::~MotorTask() {
     vSemaphoreDelete(motor_standby_sem_);
-    vSemaphoreDelete(motor_running_sem_);
 }
 
 
@@ -85,10 +81,8 @@ void MotorTask::run() {
         }
 
         if (motor_->isRunning()) {
+            xTimerStart(system_sleep_timer_, 0);
             continue;
-        } else if (!motor_stopped_) {
-            motor_stopped_ = true;
-            xSemaphoreTake(motor_running_sem_, portMAX_DELAY);
         }
 
         if (last_updated_percent_ == getPercent()) {
@@ -101,7 +95,7 @@ void MotorTask::run() {
             last_updated_percent_ = current_percent;
             Message new_position(current_percent);
             if (xQueueSend(wireless_task_queue_, (void*) &new_position, 0) != pdTRUE) {
-                LOGE("Failed to send to wireless_message_queue_");
+                LOGE("Failed to send to wireless_task queue_");
             }
         }
     }
@@ -146,10 +140,8 @@ void MotorTask::moveToPercent(int percent) {
         driver_.rms_current(opening_current_);
     }
 
-    xSemaphoreGive(motor_running_sem_);
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
-    motor_stopped_ = false;
 
     LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder_.getCumulativePosition(), encod_max_pos_, new_position);
 }
@@ -193,18 +185,18 @@ bool MotorTask::setMax() {
 }
 
 
+void MotorTask::addSystemSleepTimer(xTimerHandle timer) {
+    system_sleep_timer_ = timer;
+}
+
+
 void MotorTask::addWirelessTaskQueue(QueueHandle_t queue) {
     wireless_task_queue_ = queue;
 }
 
 
-SemaphoreHandle_t MotorTask::getMotorStandbySemaphore(){
+SemaphoreHandle_t MotorTask::getMotorStandbySemaphore() {
     return motor_standby_sem_;
-}
-
-
-SemaphoreHandle_t MotorTask::getMotorRunningSemaphore() {
-    return motor_running_sem_;
 }
 
 
@@ -237,7 +229,7 @@ void MotorTask::driverStartup() {
 
     // Take the 'motor running semaphore' to signal that driver isn't in standby anymore to prevent
     // redundant restarting of the driver.
-    xSemaphoreTake(motor_standby_sem_, portMAX_DELAY);
+    xSemaphoreTake(motor_standby_sem_, 10);
 
     // Pull standby pin low to disable driver standby.
     digitalWrite(STBY_PIN, LOW);
