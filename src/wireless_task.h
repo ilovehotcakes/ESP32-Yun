@@ -55,8 +55,8 @@ private:
     const char* password = "123456789";
     bool ledState = 0;
 
-    // String   ssid_          = secretSSID;      // SSID (name) for WiFi
-    // String   password_      = secretPass;      // Network password for WiFi
+    String   ssid_          = secretSSID;      // SSID (name) for WiFi
+    String   password_      = secretPass;      // Network password for WiFi
     // String   mqtt_id_       = secretMqttID;    // MQTT ID for PubSubClient
     // String   mqtt_user_     = secretMqttUser;  // MQTT server username (optional)
     // String   mqtt_password_ = secretMqttPass;  // MQTT server password (optional)

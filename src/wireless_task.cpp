@@ -11,9 +11,9 @@ WirelessTask::~WirelessTask() {}
 void WirelessTask::run() {
     disableCore0WDT();  // Disable watchdog timer
     // Turn on LED to indicate disconnected
-    // digitalWrite(LED_PIN, HIGH);
+    digitalWrite(LED_PIN, HIGH);
 
-    // LOGI("Attempting to connect to WPA SSID: %s", ssid_.c_str());
+    LOGI("Attempting to connect to WPA SSID: %s", ssid_.c_str());
 
     const char index_html[] = R"rawliteral(
     <!DOCTYPE html>
@@ -27,11 +27,12 @@ void WirelessTask::run() {
             h1{color: #444444;margin: 50px auto;}
             p{font-size: 19px;color: #888;}
             #state{font-weight: bold;color: #444;}
-            .stop-button {
-                width: 200px;
-                height: 70px;
-                padding: 10px 30px;
-                font-size: 24px;
+            .button {
+                display: inline-block;
+                width: 25%;
+                margin: 0px 5px;
+                padding: 10px;
+                font-size: 20px;
                 text-align: center;
                 cursor: pointer;
                 outline: none;
@@ -41,27 +42,39 @@ void WirelessTask::run() {
                 border-radius: 15px;
                 box-shadow: 0 9px #999;
             }
-            .stop-button:active {
+            .button:active {
                 background-color: #3e8e41;
                 box-shadow: 0 5px #666;
                 transform: translateY(4px);
+                transform: translateY(4px);
             }
-            .switch{margin:25px auto;width:80px}
-            .toggle{display:none}
-            .toggle+label{display:block;position:relative;cursor:pointer;outline:0;user-select:none;padding:2px;width:80px;height:40px;background-color:#ddd;border-radius:40px}
-            .toggle+label:before,.toggle+label:after{display:block;position:absolute;top:1px;left:1px;bottom:1px;content:""}
-            .toggle+label:before{right:1px;background-color:#f1f1f1;border-radius:40px;transition:background .4s}
-            .toggle+label:after{width:40px;background-color:#fff;border-radius:20px;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:margin .4s}
-            .toggle:checked+label:before{background-color:#4285f4}
-            .toggle:checked+label:after{margin-left:42px}
+            .slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 300px;
+                margin: 50px 0px;
+                height: 50px;
+                background: #d3d3d3;
+                outline: none;
+            }
+            .slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 15px; /* Set a specific slider handle width */
+                height: 35px; /* Slider handle height */
+                background: #04AA6D; /* Green background */
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
         <h1>ESP32 Motorcover Demo</h1>
-        <div class="switch">
-            <input id="toggle-btn" class="toggle" type="checkbox" %CHECK%>
-            <label for="toggle-btn"></label>
+        <div>
+            <button id="open-button" class="button">OPEN</button>
+            <button id="stop-button" class="button">STOP</button>
+            <button id="close-button" class="button">CLOSE</button>
         </div>
+        <input id="percentage-slider" class="slider" type="range" min="0" max="100">
         <p>On-board LED: <span id="state">%STATE%</span></p>
 
         <script>
@@ -78,27 +91,44 @@ void WirelessTask::run() {
             };
             websocket.onmessage = function(event) {
                 if (event.data == "1") {
-                document.getElementById('state').innerHTML = "ON";
-                document.getElementById('toggle-btn').checked = true;
-                }
-                else {
-                document.getElementById('state').innerHTML = "OFF";
-                document.getElementById('toggle-btn').checked = false;
+                    document.getElementById('state').innerHTML = "ON";
+                    document.getElementById('stop-button').checked = true;
+                } else {
+                    document.getElementById('state').innerHTML = "OFF";
+                    document.getElementById('stop-button').checked = false;
                 }
             };
             
-            document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle'); });
+            document.getElementById('stop-button').addEventListener('click', function() { websocket.send('-1'); });
+            document.getElementById('open-button').addEventListener('click', function() { websocket.send('0'); });
+            document.getElementById('close-button').addEventListener('click', function() { websocket.send('100'); });
+            document.getElementById('percentage-slider').addEventListener('change', function() { websocket.send(document.getElementById('percentage-slider').value); });
         });
         </script>
     </body>
     </html>
     )rawliteral";
 
+    // ESP32 as STA
+    // if (!WiFi.config(IPAddress(192, 168, 20, 208), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0))) {
+    //     Serial.println("STA Failed to configure");
+    // }
+    WiFi.begin(ssid_.c_str(), password_.c_str());
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(".");
+    }
+    // Print local IP address and start web server
+    Serial.println("");
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
 
-    // Setup ESPS32 as WiFi in access point (AP) mode; leave out password for no password
-    WiFi.softAP(ssid);
-    // Set ESP32's IP to 192.168.1.2
-    WiFi.softAPConfig(IPAddress(192, 168, 1, 2), IPAddress(192, 168, 1, 2), IPAddress(255, 255, 255, 0));  
+
+    // // Setup ESPS32 as WiFi in access point (AP) mode; leave out password for no password
+    // WiFi.softAP(ssid);
+    // // Set ESP32's IP to 192.168.1.2
+    // WiFi.softAPConfig(IPAddress(192, 168, 1, 2), IPAddress(192, 168, 1, 2), IPAddress(255, 255, 255, 0));
 
     // Websocket server
     server.begin();
@@ -114,6 +144,8 @@ void WirelessTask::run() {
 
     // Start server
     server.begin();
+    
+    digitalWrite(LED_PIN, LOW);
 
     // #if COMPILEOTA
     //     ArduinoOTA.begin();
@@ -256,17 +288,37 @@ void WirelessTask::addMotorStandbySemaphore(SemaphoreHandle_t semaphore) {
 
 
 void WirelessTask::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
-    AwsFrameInfo *info = (AwsFrameInfo*)arg;
-    
-    Serial.println("4");
+    AwsFrameInfo *info = (AwsFrameInfo*) arg;
+
     if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
         data[len] = 0;
-        Serial.println("5");
-        if (strcmp((char*)data, "toggle") == 0) {
-            Serial.println("6");
-            ledState = !ledState;
-            ws.textAll(String(ledState));
+        Message outbox(atoi((char*) data));
+
+        LOGI("Received message from MQTT server: %i, %i", outbox.command, outbox.parameter);
+
+        if (outbox.command > -10) {  // Messages intended for motor task
+            xTimerStart(system_sleep_timer_, portMAX_DELAY);
+            // For moving commands, need to startup driver first if it's in standby
+            if (outbox.command > -1 && uxSemaphoreGetCount(motor_standby_sem_) == 1) {
+                Message startup(STBY_OFF);
+                if (xQueueSend(motor_task_queue_, (void*) &startup, 10) != pdTRUE) {
+                    LOGE("Failed to send to motor_task queue_");
+                }
+                vTaskDelay(5);  // Wait for driver to startup
+            }
+
+            if (xQueueSend(motor_task_queue_, (void*) &outbox, 0) != pdTRUE) {
+                LOGE("Failed to send to motor_task queue_");
+            }
+        } else {  // Messages inteded for system task
+            if (xQueueSend(system_task_queue_, (void*) &outbox, 0) != pdTRUE) {
+                LOGE("Failed to send to system_task queue_");
+            }
         }
+
+        // if (strcmp((char*) data, "stop") == 0) {
+        //     ws.textAll(String(ledState));
+        // }
     }
 }
 
@@ -280,9 +332,7 @@ void WirelessTask::eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *cl
             Serial.printf("WebSocket client #%u disconnected\n", client->id());
             break;
         case WS_EVT_DATA:
-            Serial.println("1");
             handleWebSocketMessage(arg, data, len);
-            digitalWrite(LED_PIN, ledState);
             break;
         case WS_EVT_PONG:
         case WS_EVT_ERROR:
