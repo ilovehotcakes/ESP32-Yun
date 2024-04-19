@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "commands.h"
 #include "secrets.h"
+#include "index.h"
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
