@@ -34,6 +34,8 @@ void WirelessTask::run() {
         #if COMPILEOTA
             ArduinoOTA.handle();
         #endif
+
+        vTaskDelay(1);  // Finished all task within loop, handing control back to scheduler
     }
 }
 

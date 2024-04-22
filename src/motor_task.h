@@ -68,6 +68,7 @@ private:
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
     bool stallguard_enabled_  = true;
 
+    int32_t encod_pos_            = 0;
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;
     float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;

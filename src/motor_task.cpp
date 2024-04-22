@@ -1,7 +1,7 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1 , task_core, 2} {
+MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core, 2} {
     motor_standby_sem_ = xSemaphoreCreateBinary();
     assert(motor_standby_sem_ != NULL && "Failed to create motor_standby_sem_");
 }
@@ -50,7 +50,8 @@ void MotorTask::run() {
     loadSettings();
 
     while (1) {
-        motor_->setCurrentPosition(positionToSteps(encoder_.getCumulativePosition()));
+        encod_pos_ = encoder_.getCumulativePosition();
+        motor_->setCurrentPosition(positionToSteps(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
             LOGD("Motor task received command: %i, %i", inbox_.command, inbox_.parameter);
@@ -84,10 +85,12 @@ void MotorTask::run() {
 
         if (motor_->isRunning()) {
             xTimerStart(system_sleep_timer_, 0);
+            vTaskDelay(1);
             continue;
         }
 
         if (last_updated_percent_ == getPercent()) {
+            vTaskDelay(1);
             continue;
         }
 
@@ -100,6 +103,8 @@ void MotorTask::run() {
                 LOGE("Failed to send to wireless_task queue_");
             }
         }
+
+        vTaskDelay(1);  // Finished all task within loop, handing control back to scheduler
     }
 }
 
@@ -145,7 +150,7 @@ void MotorTask::moveToPercent(int percent) {
     int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
 
-    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encoder_.getCumulativePosition(), encod_max_pos_, new_position);
+    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
 }
 
 
@@ -156,7 +161,7 @@ void MotorTask::stop() {
     // position in the while loop. Author of fastaccelstepper recommends for ESP32 to only call
     // setCurrentPosition when motor is in standstill.
     vTaskDelay(2 / portTICK_PERIOD_MS);
-    LOGD("Motor stopped(curr/max): %d/%d", encoder_.getCumulativePosition(), encod_max_pos_);
+    LOGD("Motor stopped(curr/max): %d/%d", encod_pos_, encod_max_pos_);
 }
 
 
@@ -204,7 +209,7 @@ SemaphoreHandle_t MotorTask::getMotorStandbySemaphore() {
 
 // 0 is open; 100 is closed.
 inline int MotorTask::getPercent() {
-    return static_cast<int>(static_cast<float>(encoder_.getCumulativePosition()) / encod_max_pos_ * 100 + 0.5);
+    return static_cast<int>(static_cast<float>(encod_pos_) / encod_max_pos_ * 100 + 0.5);
 }
 
 
