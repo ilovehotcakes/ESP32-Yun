@@ -51,6 +51,7 @@ void MotorTask::run() {
     LOGD("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
+
     while (1) {
         encod_pos_ = encoder_.getCumulativePosition();
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
