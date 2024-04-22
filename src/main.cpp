@@ -28,15 +28,16 @@ void setup() {
     // Initializing LED
     pinMode(LED_PIN, OUTPUT);
 
+    // setCpuFrequencyMhz(80);
+
     // The system task performs coordination between all tasks
     system_task.init();
     system_task.addMotorTaskQueue(motor_task.getQueue());
 
     wireless_task.init();
+    wireless_task.addMotorTaskQueue(motor_task.getQueue());
     wireless_task.addSystemTaskQueue(system_task.getQueue());
     wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
-    wireless_task.addMotorTaskQueue(motor_task.getQueue());
-    wireless_task.addMotorStandbySemaphore(motor_task.getMotorStandbySemaphore());
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position. TODO not start motor task on wake to reduce boot time

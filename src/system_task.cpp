@@ -60,6 +60,8 @@ void SystemTask::run() {
         //     // || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
         //     xTimerStart(system_sleep_timer_, portMAX_DELAY);
         // }
+
+        vTaskDelay(1);  // Finished all task within loop, handing control back to scheduler
     }
 }
 

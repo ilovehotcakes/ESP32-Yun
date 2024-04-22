@@ -30,7 +30,6 @@ public:
     void addSystemTaskQueue(QueueHandle_t queue);
     void addSystemSleepTimer(TimerHandle_t timer);
     void addMotorTaskQueue(QueueHandle_t queue);
-    void addMotorStandbySemaphore(SemaphoreHandle_t semaphore);
 
 protected:
     void run();
@@ -45,7 +44,6 @@ private:
     TimerHandle_t system_sleep_timer_;     // Keep system from sleeping between driver startup and motor running
     QueueHandle_t system_task_queue_;      // To send messages to system task
     QueueHandle_t motor_task_queue_;       // To send messages to motor task
-    SemaphoreHandle_t motor_standby_sem_;  // To signal to motor driver to startup
     String motor_position_;
 
     // Create AsyncWebServer object on port 80
