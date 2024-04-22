@@ -40,7 +40,7 @@ void SystemTask::run() {
 
     while (1) {
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
-            LOGI("System task received command: %i, %i", inbox_.command, inbox_.parameter);
+            LOGI("System task received message: %i, %i", inbox_.command, inbox_.parameter);
             switch (inbox_.command) {
                 case SYS_STANDBY:
                     systemStandby(system_sleep_timer_);

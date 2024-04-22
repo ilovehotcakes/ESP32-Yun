@@ -9,7 +9,8 @@ enum MotorCommand {
 };
 
 enum SystemCommand {
-    SYS_STANDBY = -97,
-    SYS_RESET   = -98,
-    SYS_REBOOT  = -99
+    SYS_STANDBY  = -97,
+    SYS_RESET    = -98,
+    SYS_REBOOT   = -99,
+    GET_POSITION = -100
 };
