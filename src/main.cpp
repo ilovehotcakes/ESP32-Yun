@@ -33,10 +33,9 @@ void setup() {
     system_task.addMotorTaskQueue(motor_task.getQueue());
 
     wireless_task.init();
+    wireless_task.addMotorTaskQueue(motor_task.getQueue());
     wireless_task.addSystemTaskQueue(system_task.getQueue());
     wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
-    wireless_task.addMotorTaskQueue(motor_task.getQueue());
-    wireless_task.addMotorStandbySemaphore(motor_task.getMotorStandbySemaphore());
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position. TODO not start motor task on wake to reduce boot time

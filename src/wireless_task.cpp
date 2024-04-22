@@ -92,15 +92,6 @@ void WirelessTask::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) 
 
         if (outbox.command > -10) {  // Messages intended for motor task
             xTimerStart(system_sleep_timer_, portMAX_DELAY);
-            // For moving commands, need to startup driver first if it's in standby
-            if (outbox.command > -1 && uxSemaphoreGetCount(motor_standby_sem_)) {
-                Message startup(STBY_OFF);
-                if (xQueueSend(motor_task_queue_, (void*) &startup, 10) != pdTRUE) {
-                    LOGE("Failed to send to motor_task queue_");
-                }
-                vTaskDelay(5);  // Wait for driver to startup
-            }
-
             if (xQueueSend(motor_task_queue_, (void*) &outbox, 0) != pdTRUE) {
                 LOGE("Failed to send to motor_task queue_");
             }
@@ -151,9 +142,4 @@ void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
 
 void WirelessTask::addMotorTaskQueue(QueueHandle_t queue) {
     motor_task_queue_ = queue;
-}
-
-
-void WirelessTask::addMotorStandbySemaphore(SemaphoreHandle_t semaphore) {
-    motor_standby_sem_ = semaphore;
 }

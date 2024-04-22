@@ -28,7 +28,6 @@ public:
     ~MotorTask();
     void addWirelessTaskQueue(QueueHandle_t queue);
     void addSystemSleepTimer(xTimerHandle timer);
-    SemaphoreHandle_t getMotorStandbySemaphore();
 
 protected:
     void run();
@@ -51,13 +50,13 @@ private:
     Preferences motor_settings_;
 
     QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
-    xSemaphoreHandle motor_standby_sem_;  // To signal to wireless task that motor is in standby
     xTimerHandle system_sleep_timer_;     // To prevent system from sleeping before motor stops
 
     // User adjustable TMC2209 motor driver settings
     int microsteps_           = 16;
-    int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
-    int velocity_             = static_cast<int>(steps_per_revolution_ * 3);
+    int full_steps_per_rev_   = 200;  // NEMA motors have 200 full steps/rev
+    int microsteps_per_rev_ = full_steps_per_rev_ * microsteps_;
+    int velocity_             = static_cast<int>(microsteps_per_rev_ * 3);
     int acceleration_         = static_cast<int>(velocity_ * 0.5);
     bool direction_           = false;
     int opening_current_      = 200;
@@ -67,12 +66,13 @@ private:
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
     bool stallguard_enabled_  = true;
+    bool motor_standby_       = false;
 
     int32_t encod_pos_            = 0;
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;
-    float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;
-    float encoder_motor_ratio_    = 4096.0 / steps_per_revolution_;
+    float motor_encoder_ratio_    = microsteps_per_rev_ / 4096.0;
+    float encoder_motor_ratio_    = 4096.0 / microsteps_per_rev_;
 
     void stallguardInterrupt();
     void loadSettings(); // Load motor settings from flash
@@ -80,15 +80,15 @@ private:
     void stop();
     bool setMin();
     bool setMax();
-    bool driverEnable(uint8_t enable_pin, uint8_t value);
+    bool motorEnable(uint8_t enable_pin, uint8_t value);
+    inline int getPercent();
+    inline int positionToSteps(int encoder_position);
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
     // can send settings to the driver via UART.
     void driverStartup();
     void driverStandby();
-    inline int getPercent();
-    inline int positionToSteps(int encoder_position);
 
     // TODO set/get
     // void setMicrosteps()

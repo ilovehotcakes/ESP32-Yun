@@ -1,14 +1,17 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core, 2} {
-    motor_standby_sem_ = xSemaphoreCreateBinary();
-    assert(motor_standby_sem_ != NULL && "Failed to create motor_standby_sem_");
+MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core, 2} {}
+MotorTask::~MotorTask() {}
+
+
+void MotorTask::addWirelessTaskQueue(QueueHandle_t queue) {
+    wireless_task_queue_ = queue;
 }
 
 
-MotorTask::~MotorTask() {
-    vSemaphoreDelete(motor_standby_sem_);
+void MotorTask::addSystemSleepTimer(xTimerHandle timer) {
+    system_sleep_timer_ = timer;
 }
 
 
@@ -27,7 +30,7 @@ void MotorTask::run() {
     motor_ = engine_.stepperConnectToPin(STEP_PIN);
     assert(motor_ && "Failed to initialize FastAccelStepper");
     motor_->setEnablePin(100, false);
-    motor_->setExternalEnableCall(std::bind(&MotorTask::driverEnable, this, std::placeholders::_1, std::placeholders::_2));
+    motor_->setExternalEnableCall(std::bind(&MotorTask::motorEnable, this, std::placeholders::_1, std::placeholders::_2));
     motor_->setDirectionPin(DIR_PIN);
     motor_->setSpeedInHz(velocity_);
     motor_->setAcceleration(acceleration_);
@@ -48,7 +51,6 @@ void MotorTask::run() {
     LOGD("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
-
     while (1) {
         encod_pos_ = encoder_.getCumulativePosition();
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
@@ -139,6 +141,10 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
+    driverStartup();
+
+    vTaskDelay(5);  // Wait for driver to startup
+
     motor_->setSpeedInHz(velocity_);
 
     if (percent > getPercent()) {
@@ -192,21 +198,6 @@ bool MotorTask::setMax() {
 }
 
 
-void MotorTask::addSystemSleepTimer(xTimerHandle timer) {
-    system_sleep_timer_ = timer;
-}
-
-
-void MotorTask::addWirelessTaskQueue(QueueHandle_t queue) {
-    wireless_task_queue_ = queue;
-}
-
-
-SemaphoreHandle_t MotorTask::getMotorStandbySemaphore() {
-    return motor_standby_sem_;
-}
-
-
 // 0 is open; 100 is closed.
 inline int MotorTask::getPercent() {
     return static_cast<int>(static_cast<float>(encod_pos_) / encod_max_pos_ * 100 + 0.5);
@@ -218,7 +209,7 @@ inline int MotorTask::positionToSteps(int encoder_position) {
 }
 
 
-bool MotorTask::driverEnable(uint8_t enable_pin, uint8_t value) {
+bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
     if (value == HIGH) {
         driver_.toff(4);
     } else {
@@ -229,16 +220,14 @@ bool MotorTask::driverEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::driverStartup() {
-    if (uxSemaphoreGetCount(motor_standby_sem_) == 0) {
+    if (!motor_standby_) {
         LOGD("Driver already started");
         return;
     }
 
-    // Take the 'motor running semaphore' to signal that driver isn't in standby anymore to prevent
-    // redundant restarting of the driver.
-    xSemaphoreTake(motor_standby_sem_, 10);
+    motor_standby_ = false;
 
-    // Pull standby pin low to disable driver standby.
+    // Pull standby pin low to disable driver standby
     digitalWrite(STBY_PIN, LOW);
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
@@ -278,8 +267,8 @@ void MotorTask::driverStartup() {
     // events and the duration of ringing on sense resistor. For most applications, a setting of 16
     // or 24 is good. For highly capacitive loads, a setting of 32 or 40 will be required.
     driver_.blank_time(24);
-    // driver_.hstrt(4);
-    // driver_.hend(12);
+    driver_.hstrt(4);
+    driver_.hend(12);
 
     // Inverse motor direction
     driver_.shaft(direction_);
@@ -309,14 +298,12 @@ void MotorTask::driverStartup() {
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
-    LOGD("Driver has started");
-
-    // return driver.toff(0);  // TODO
+    LOGI("Driver has started");
 }
 
 
 void MotorTask::driverStandby() {
-    if (uxSemaphoreGetCount(motor_standby_sem_) == 1) {
+    if (motor_standby_) {
         LOGD("Driver already in standby");
         return;
     } else if (motor_->isRunning()) {
@@ -324,11 +311,12 @@ void MotorTask::driverStandby() {
         return;
     }
 
+    motor_standby_ = true;
+
     // Need to disable StallGuard or else it will stall the motor when disabling the driver
     detachInterrupt(DIAG_PIN);
 
-    // Pull standby pin high to turn on TMC2209 driver
+    // Pull standby pin high to standby TMC2209 driver
     digitalWrite(STBY_PIN, HIGH);
-    xSemaphoreGive(motor_standby_sem_);
-    LOGD("Driver in standby");
+    LOGI("Driver in standby");
 }
