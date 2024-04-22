@@ -1,12 +1,11 @@
 #pragma once
 /**
-    motor_task.h - A class that contains all functions to control a stepper motor.
+    motor_task.h - A class that contains all functions to control a bipolar stepper motor.
     Author: Jason Chen, 2022
 
-    The way to control the stepper motor is sending PWM to the stepper motor driver, TMC2209. To
-    operate the TMC2209: (1) need to start the driver (take it out of STANDBY), and (2) ENABLE the
-    motor by energizing the motor coils. Both are done automatically: (1) is by the wireless task
-    and (2) is by FastAccelStepper.
+    To control the stepper motor, send PWM signals to the stepper motor driver, TMC2209. To operate
+    the driver: (1) start the driver by taking it out of STANDBY), and (2) ENABLE the motor coils.
+    Both are done automatically.
 **/
 #include <Arduino.h>
 #include <HardwareSerial.h>       // Hardwareserial for uart
@@ -33,8 +32,8 @@ protected:
     void run();
 
 private:
-    // TMCStepper library for interfacing with stepper motor driver hardware, mainly reading and
-    // writing registers for setting speed, acceleration, current, etc.
+    // TMCStepper library for interfacing with the stepper motor driver hardware, to read/write
+    // registers for setting speed, acceleration, current, etc.
     TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
     // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
@@ -63,11 +62,14 @@ private:
     int closing_current_      = 75;  // 1, 3: 200; 2: 400; 4: 300
     int stallguard_threshold_ = 10;
 
+    // Motor task's internal states
     volatile bool stalled_    = false;
     portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
     bool stallguard_enabled_  = true;
-    bool motor_standby_       = false;
+    bool driver_standby_      = false;
 
+    // Encoder's attributes: we keep track of the overall position via encoder's position and then
+    // convert it into motor's position and percentage.
     int32_t encod_pos_            = 0;
     int32_t encod_max_pos_        = 0;
     int8_t  last_updated_percent_ = -100;

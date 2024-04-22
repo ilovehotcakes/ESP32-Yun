@@ -28,6 +28,8 @@ void setup() {
     // Initializing LED
     pinMode(LED_PIN, OUTPUT);
 
+    // setCpuFrequencyMhz(80);
+
     // The system task performs coordination between all tasks
     system_task.init();
     system_task.addMotorTaskQueue(motor_task.getQueue());

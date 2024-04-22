@@ -42,13 +42,9 @@ void MotorTask::run() {
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
     // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder");
-    Wire.setClock(1000000);
-    encoder_.setWatchDog(1);    // Enable automatic low power (sleep) mode 6.5mA -> 1.5mA
-    encoder_.setHysteresis(3);  // Reduce sensitivity when in sleep mode
-    encoder_.setConfigure(0x900);  // fast filter 111=10LSBs, slow filter 01=8x
-    // encoder_.setSlowFilter(0);  // Reduce noise especially when stopping
-    // encoder_.setFastFilter(7);
-    LOGD("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
+    Wire.setClock(1000000);         // Increase I2C bus speed to 1MHz which is AS5600's max bus speed
+    encoder_.setConfigure(0x2904);  // Hysteresis=1LSB, fast filter=10LSBs, slow filter=8x, WD=ON
+    LOGI("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
 
@@ -142,9 +138,10 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    driverStartup();
-
-    vTaskDelay(5);  // Wait for driver to startup
+    if (driver_standby_) {
+        driverStartup();
+        vTaskDelay(5);  // Wait for driver to startup
+    }
 
     motor_->setSpeedInHz(velocity_);
 
@@ -221,12 +218,12 @@ bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::driverStartup() {
-    if (!motor_standby_) {
+    if (!driver_standby_) {
         LOGD("Driver already started");
         return;
     }
 
-    motor_standby_ = false;
+    driver_standby_ = false;
 
     // Pull standby pin low to disable driver standby
     digitalWrite(STBY_PIN, LOW);
@@ -304,7 +301,7 @@ void MotorTask::driverStartup() {
 
 
 void MotorTask::driverStandby() {
-    if (motor_standby_) {
+    if (driver_standby_) {
         LOGD("Driver already in standby");
         return;
     } else if (motor_->isRunning()) {
@@ -312,7 +309,7 @@ void MotorTask::driverStandby() {
         return;
     }
 
-    motor_standby_ = true;
+    driver_standby_ = true;
 
     // Need to disable StallGuard or else it will stall the motor when disabling the driver
     detachInterrupt(DIAG_PIN);
