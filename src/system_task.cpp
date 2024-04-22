@@ -9,7 +9,7 @@ SystemTask::SystemTask(const uint8_t task_core) :
         assert(temp_system_ptr != NULL);
         temp_system_ptr->systemStandby(timer);
     };
-    system_sleep_timer_ = xTimerCreate("System sleep", system_wake_time_, pdFALSE, this, on_timer);
+    system_sleep_timer_ = xTimerCreate("System_sleep_timer", system_wake_time_, pdFALSE, this, on_timer);
     assert(system_sleep_timer_ != NULL && "Failed to create system_sleep_timer_");
 }
 
@@ -56,8 +56,7 @@ void SystemTask::run() {
             }
         }
 
-        // if (uxSemaphoreGetCount(motor_running_sem_) == 1) {
-        //     // || xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
+        // if (xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
         //     xTimerStart(system_sleep_timer_, portMAX_DELAY);
         // }
 
