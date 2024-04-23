@@ -29,6 +29,8 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
 
     // setCpuFrequencyMhz(80);
+    
+    esp_task_wdt_init(10, true);  // Restart system if wd hasn't been fed in 10 seconds
 
     // The system task performs coordination between all tasks
     system_task.init();

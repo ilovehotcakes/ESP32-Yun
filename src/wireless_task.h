@@ -10,6 +10,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <FunctionalInterrupt.h>  // std:bind()
+#include <esp_task_wdt.h>
 #include "task.h"
 #include "logger.h"
 #include "commands.h"

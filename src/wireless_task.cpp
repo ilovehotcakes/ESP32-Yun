@@ -2,21 +2,18 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {}
+        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {
+}
 
 
 WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
-    disableCore0WDT();  // Disable watchdog timer
-    connectWifi();      // Must connect to WiFi before setting up OTA
-
-    #if COMPILEOTA
-        ArduinoOTA.begin();
-    #endif
-
+    esp_task_wdt_add(getTaskHandle());
     while (1) {
+        esp_task_wdt_reset();
+
         // Check WiFi connection
         if (WiFi.status() != WL_CONNECTED) {
             connectWifi();
@@ -40,7 +37,6 @@ void WirelessTask::run() {
 }
 
 
-// TODO: Restart on timeout
 void WirelessTask::connectWifi() {
     // Turn on LED to indicate disconnected
     digitalWrite(LED_PIN, HIGH);
@@ -63,12 +59,17 @@ void WirelessTask::connectWifi() {
     websocket.onEvent(std::bind(&WirelessTask::eventHandler, this, std::placeholders::_1,
                       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
                       std::placeholders::_5, std::placeholders::_6));
+
     webserver.addHandler(&websocket);
 
     // Route for root/web page
     webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
         request->send_P(200, "text/html", index_html, std::bind(&WirelessTask::processor, this, std::placeholders::_1));
     });
+
+    #if COMPILEOTA
+        ArduinoOTA.begin();
+    #endif
 
     digitalWrite(LED_PIN, LOW);
 
