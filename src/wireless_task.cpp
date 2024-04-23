@@ -64,7 +64,7 @@ void WirelessTask::connectWifi() {
 
     // Route for root/web page
     webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        request->send_P(200, "text/html", index_html, std::bind(&WirelessTask::processor, this, std::placeholders::_1));
+        request->send(200, "text/html", index_html);
     });
 
     #if COMPILEOTA
@@ -83,7 +83,7 @@ void WirelessTask::sendWebsocket(String message) {
 
 
 void WirelessTask::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
-    AwsFrameInfo *info = (AwsFrameInfo*) arg;
+    AwsFrameInfo *info = static_cast<AwsFrameInfo*>(arg);
 
     if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
         data[len] = 0;
@@ -123,11 +123,6 @@ void WirelessTask::eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *cl
         case WS_EVT_ERROR:
             break;
     }
-}
-
-
-String WirelessTask::processor(const String& var) {
-    return String();
 }
 
 

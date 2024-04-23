@@ -40,7 +40,6 @@ private:
     void sendWebsocket(String message);
     void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
     void eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
-    String processor(const String& var);
 
     TimerHandle_t system_sleep_timer_;     // Keep system from sleeping between driver startup and motor running
     QueueHandle_t system_task_queue_;      // To send messages to system task
@@ -53,6 +52,6 @@ private:
     const char* ssid     = "ESP32 Motorcover";
     const char* password = "123456789";
 
-    String   ssid_          = secretSSID;      // SSID (name) for WiFi
-    String   password_      = secretPass;      // Network password for WiFi
+    String   ssid_       = secretSSID;      // SSID (name) for WiFi
+    String   password_   = secretPass;      // Network password for WiFi
 };
