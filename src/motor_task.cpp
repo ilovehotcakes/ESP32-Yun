@@ -140,7 +140,6 @@ void MotorTask::moveToPercent(int percent) {
 
     if (driver_standby_) {
         driverStartup();
-        vTaskDelay(5);  // Wait for driver to startup
     }
 
     motor_->setSpeedInHz(velocity_);
@@ -295,6 +294,8 @@ void MotorTask::driverStartup() {
         // Enable StallGuard or else it will stall the motor when starting the driver
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
+
+    vTaskDelay(10);  // Wait for driver to startup
 
     LOGI("Driver has started");
 }
