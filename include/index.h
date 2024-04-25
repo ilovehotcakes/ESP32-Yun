@@ -2,6 +2,7 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- go to https://base64.guru/converter/encode/image/ico to convert favicon to base64 image -->
     <link rel="shortcut icon" href="data:image/x-icon;base64,UklGRl4AAABXRUJQVlA4TFIAAAAvOQATADdAEECSeT5D7DLJGgSCEK0zw3hHkAlYrIYc+lfxOkUw//E/JqtVKghkBkUBQDgiiCCECDTRP8XtPT8R/Z8A6DKqpOf1E0oug7T/ip4C" />
     <title>ESP32 Motorcover</title>
     <style>
