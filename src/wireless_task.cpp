@@ -11,6 +11,7 @@ WirelessTask::~WirelessTask() {}
 
 void WirelessTask::run() {
     esp_task_wdt_add(getTaskHandle());
+    // connectWifi();  // For AP mode
     while (1) {
         esp_task_wdt_reset();
 
@@ -49,7 +50,7 @@ void WirelessTask::connectWifi() {
     }
 
     // Setup ESPS32 as WiFi in access point (AP) mode; leave out password for no password
-    // WiFi.softAP(ssid);
+    // WiFi.softAP(ap_ssid_.c_str());
     // // Set ESP32's IP to 192.168.1.2
     // WiFi.softAPConfig(IPAddress(192, 168, 1, 2), IPAddress(192, 168, 1, 2), IPAddress(255, 255, 255, 0));
 

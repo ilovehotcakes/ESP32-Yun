@@ -49,9 +49,7 @@ private:
     // Create AsyncWebServer object on port 80
     AsyncWebServer webserver;
     AsyncWebSocket websocket;
-    const char* ssid     = "ESP32 Motorcover";
-    const char* password = "123456789";
-
-    String   ssid_       = secretSSID;      // SSID (name) for WiFi
-    String   password_   = secretPass;      // Network password for WiFi
+    String ap_ssid_  = "ESP32 Motorcover";  // SSID (hostname) for AP
+    String ssid_     = secretSSID;          // SSID (hostname) for WiFi
+    String password_ = secretPass;          // Network password for WiFi
 };
