@@ -54,7 +54,7 @@ private:
     // User adjustable TMC2209 motor driver settings
     int microsteps_           = 16;
     int full_steps_per_rev_   = 200;  // NEMA motors have 200 full steps/rev
-    int microsteps_per_rev_ = full_steps_per_rev_ * microsteps_;
+    int microsteps_per_rev_   = full_steps_per_rev_ * microsteps_;
     int velocity_             = static_cast<int>(microsteps_per_rev_ * 3);
     int acceleration_         = static_cast<int>(velocity_ * 0.5);
     bool direction_           = false;
