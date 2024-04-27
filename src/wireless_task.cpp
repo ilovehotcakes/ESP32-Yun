@@ -10,11 +10,8 @@ WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
-    esp_task_wdt_add(getTaskHandle());
     // connectWifi();  // For AP mode
     while (1) {
-        esp_task_wdt_reset();
-
         // Check WiFi connection
         if (WiFi.status() != WL_CONNECTED) {
             connectWifi();
@@ -39,6 +36,8 @@ void WirelessTask::run() {
 
 
 void WirelessTask::connectWifi() {
+    esp_task_wdt_add(getTaskHandle());
+
     // Turn on LED to indicate disconnected
     digitalWrite(LED_PIN, HIGH);
 
@@ -68,11 +67,20 @@ void WirelessTask::connectWifi() {
         request->send(200, "text/html", index_html);
     });
 
+    // RESTful api for turning on/off LED or setting motor states
+    webserver.on("/led", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (request->hasParam("state"))
+            digitalWrite(LED_PIN, request->getParam("state")->value().toInt());
+        request->send(200, "text/plain", "success");
+    });
+
     #if COMPILEOTA
         ArduinoOTA.begin();
     #endif
 
     digitalWrite(LED_PIN, LOW);
+
+    esp_task_wdt_delete(getTaskHandle());
 
     LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
 }
