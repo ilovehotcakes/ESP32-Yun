@@ -98,7 +98,7 @@ void WirelessTask::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) 
         data[len] = 0;
         Message outbox(atoi((char*) data));
 
-        LOGI("Received message from webserver: %i, %i", outbox.command, outbox.parameter);
+        LOGI("Received message from webserver: %s", outbox.toString());
 
         if (outbox.command > -10) {  // Messages intended for motor task
             xTimerStart(system_sleep_timer_, portMAX_DELAY);

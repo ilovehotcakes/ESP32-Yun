@@ -20,7 +20,8 @@
 
 
 struct Message {
-    Message(int command, int parameter = -404) : command(command), parameter(parameter) {}
+    Message(int command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
+    String toString() { return String(command) + (parameter == INT_MIN? "" : ", " + String(parameter)); }
     int command;
     int parameter;
 };

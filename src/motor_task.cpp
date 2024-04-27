@@ -53,7 +53,7 @@ void MotorTask::run() {
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
-            LOGD("Motor task received command: %i, %i", inbox_.command, inbox_.parameter);
+            LOGD("Motor task received command: %s", inbox_.toString());
             switch (inbox_.command) {
                 case COVER_STOP:
                     stop();
