@@ -138,8 +138,9 @@ void MotorTask::moveToPercent(int percent) {
         return;
     }
 
-    if (driver_standby_) {
+    while (driver_standby_) {
         driverStartup();
+        vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
     motor_->setSpeedInHz(velocity_);
@@ -222,8 +223,6 @@ void MotorTask::driverStartup() {
         return;
     }
 
-    driver_standby_ = false;
-
     // Pull standby pin low to disable driver standby
     digitalWrite(STBY_PIN, LOW);
 
@@ -295,7 +294,8 @@ void MotorTask::driverStartup() {
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
-    vTaskDelay(10);  // Wait for driver to startup
+    // TODO: check via UART driver register read/write ok?
+    driver_standby_ = false;
 
     LOGI("Driver has started");
 }
