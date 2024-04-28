@@ -2,10 +2,7 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {
-}
-
-
+        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {}
 WirelessTask::~WirelessTask() {}
 
 
@@ -18,8 +15,8 @@ void WirelessTask::run() {
 
         // If motor has changed position(%), broadcast it to all WS clients
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
-            LOGI("Wireless task received message: %i", inbox_.command);
-            motor_position_ = static_cast<String>(inbox_.command);
+            LOGI("WirelessTask received message: %s", inbox_.toString().c_str());
+            motor_position_ = static_cast<String>(inbox_.parameter);
             websocket.textAll(motor_position_);
         }
 
@@ -147,9 +144,9 @@ bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String par
             request->send(400, "text/plain", "failed: " + error_message);
             return true;
         }
-        Message(hash(param), value); // send to motor task
+        LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
+        sendTo(motor_task_, Message(hash(param), value), 0);
         request->send(200, "text/plain", "success");
-        LOGI("Successfully parsing HTTP request: param=%s, value=%u", param.c_str(), value);
         return true;
     }
     return false;
@@ -162,6 +159,7 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
     xTimerStart(system_sleep_timer_, portMAX_DELAY);
     switch (type) {
         case WS_EVT_CONNECT:
+            client->printf(motor_position_.c_str());
             LOGI("WebSocket client #%u connected from %s", client->id(),
                                                            client->remoteIP().toString().c_str());
             break;
@@ -184,14 +182,12 @@ void WirelessTask::wsEventDataProcessor(void *arg, uint8_t *data, size_t len) {
 
     if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
         data[len] = 0;
-        Message outgoing(atoi((char*) data));
+        Message outgoing(MOTOR_MOVE, atoi((char*) data));
 
-        LOGI("Received message from webserver: %s", outgoing.toString());
+        LOGI("Received message from WebSocket: %s", outgoing.toString());
 
         if (outgoing.command > -1 && outgoing.command < 101) {  // Messages intended for motor task
-            if (xQueueSend(motor_task_queue_, (void*) &outgoing, 0) != pdTRUE) {
-                LOGE("Failed to send to motor_task queue_");
-            }
+            sendTo((Task*) motor_task_, outgoing, 0);
         } else {
             LOGE("Position(%) of motor cannot be great than 100 or less than 0");
         }
@@ -209,6 +205,6 @@ void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
 }
 
 
-void WirelessTask::addMotorTaskQueue(QueueHandle_t queue) {
-    motor_task_queue_ = queue;
+void WirelessTask::addMotorTask(void *task) {
+    motor_task_ = static_cast<Task*>(task);
 }

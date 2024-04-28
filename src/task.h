@@ -17,12 +17,15 @@
     Modified by Jason Chen, 2024
 **/
 #include <Arduino.h>
+#include "commands.h"
+#include "logger.h"
 
 
 struct Message {
-    Message(int command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
-    String toString() { return String(command) + (parameter == INT_MIN ? "" : ", " + String(parameter)); }
-    int command;
+    Message(Command command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
+    String toString() { return "command=" + hash(command) 
+                        + (parameter == INT_MIN ? "" : ", parameter=" + String(parameter)); }
+    Command command;
     int parameter;
 };
 
@@ -36,7 +39,7 @@ public:
     Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
          const BaseType_t core_id = tskNO_AFFINITY, int queue_length = 1) :
             name_ {name},
-            inbox_(-404, -404),
+            inbox_(ERROR_COMMAND, INT_MIN),
             stack_depth_ {stack_depth},
             priority_ {priority},
             core_id_ {core_id} {
@@ -44,7 +47,7 @@ public:
         assert(queue_ != NULL && "Failed to create task_queue_");
     }
 
-    virtual ~Task() {
+    ~Task() {
         vQueueDelete(queue_);
     }
 
@@ -52,8 +55,17 @@ public:
         return task_handle_;
     }
 
-    QueueHandle_t getQueue() {
+    QueueHandle_t getQueueHandle() {
         return queue_;
+    }
+
+    bool sendTo(Task *task, Message message, int timeout) {
+        LOGI("Sending message from %s to %s", name_, task->name_);
+        if (xQueueSend(task->getQueueHandle(), (void*) &message, timeout) != pdTRUE) {
+            LOGE("Failed to send message from %s to %s", name_, task->name_);
+            return false;
+        }
+        return true;
     }
 
     void init() {

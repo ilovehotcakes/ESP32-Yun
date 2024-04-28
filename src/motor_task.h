@@ -25,7 +25,7 @@ class MotorTask : public Task<MotorTask> {
 public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
-    void addWirelessTaskQueue(QueueHandle_t queue);
+    void addWirelessTask(void *task);
     void addSystemSleepTimer(xTimerHandle timer);
 
 protected:
@@ -48,8 +48,8 @@ private:
     // Saving motor settings, such as motor's max position and other attributes
     Preferences motor_settings_;
 
-    QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
-    xTimerHandle system_sleep_timer_;     // To prevent system from sleeping before motor stops
+    Task *wireless_task_;       // To receive messages from wireless task
+    xTimerHandle system_sleep_timer_;  // To prevent system from sleeping before motor stops
 
     // User adjustable TMC2209 motor driver settings
     int microsteps_           = 16;

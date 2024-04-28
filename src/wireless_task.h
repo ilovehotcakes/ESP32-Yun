@@ -15,8 +15,8 @@
 #include "task.h"
 #include "logger.h"
 #include "commands.h"
-#include "secrets.h"
 #include "index.h"
+#include "secrets.h"
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
@@ -31,7 +31,7 @@ public:
     ~WirelessTask();
     void addSystemTaskQueue(QueueHandle_t queue);
     void addSystemSleepTimer(TimerHandle_t timer);
-    void addMotorTaskQueue(QueueHandle_t queue);
+    void addMotorTask(void *task);
 
 protected:
     void run();
@@ -46,7 +46,7 @@ private:
 
     TimerHandle_t system_sleep_timer_;  // Prevent system from sleeping before processing incoming messages
     QueueHandle_t system_task_queue_;   // To send messages to system task
-    QueueHandle_t motor_task_queue_;    // To send messages to motor task
+    Task *motor_task_;    // To send messages to motor task
     String motor_position_;
 
     // Create AsyncWebServer object on port 80

@@ -34,17 +34,17 @@ void setup() {
 
     // The system task performs coordination between all tasks
     system_task.init();
-    system_task.addMotorTaskQueue(motor_task.getQueue());
+    system_task.addMotorTask(&motor_task);
 
     wireless_task.init();
-    wireless_task.addMotorTaskQueue(motor_task.getQueue());
-    wireless_task.addSystemTaskQueue(system_task.getQueue());
+    wireless_task.addMotorTask((void*) &motor_task);
+    wireless_task.addSystemTaskQueue(system_task.getQueueHandle());
     wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position. TODO not start motor task on wake to reduce boot time
     motor_task.init();
-    motor_task.addWirelessTaskQueue(wireless_task.getQueue());
+    motor_task.addWirelessTask((void*) &wireless_task);
     motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // Delete setup/loop task

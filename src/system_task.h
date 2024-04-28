@@ -10,15 +10,14 @@ class SystemTask: public Task<SystemTask> {
 public:
     SystemTask(const uint8_t task_core);
     ~SystemTask();
-    void addMotorTaskQueue(QueueHandle_t queue);
-    void addMotorRunningSemaphore(SemaphoreHandle_t semaphore);
+    void addMotorTask(void *task);
     TimerHandle_t getSystemSleepTimer();
 
 protected:
     void run();
 
 private:
-    QueueHandle_t motor_task_queue_;
+    Task *motor_task_;
     TimerHandle_t system_sleep_timer_;
 
     void systemStandby(TimerHandle_t timer);
