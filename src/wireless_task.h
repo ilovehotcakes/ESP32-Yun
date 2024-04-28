@@ -6,6 +6,7 @@
     WirelessTask establishes and maintains WiFi connection and MQTT connection.
 **/
 #include <Arduino.h>
+#include <queue>
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -37,13 +38,15 @@ protected:
 
 private:
     void connectWifi();
-    void sendWebsocket(String message);
-    void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
-    void eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
+    void routing();
+    bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message);
+    void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
+                        AwsEventType type, void *arg, uint8_t *data, size_t len);
+    void wsEventDataProcessor(void *arg, uint8_t *data, size_t len);
 
-    TimerHandle_t system_sleep_timer_;     // Keep system from sleeping between driver startup and motor running
-    QueueHandle_t system_task_queue_;      // To send messages to system task
-    QueueHandle_t motor_task_queue_;       // To send messages to motor task
+    TimerHandle_t system_sleep_timer_;  // Prevent system from sleeping before processing incoming messages
+    QueueHandle_t system_task_queue_;   // To send messages to system task
+    QueueHandle_t motor_task_queue_;    // To send messages to motor task
     String motor_position_;
 
     // Create AsyncWebServer object on port 80
