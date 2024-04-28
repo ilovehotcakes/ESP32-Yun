@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "command.h"
 
 
 Command hash (String command) {

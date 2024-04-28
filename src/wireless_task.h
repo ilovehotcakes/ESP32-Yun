@@ -13,8 +13,6 @@
 #include <FunctionalInterrupt.h>  // std:bind()
 #include <esp_task_wdt.h>
 #include "task.h"
-#include "logger.h"
-#include "commands.h"
 #include "index.h"
 #include "secrets.h"
 
