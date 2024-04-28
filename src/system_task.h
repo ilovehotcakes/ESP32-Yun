@@ -1,7 +1,5 @@
 #pragma once
 #include "task.h"
-#include "logger.h"
-#include "commands.h"
 
 
 class SystemTask: public Task<SystemTask> {

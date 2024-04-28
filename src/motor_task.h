@@ -15,8 +15,6 @@
 #include <Preferences.h>
 #include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
-#include "logger.h"
-#include "commands.h"
 
 
 class MotorTask : public Task<MotorTask> {

@@ -17,7 +17,7 @@
     Modified by Jason Chen, 2024
 **/
 #include <Arduino.h>
-#include "commands.h"
+#include "command.h"
 #include "logger.h"
 
 
