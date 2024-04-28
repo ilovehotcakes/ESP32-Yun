@@ -3,7 +3,6 @@
 
 
 enum Command {
-    // Get motor current position
     GET_MOTOR_POS  = 0,
     ERROR_COMMAND  = INT_MIN,
 
