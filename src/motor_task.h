@@ -25,7 +25,7 @@ class MotorTask : public Task<MotorTask> {
 public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
-    void addWirelessTaskQueue(QueueHandle_t queue);
+    void addWirelessTask(void *task);
     void addSystemSleepTimer(xTimerHandle timer);
 
 protected:
@@ -48,13 +48,13 @@ private:
     // Saving motor settings, such as motor's max position and other attributes
     Preferences motor_settings_;
 
-    QueueHandle_t wireless_task_queue_;   // To receive messages from wireless task
-    xTimerHandle system_sleep_timer_;     // To prevent system from sleeping before motor stops
+    Task *wireless_task_;       // To receive messages from wireless task
+    xTimerHandle system_sleep_timer_;  // To prevent system from sleeping before motor stops
 
     // User adjustable TMC2209 motor driver settings
     int microsteps_           = 16;
     int full_steps_per_rev_   = 200;  // NEMA motors have 200 full steps/rev
-    int microsteps_per_rev_ = full_steps_per_rev_ * microsteps_;
+    int microsteps_per_rev_   = full_steps_per_rev_ * microsteps_;
     int velocity_             = static_cast<int>(microsteps_per_rev_ * 3);
     int acceleration_         = static_cast<int>(velocity_ * 0.5);
     bool direction_           = false;

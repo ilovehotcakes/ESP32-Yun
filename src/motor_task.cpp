@@ -1,12 +1,12 @@
 #include "motor_task.h"
 
 
-MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core, 2} {}
+MotorTask::MotorTask(const uint8_t task_core) : Task{"MotorTask", 8192, 1, task_core} {}
 MotorTask::~MotorTask() {}
 
 
-void MotorTask::addWirelessTaskQueue(QueueHandle_t queue) {
-    wireless_task_queue_ = queue;
+void MotorTask::addWirelessTask(void *task) {
+    wireless_task_ = static_cast<Task*>(task);
 }
 
 
@@ -53,25 +53,26 @@ void MotorTask::run() {
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
-            LOGD("Motor task received command: %i, %i", inbox_.command, inbox_.parameter);
+            LOGI("MotorTask received message: %s", inbox_.toString().c_str());
             switch (inbox_.command) {
-                case COVER_STOP:
+                case MOTOR_STOP:
                     stop();
                     break;
-                case COVER_SET_MAX:
+                case MOTOR_SET_MAX:
                     setMax();
                     break;
-                case COVER_SET_MIN:
+                case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case STBY_ON:
-                    driverStandby();
-                    break;
-                case STBY_OFF:
-                    driverStartup();
+                case MOTOR_STNDBY:
+                    if (inbox_.parameter == 1) {
+                        driverStandby();
+                    } else {
+                        driverStartup();
+                    }
                     break;
                 default:
-                    moveToPercent(inbox_.command);
+                    moveToPercent(inbox_.parameter);
                     break;
             }
         }
@@ -97,13 +98,10 @@ void MotorTask::run() {
         int current_percent = getPercent();
         if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
-            Message new_position(current_percent);
-            if (xQueueSend(wireless_task_queue_, (void*) &new_position, 0) != pdTRUE) {
-                LOGE("Failed to send to wireless_task queue_");
-            }
+            sendTo(wireless_task_, Message(GET_MOTOR_POS, current_percent), 0);
         }
 
-        vTaskDelay(1);  // Finished all task within loop, handing control back to scheduler
+        vTaskDelay(1);  // Finished all task within loop, yielding control back to scheduler
     }
 }
 
