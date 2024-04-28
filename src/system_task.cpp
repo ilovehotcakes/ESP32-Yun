@@ -42,14 +42,14 @@ void SystemTask::run() {
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
             LOGI("System task received message: %s", inbox_.toString());
             switch (inbox_.command) {
-                case SYS_STANDBY:
+                case SYSTEM_STNDBY:
                     systemStandby(system_sleep_timer_);
                     break;
-                case SYS_RESET:
+                case SYSTEM_RESET:
                     // motor_settings_.clear();
                     ESP.restart();
                     break;
-                case SYS_REBOOT:
+                case SYSTEM_REBOOT:
                     LOGD("");
                     ESP.restart();
                     break;
@@ -67,7 +67,7 @@ void SystemTask::run() {
 
 void SystemTask::systemStandby(TimerHandle_t timer) {
     // Standby motor driver
-    Message standby(STBY_ON);
+    Message standby(SYSTEM_STNDBY, 1);
     if (xQueueSend(motor_task_queue_, (void*) &standby, 10) != pdTRUE) {
         LOGE("Failed to send to motor_task queue_");
     }

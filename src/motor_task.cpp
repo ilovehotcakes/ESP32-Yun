@@ -55,23 +55,24 @@ void MotorTask::run() {
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
             LOGD("Motor task received command: %s", inbox_.toString());
             switch (inbox_.command) {
-                case COVER_STOP:
+                case MOTOR_STOP:
                     stop();
                     break;
-                case COVER_SET_MAX:
+                case MOTOR_SET_MAX:
                     setMax();
                     break;
-                case COVER_SET_MIN:
+                case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case STBY_ON:
-                    driverStandby();
-                    break;
-                case STBY_OFF:
-                    driverStartup();
+                case MOTOR_STNDBY:
+                    if (inbox_.parameter == 1) {
+                        driverStandby();
+                    } else {
+                        driverStartup();
+                    }
                     break;
                 default:
-                    moveToPercent(inbox_.command);
+                    moveToPercent(inbox_.parameter);
                     break;
             }
         }

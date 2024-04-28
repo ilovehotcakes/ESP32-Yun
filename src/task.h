@@ -21,14 +21,14 @@
 
 struct Message {
     Message(int command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
-    String toString() { return String(command) + (parameter == INT_MIN? "" : ", " + String(parameter)); }
+    String toString() { return String(command) + (parameter == INT_MIN ? "" : ", " + String(parameter)); }
     int command;
     int parameter;
 };
 
 
-// Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete implementations
-// should implement a run() method.
+// Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete
+// implementations should implement a run() method.
 // Inspired by https://fjrg76.wordpress.com/2018/05/23/objectifying-task-creation-in-freertos-ii/
 template<class T>
 class Task {
