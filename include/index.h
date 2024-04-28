@@ -86,7 +86,7 @@ window.addEventListener('load', () => {
             // document.getElementById('stop-button').addEventListener('click', () => { websocket.send('-1'); });
             // document.getElementById('open-button').addEventListener('click', () => { websocket.send('0'); });
             // document.getElementById('close-button').addEventListener('click', () => { websocket.send('100'); });
-            // percentage_slider_.addEventListener('change', () => { websocket.send(percentage_slider_.value); });
+            percentage_slider_.addEventListener('change', () => { websocket.send(percentage_slider_.value); });
             console.log(`Connection established with ${window.location.hostname}`);
             console.log(event)
         };
