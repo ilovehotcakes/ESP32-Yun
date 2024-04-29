@@ -12,9 +12,9 @@
 <body>
     <h1>ESP32 Motorcover</h1>
     <div>
-        <button id="open-button" class="button">OPEN</button>
-        <button id="stop-button" class="button">STOP</button>
-        <button id="close-button" class="button">CLOSE</button>
+        <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
+        <button id="stop-button" class="button" onclick="motorStop(this)">STOP</button>
+        <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
     </div>
     
     <div>
