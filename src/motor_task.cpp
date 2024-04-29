@@ -62,6 +62,7 @@ void MotorTask::run() {
                     break;
                 case MOTOR_OPENCLOSE:
                     open_close_ = inbox_.parameter;
+                    // motor_settings_.putBool("open_close_", open_close_);
                     break;
                 case MOTOR_SET_VELO:
                     opening_velocity_ = inbox_.parameterf;
@@ -162,22 +163,40 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     motor_settings_.begin("local", false);
 
-    encod_max_pos_ = motor_settings_.getInt("encod_max_pos_", 4096 * 20);
+    // opening_current_       = motor_settings_.getInt("opening_current_", 200);
+    // closing_current_       = motor_settings_.getInt("closing_current_", 75);
+    // direction_             = motor_settings_.getBool("direction_", false);
+    // microsteps_            = motor_settings_.getInt("microsteps_", 200);
+    // stallguard_enable_     = motor_settings_.getBool("stallguard_enable_", true);
+    // // coolstep_threshold_
+    // stallguard_threshold_  = motor_settings_.getInt("stallguard_threshold_", 10);
+    // spreadcycle_enable_    = motor_settings_.getBool("spreadcycle_enable_", false);
+    // spreadcycle_threshold_ = motor_settings_.getInt("spreadcycle_threshold_", 33);
+
+    // full_steps_per_rev_    = motor_settings_.getInt("full_steps_per_rev_", 200);
+    // open_close_            = motor_settings_.getBool("open_close_", true);
+    // opening_velocity_      = motor_settings_.getFloat("opening_velocity_", 3.0);
+    // closing_velocity_      = motor_settings_.getFloat("closing_velocity_", 3.0);
+    // opening_acceleration_  = motor_settings_.getFloat("opening_acceleration_", 0.5);
+    // closing_acceleration_  = motor_settings_.getFloat("closing_acceleration_", 0.5);
+
+    encod_max_pos_         = motor_settings_.getInt("encod_max_pos_", 4096 * 20);
     int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
     encoder_.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
     motor_->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
+    // calculateTotalMicrosteps();
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
 }
 
 
-void MotorTask::moveToPercent(int percent) {
+void MotorTask::moveToPercent(int target) {
     if (motor_->isRunning()) {
         stop();
         return;
     }
 
-    if (percent == getPercent()) {
+    if (target == getPercent()) {
         return;
     }
 
@@ -186,13 +205,13 @@ void MotorTask::moveToPercent(int percent) {
         vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
-    if (percent > getPercent()) {
+    if (target > getPercent() && open_close_) {
         updateMotorSettings(closing_velocity_, closing_acceleration_, closing_current_);
     } else {
         updateMotorSettings(opening_velocity_, opening_acceleration_, opening_current_);
     }
 
-    int32_t new_position = static_cast<int>(percent * encod_max_pos_ / 100.0 + 0.5);
+    int32_t new_position = static_cast<int>(target * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
 
     LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
@@ -217,8 +236,6 @@ bool MotorTask::setMin() {
     encod_max_pos_ -= encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
     encoder_.resetCumulativePosition(0);
-    motor_->setCurrentPosition(0);
-    last_updated_percent_ = -100;  // Needed to trigger send message
     LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
@@ -230,8 +247,6 @@ bool MotorTask::setMax() {
     }
     encod_max_pos_ = encoder_.getCumulativePosition();
     motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
-    motor_->setCurrentPosition(positionToSteps(encod_max_pos_));
-    last_updated_percent_ = -100;
     LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
