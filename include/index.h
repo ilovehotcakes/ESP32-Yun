@@ -68,9 +68,9 @@ p {
 <body>
     <h1>ESP32 Motorcover</h1>
     <div>
-        <button id="open-button" class="button">OPEN</button>
-        <button id="stop-button" class="button">STOP</button>
-        <button id="close-button" class="button">CLOSE</button>
+        <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
+        <button id="stop-button" class="button" onclick="motorStop(this)">STOP</button>
+        <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
     </div>
     
     <div>
@@ -83,26 +83,23 @@ window.addEventListener('load', () => {
         const percentage_slider_ = document.getElementById('percentage-slider');
 
         websocket.onopen = (event) => {
-            // document.getElementById('stop-button').addEventListener('click', () => { websocket.send('-1'); });
-            // document.getElementById('open-button').addEventListener('click', () => { websocket.send('0'); });
-            // document.getElementById('close-button').addEventListener('click', () => { websocket.send('100'); });
             percentage_slider_.addEventListener('change', () => { websocket.send(percentage_slider_.value); });
             console.log(`Connection established with ${window.location.hostname}`);
-            console.log(event)
+            console.log(event);
         };
 
         websocket.onclose = (event) => {
             console.log(`Connection with ${window.location.hostname} closed`);
-            console.log(event)
+            console.log(event);
         };
 
         websocket.onerror = (error) => {
             console.log("Websocket error");
-            console.log(error)
+            console.log(error);
         };
 
         websocket.onmessage = (event) => {
-            const data = event.data
+            const data = event.data;
             console.log(data);
             if (data > -1) {
                 percentage_slider_.value = data;
@@ -113,6 +110,17 @@ window.addEventListener('load', () => {
         console.log(error)
     }
 });
-    </script>
+
+function motorMove(element) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?position=' + element, true);
+    xhr.send();
+}
+
+function motorStop(element) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?stop=1', true);
+    xhr.send();
+}    </script>
 </body>
 </html>)rawliteral";
