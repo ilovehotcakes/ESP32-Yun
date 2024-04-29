@@ -22,11 +22,13 @@
 
 
 struct Message {
-    Message(Command command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
-    String toString() { return "command=" + hash(command) 
-                        + (parameter == INT_MIN ? "" : ", parameter=" + String(parameter)); }
+    Message(Command command, int parameter) : command(command), parameter(parameter) {}
+    Message(Command command, float parameterf) : command(command), parameterf(parameterf) {}
+    String toString() { return "command=" + hash(command) + ", parameter="
+                                + (parameter != INT_MIN ? String(parameter) : String(parameterf)); }
     Command command;
-    int parameter;
+    int parameter = INT_MIN;
+    float parameterf = 0.0;
 };
 
 

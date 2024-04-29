@@ -23,10 +23,10 @@ Command hash (String command) {
     else if (command == "direction") return MOTOR_DIRECTION;
     else if (command == "microsteps") return MOTOR_MICROSTEPS;
     else if (command == "full-steps-per-rev") return MOTOR_FULLSTEPS;
-    else if (command == "stallguard-enable") return MOTOR_STALLGUARD;
+    else if (command == "stallguard") return MOTOR_STALLGUARD;
     else if (command == "coolstep-threshold") return MOTOR_TCOOLTHRS;
     else if (command == "stallguard-threshold") return MOTOR_SGTHRS;
-    else if (command == "fastmode-enable") return MOTOR_SPREADCYCL;
+    else if (command == "fastmode") return MOTOR_SPREADCYCL;
     else if (command == "fastmode-threshold") return MOTOR_TPWMTHRS;
 
     else if (command == "system-standby") return SYSTEM_STNDBY;
@@ -59,10 +59,10 @@ String hash (Command command) {
     else if (command == MOTOR_DIRECTION) return "direction";
     else if (command == MOTOR_MICROSTEPS) return "microsteps";
     else if (command == MOTOR_FULLSTEPS) return "full-steps-per-rev";
-    else if (command == MOTOR_STALLGUARD) return "stallguard-enable";
+    else if (command == MOTOR_STALLGUARD) return "stallguard";
     else if (command == MOTOR_TCOOLTHRS) return "coolstep-threshold";
     else if (command == MOTOR_SGTHRS) return "stallguard-threshold";
-    else if (command == MOTOR_SPREADCYCL) return "fastmode-enable";
+    else if (command == MOTOR_SPREADCYCL) return "fastmode";
     else if (command == MOTOR_TPWMTHRS) return "fastmode-threshold";
 
     else if (command == SYSTEM_STNDBY) return "system-standby";

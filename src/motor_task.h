@@ -42,7 +42,7 @@ private:
     bool stallguard_enable_    = true;
     int coolstep_threshold_    = 0;
     int stallguard_threshold_  = 10;
-    int spreadcycle_enabele_   = false;
+    int spreadcycle_enable_    = false;
     int spreadcycle_threshold_ = 33;
 
     // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
@@ -54,10 +54,10 @@ private:
     int full_steps_per_rev_   = 200;   // NEMA motors have 200 full steps/rev
     bool driver_standby_      = false;
     bool open_close_          = true;  // If opeining/closing settings should be different
-    int opening_velocity_     = 3;
-    int closing_velocity_     = 3;
-    int opening_acceleration_ = 1;
-    int closing_acceleration_ = 1;
+    float opening_velocity_     = 3.0;
+    float closing_velocity_     = 3.0;
+    float opening_acceleration_ = 0.5;
+    float closing_acceleration_ = 0.5;
 
     // Not adjustable motor states.
     int8_t  last_updated_percent_ = -100;
@@ -96,7 +96,7 @@ private:
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
     // can send settings to the driver via UART.
-    void updateMotorSettings(int velocity, int acceleration, int current);
+    void updateMotorSettings(float velocity, float acceleration, int current);
     void driverStartup();
     void driverStandby();
 };

@@ -101,7 +101,7 @@ void WirelessTask::routing() {
             return;
         }
         if (httpRequestHandler(request, hash(MOTOR_MOVE), [=](int val) -> bool { return val > 100 || val < 0; },
-                                           "position=0~100 (%); 0 to open; 100 to close")  // float?
+                                           "position=0~100 (%); 0 to open; 100 to close")
             || httpRequestHandler(request, hash(MOTOR_STOP), [=](int val) -> bool { return false; }, "")
             || httpRequestHandler(request, hash(MOTOR_SET_MIN), [=](int val) -> bool { return false; }, "")
             || httpRequestHandler(request, hash(MOTOR_SET_MAX), [=](int val) -> bool { return false; }, "")
@@ -109,17 +109,17 @@ void WirelessTask::routing() {
                                            "standby=0 | 1; 1 to standby motor driver; 0 to wake")
             || httpRequestHandler(request, hash(MOTOR_OPENCLOSE), [=](int val) -> bool { return val != 0 && val != 1; },
                                            "open-close=0 | 1; 0 to keep opening/closing settings the same")
-            || httpRequestHandler(request, hash(MOTOR_SET_VELO), [=](int val) -> bool { return val <= 0; },
+            || httpRequestHandler(request, hash(MOTOR_SET_VELO), [=](float val) -> bool { return val <= 0.0; },
                                            "velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_OPVELO), [=](int val) -> bool { return val <= 0; },
+            || httpRequestHandler(request, hash(MOTOR_SET_OPVELO), [=](float val) -> bool { return val <= 0.0; },
                                            "opening-velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_CLVELO), [=](int val) -> bool { return val <= 0; },
+            || httpRequestHandler(request, hash(MOTOR_SET_CLVELO), [=](float val) -> bool { return val <= 0.0; },
                                            "closing-velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_ACCL), [=](int val) -> bool { return val <= 0; },
-                                           "acceleration has to be greater than 0")   // float
-            || httpRequestHandler(request, hash(MOTOR_SET_OPACCL), [=](int val) -> bool { return val <= 0; },
+            || httpRequestHandler(request, hash(MOTOR_SET_ACCL), [=](float val) -> bool { return val <= 0.0; },
+                                           "acceleration has to be greater than 0.0")   // float
+            || httpRequestHandler(request, hash(MOTOR_SET_OPACCL), [=](float val) -> bool { return val <= 0.0; },
                                            "opening-acceleration has to be greater than 0")   // float
-            || httpRequestHandler(request, hash(MOTOR_SET_CLACCL), [=](int val) -> bool { return val <= 0; },
+            || httpRequestHandler(request, hash(MOTOR_SET_CLACCL), [=](float val) -> bool { return val <= 0.0; },
                                            "closing-acceleration has to be greater than 0")   // float
             || httpRequestHandler(request, hash(MOTOR_CURRENT), [=](int val) -> bool { return val <= 0 || val > 2000; },
                                            "current=1~2000 (mA); please refer to motor datasheet for max RMS")
@@ -138,13 +138,13 @@ void WirelessTask::routing() {
             || httpRequestHandler(request, hash(MOTOR_FULLSTEPS), [=](int val) -> bool { return val <= 0; },
                                            "full-step-per-rev has to be greater than 0")
             || httpRequestHandler(request, hash(MOTOR_STALLGUARD), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "stallguard-enable=0 | 1; 0 to disable; 1 to enable")
+                                           "stallguard=0 | 1; 0 to disable; 1 to enable")
             || httpRequestHandler(request, hash(MOTOR_TCOOLTHRS), [=](int val) -> bool { return val < 0 || val > 1048575; },
                                            "coolstep-threshold=0~1048575; lower threshold velocity for switching on stallguard")
             || httpRequestHandler(request, hash(MOTOR_SGTHRS), [=](int val) -> bool { return val < 0 || val > 255; },
                                            "stallguard-threshold=0~255; the greater, the easier to stall")
             || httpRequestHandler(request, hash(MOTOR_SPREADCYCL), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "fastmode-enable=0 | 1; 0 to disable; 1 to enable")
+                                           "fastmode=0 | 1; 0 to disable; 1 to enable")
             || httpRequestHandler(request, hash(MOTOR_TPWMTHRS), [=](int val) -> bool { return val < 0 || val > 1048575; },
                                            "fastmode-threshold=0~1048575; upper threshold to switch to fastmode")) {
             return;
@@ -155,6 +155,8 @@ void WirelessTask::routing() {
 
 
 bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
     if (request->hasParam(param)) {
         String value_str = request->getParam(param)->value();  // To check if param="0" is value=0
         int value = value_str.toInt();
@@ -163,6 +165,24 @@ bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String par
             return true;
         }
         LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
+        sendTo(motor_task_, Message(hash(param), value), 0);
+        request->send(200, "text/plain", "success");
+        return true;
+    }
+    return false;
+}
+
+
+bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(float), String error_message) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
+    if (request->hasParam(param)) {
+        float value = request->getParam(param)->value().toFloat();
+        if (eval(value)) {
+            request->send(400, "text/plain", "failed: " + error_message);
+            return true;
+        }
+        LOGI("Parsed HTTP request: param=%s, value=%.1f", param.c_str(), value);
         sendTo(motor_task_, Message(hash(param), value), 0);
         request->send(200, "text/plain", "success");
         return true;

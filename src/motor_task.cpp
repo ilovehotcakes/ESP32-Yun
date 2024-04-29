@@ -64,24 +64,24 @@ void MotorTask::run() {
                     open_close_ = inbox_.parameter;
                     break;
                 case MOTOR_SET_VELO:
-                    opening_velocity_ = inbox_.parameter;
-                    closing_velocity_ = inbox_.parameter;
+                    opening_velocity_ = inbox_.parameterf;
+                    closing_velocity_ = inbox_.parameterf;
                     break;
                 case MOTOR_SET_OPVELO:
-                    if (open_close_) opening_velocity_ = inbox_.parameter;
+                    if (open_close_) opening_velocity_ = inbox_.parameterf;
                     break;
                 case MOTOR_SET_CLVELO:
-                    if (open_close_) closing_velocity_ = inbox_.parameter;
+                    if (open_close_) closing_velocity_ = inbox_.parameterf;
                     break;
                 case MOTOR_SET_ACCL:
-                    opening_acceleration_ = inbox_.parameter;
-                    closing_acceleration_ = inbox_.parameter;
+                    opening_acceleration_ = inbox_.parameterf;
+                    closing_acceleration_ = inbox_.parameterf;
                     break;
                 case MOTOR_SET_OPACCL:
-                    if (open_close_) opening_acceleration_ = inbox_.parameter;
+                    if (open_close_) opening_acceleration_ = inbox_.parameterf;
                     break;
                 case MOTOR_SET_CLACCL:
-                    if (open_close_) closing_acceleration_ = inbox_.parameter;
+                    if (open_close_) closing_acceleration_ = inbox_.parameterf;
                     break;
                 case MOTOR_CURRENT:
                     opening_current_ = inbox_.parameter;
@@ -114,7 +114,7 @@ void MotorTask::run() {
                     stallguard_threshold_ = inbox_.parameter;
                     break;
                 case MOTOR_SPREADCYCL:
-                    spreadcycle_enabele_ = inbox_.parameter;
+                    spreadcycle_enable_ = inbox_.parameter;
                     break;
                 case MOTOR_TPWMTHRS:
                     spreadcycle_threshold_ = inbox_.parameter;
@@ -183,7 +183,7 @@ void MotorTask::moveToPercent(int percent) {
 
     while (driver_standby_) {
         driverStartup();
-        vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
+        vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
     if (percent > getPercent()) {
@@ -265,8 +265,8 @@ bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
 }
 
 
-void MotorTask::updateMotorSettings(int velocity, int acceleration, int current) {
-    motor_->setSpeedInHz(microsteps_per_rev_ * velocity);
+void MotorTask::updateMotorSettings(float velocity, float acceleration, int current) {
+    motor_->setSpeedInHz(static_cast<int>(microsteps_per_rev_ * velocity));
     motor_->setAcceleration(static_cast<int>(microsteps_per_rev_ * velocity * acceleration));
 
     // Set motor RMS current via UART, higher torque requires more current. The default holding
@@ -285,12 +285,12 @@ void MotorTask::updateMotorSettings(int velocity, int acceleration, int current)
     // 1=SpreadCycle only; 0=StealthChop PWM mode (below velocity threshold) + SpreadCycle (above
     // velocity threshold); set register TPWMTHRS to determine the velocity threshold
     // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque.
-    driver_.en_spreadCycle(spreadcycle_enabele_);
+    driver_.en_spreadCycle(spreadcycle_enable_);
     driver_.TPWMTHRS(spreadcycle_threshold_);
 
     if (stallguard_enable_) {
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver_.TCOOLTHRS(3089838.00 * pow(float(microsteps_per_rev_ * velocity), -1.00161534));
+        driver_.TCOOLTHRS(3089838.00 * pow(microsteps_per_rev_ * velocity, -1.00161534));
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more

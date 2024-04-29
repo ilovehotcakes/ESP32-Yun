@@ -38,6 +38,7 @@ private:
     void connectWifi();
     void routing();
     bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message);
+    bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(float), String error_message);
     void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         AwsEventType type, void *arg, uint8_t *data, size_t len);
     void wsEventDataProcessor(void *arg, uint8_t *data, size_t len);
