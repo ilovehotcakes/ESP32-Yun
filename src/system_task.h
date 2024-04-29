@@ -18,9 +18,9 @@ private:
     Task *motor_task_;
     TimerHandle_t system_sleep_timer_;
 
-    void systemStandby(TimerHandle_t timer);
-
     int system_wake_time_ = 5000;      // mSec
     int system_sleep_time_ = 5000000;  // uSec
     bool sleep_enabled_ = false;
+
+    void systemSleep(TimerHandle_t timer);
 };

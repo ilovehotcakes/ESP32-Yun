@@ -29,9 +29,9 @@ Command hash (String command) {
     else if (command == "fastmode") return MOTOR_SPREADCYCL;
     else if (command == "fastmode-threshold") return MOTOR_TPWMTHRS;
 
-    else if (command == "system-standby") return SYSTEM_STNDBY;
-    else if (command == "system-reboot")  return SYSTEM_REBOOT;
-    else if (command == "system-reset")   return SYSTEM_RESET;
+    else if (command == "sleep") return SYSTEM_SLEEP;
+    else if (command == "reboot") return SYSTEM_REBOOT;
+    else if (command == "reset") return SYSTEM_RESET;
 
     return ERROR_COMMAND;
 }
@@ -65,9 +65,9 @@ String hash (Command command) {
     else if (command == MOTOR_SPREADCYCL) return "fastmode";
     else if (command == MOTOR_TPWMTHRS) return "fastmode-threshold";
 
-    else if (command == SYSTEM_STNDBY) return "system-standby";
-    else if (command == SYSTEM_REBOOT)  return "system-reboot";
-    else if (command == SYSTEM_RESET)   return "system-reset";
+    else if (command == SYSTEM_SLEEP) return "sleep";
+    else if (command == SYSTEM_REBOOT) return "reboot";
+    else if (command == SYSTEM_RESET) return "reset";
 
     return "error";
 }
@@ -84,7 +84,7 @@ String listMotorCommands() {
 
 String listSystemCommands() {
     String list = "";
-    for (int command = SYSTEM_STNDBY; command >= SYSTEM_RESET; command--) {
+    for (int command = SYSTEM_SLEEP; command >= SYSTEM_RESET; command--) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);

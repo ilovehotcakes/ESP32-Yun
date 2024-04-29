@@ -10,7 +10,7 @@ SystemTask::SystemTask(const uint8_t task_core) :
     auto on_timer = [](TimerHandle_t timer) {
         SystemTask *temp_system_ptr = static_cast<SystemTask*>(pvTimerGetTimerID(timer));
         assert(temp_system_ptr != NULL);
-        temp_system_ptr->systemStandby(timer);
+        temp_system_ptr->systemSleep(timer);
     };
     system_sleep_timer_ = xTimerCreate("System_sleep_timer_", system_wake_time_, pdFALSE, this, on_timer);
     assert(system_sleep_timer_ != NULL && "Failed to create system_sleep_timer_");
@@ -43,13 +43,15 @@ void SystemTask::run() {
 
     while (1) {
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
-            LOGI("System task received message: %s", inbox_.toString());
+            LOGI("SystemTask received message: %s", inbox_.toString().c_str());
             switch (inbox_.command) {
-                case SYSTEM_STNDBY:
-                    systemStandby(system_sleep_timer_);
+                case SYSTEM_SLEEP:
+                    // systemSleep(system_sleep_timer_);
+                    Serial.println("System sleep");
                     break;
                 case SYSTEM_RESET:
                     // motor_settings_.clear();
+                    Serial.println("System reset");
                     ESP.restart();
                     break;
                 case SYSTEM_REBOOT:
@@ -59,7 +61,7 @@ void SystemTask::run() {
             }
         }
 
-        // if (xTimerIsTimerActive(system_standby_timer_) == pdFALSE) {
+        // if (xTimerIsTimerActive(system_sleep_timer_) == pdFALSE) {
         //     xTimerStart(system_sleep_timer_, portMAX_DELAY);
         // }
 
@@ -68,14 +70,14 @@ void SystemTask::run() {
 }
 
 
-void SystemTask::systemStandby(TimerHandle_t timer) {
+void SystemTask::systemSleep(TimerHandle_t timer) {
     // Standby motor driver
     sendTo(motor_task_, Message(MOTOR_STNDBY, 1), 10);
     // gpio_hold_en(STBY_PIN);
     // gpio_deep_sleep_hold_en();
 
     // ULP I2C
-    // Sleep; TODO wait till driver is in standby
+    // Sleep; TODO wait till driver is in sleep
     // ESP.deepSleep(system_sleep_time_);
 }
 
