@@ -9,8 +9,6 @@
 
     You can use it to motorize and automate the opening & closing of blinds/shades/windows etc.
 **/
-#include <Arduino.h>
-#include "logger.h"
 #include "system_task.h"
 #include "motor_task.h"
 #include "wireless_task.h"
@@ -30,15 +28,13 @@ void setup() {
 
     // setCpuFrequencyMhz(80);
 
-    esp_task_wdt_init(10, true);  // Restart system if wd hasn't been fed in 10 seconds
-
     // The system task performs coordination between all tasks
     system_task.init();
     system_task.addMotorTask(&motor_task);
 
     wireless_task.init();
     wireless_task.addMotorTask((void*) &motor_task);
-    wireless_task.addSystemTaskQueue(system_task.getQueueHandle());
+    wireless_task.addSystemTask((void*) &system_task);
     wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
