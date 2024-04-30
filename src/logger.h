@@ -35,9 +35,9 @@ void printInf(String, String, String, const char*, ...);
 void printDbg(String, String, String, const char*, ...);
 
 #define LOG_INIT(baud_rate, log_level) Logger(baud_rate, log_level)
-#define LOGE(msg, ...) printErr(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__);
-#define LOGI(msg, ...) printInf(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__);
-#define LOGD(msg, ...) printDbg(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__);
+#define LOGE(msg, ...) printErr(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__)
+#define LOGI(msg, ...) printInf(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__)
+#define LOGD(msg, ...) printDbg(String(__FILE__), String(__LINE__), String(__func__), msg, ##__VA_ARGS__)
 
 #else
 
