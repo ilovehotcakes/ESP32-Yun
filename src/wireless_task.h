@@ -51,5 +51,4 @@ private:
     bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(float), String error_message, Task *task);
     void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         AwsEventType type, void *arg, uint8_t *data, size_t len);
-    void wsEventDataProcessor(void *arg, uint8_t *data, size_t len);
 };

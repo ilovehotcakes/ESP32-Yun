@@ -1,10 +1,10 @@
+const percentage_slider_ = document.getElementById('percentage-slider');
+
 window.addEventListener('load', () => {
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
-        const percentage_slider_ = document.getElementById('percentage-slider');
 
         websocket.onopen = (event) => {
-            percentage_slider_.addEventListener('change', () => { websocket.send(percentage_slider_.value); });
             console.log(`Connection established with ${window.location.hostname}`);
             console.log(event);
         };
@@ -34,7 +34,11 @@ window.addEventListener('load', () => {
 
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?position=' + element, true);
+    if (element == '0' || element == '100') {
+        xhr.open('GET', '/motor?position=' + element, true);
+    } else {
+        xhr.open('GET', '/motor?position=' + percentage_slider_.value, true);
+    }
     xhr.send();
 }
 

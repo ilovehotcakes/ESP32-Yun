@@ -27,7 +27,7 @@ p {
 }
 .button {
     display: inline-block;
-    width: 25%;
+    width: 100px;
     margin: 0px 5px;
     padding: 10px;
     font-size: 20px;
@@ -74,16 +74,16 @@ p {
     </div>
     
     <div>
-        <input id="percentage-slider" class="slider" type="range" min="0" max="100" step="1">
+        <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
     </div>
     <script>
+const percentage_slider_ = document.getElementById('percentage-slider');
+
 window.addEventListener('load', () => {
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
-        const percentage_slider_ = document.getElementById('percentage-slider');
 
         websocket.onopen = (event) => {
-            percentage_slider_.addEventListener('change', () => { websocket.send(percentage_slider_.value); });
             console.log(`Connection established with ${window.location.hostname}`);
             console.log(event);
         };
@@ -113,7 +113,11 @@ window.addEventListener('load', () => {
 
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?position=' + element, true);
+    if (element == '0' || element == '100') {
+        xhr.open('GET', '/motor?position=' + element, true);
+    } else {
+        xhr.open('GET', '/motor?position=' + percentage_slider_.value, true);
+    }
     xhr.send();
 }
 
