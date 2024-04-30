@@ -79,7 +79,12 @@ void WirelessTask::connectWifi() {
 void WirelessTask::routing() {
     // Root serves UI web page
     webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        request->send(200, "text/html", index_html);
+        request->send_P(200, "text/html", index_html, [=](const String& var) -> String {
+            if (var == "SLIDER") {
+                return motor_position_;
+            }
+            return String();
+        });
     });
 
     // HTTP RESTful API for managing system
@@ -209,30 +214,12 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
             LOGI("WebSocket client #%u disconnected", client->id());
             break;
         case WS_EVT_DATA:
-            wsEventDataProcessor(arg, data, len);  // Used for reading slider position
+            LOGI("WebSocket client #%u sent a message", client->id());
             break;
         case WS_EVT_PONG:
         case WS_EVT_ERROR:
-            LOGE("WebSocket client #%u error: %u", client->id(), *((uint16_t*) arg));
+            LOGE("WebSocket client #%u error: %u", client->id(), *(static_cast<uint16_t*>(arg)));
             break;
-    }
-}
-
-
-void WirelessTask::wsEventDataProcessor(void *arg, uint8_t *data, size_t len) {
-    AwsFrameInfo *info = static_cast<AwsFrameInfo*>(arg);
-
-    if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-        data[len] = 0;
-        Message outgoing(MOTOR_MOVE, atoi((char*) data));
-
-        LOGI("Received message from WebSocket: %s", outgoing.toString());
-
-        if (outgoing.command > -1 && outgoing.command < 101) {  // Messages intended for motor task
-            sendTo((Task*) motor_task_, outgoing, 0);
-        } else {
-            LOGE("Position (%) of motor cannot be great than 100 or less than 0");
-        }
     }
 }
 
