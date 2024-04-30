@@ -3,7 +3,7 @@
 
 
 enum Command {
-    GET_MOTOR_POS  = 0,
+    UPDATE_POSITION  = 0,
     ERROR_COMMAND  = INT_MIN,
 
     // Motor commands > 0

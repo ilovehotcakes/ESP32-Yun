@@ -2,7 +2,7 @@
 
 
 Command hash (String command) {
-    if (command == "get-position") return GET_MOTOR_POS;
+    if (command == "update-position") return UPDATE_POSITION;
     else if (command == "error") return ERROR_COMMAND;
 
     else if (command == "percent") return MOTOR_PERECENT;
@@ -38,7 +38,7 @@ Command hash (String command) {
 
 
 String hash (Command command) {
-    if (command == GET_MOTOR_POS) return "get-position";
+    if (command == UPDATE_POSITION) return "update-position";
     else if (command == ERROR_COMMAND) return "error";
 
     else if (command == MOTOR_PERECENT) return "percent";
