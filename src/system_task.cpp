@@ -50,7 +50,7 @@ void SystemTask::run() {
                     Serial.println("System sleep");
                     break;
                 case SYSTEM_RESET:
-                    LOGI("System factory reset")
+                    LOGI("System factory reset");
                     motor_task_->settings_.clear();
                     // wireless_task_->settings_.clear();
                     // settings_.clear();
@@ -74,7 +74,7 @@ void SystemTask::run() {
 
 void SystemTask::systemSleep(TimerHandle_t timer) {
     // Standby motor driver
-    sendTo(motor_task_, Message(MOTOR_STNDBY, 1), 10);
+    sendTo(motor_task_, Message(MOTOR_STDBY, 1), 10);
     // gpio_hold_en(STBY_PIN);
     // gpio_deep_sleep_hold_en();
 

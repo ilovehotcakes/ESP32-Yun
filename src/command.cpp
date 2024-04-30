@@ -5,18 +5,18 @@ Command hash (String command) {
     if (command == "get position") return GET_MOTOR_POS;
     else if (command == "error") return ERROR_COMMAND;
 
-    else if (command == "position") return MOTOR_MOVE;
+    else if (command == "percent") return MOTOR_PERECENT;
     else if (command == "stop") return MOTOR_STOP;
     else if (command == "set-min") return MOTOR_SET_MIN;
     else if (command == "set-max") return MOTOR_SET_MAX;
-    else if (command == "standby") return MOTOR_STNDBY;
+    else if (command == "standby") return MOTOR_STDBY;
     else if (command == "open-close") return MOTOR_OPENCLOSE;
-    else if (command == "velocity") return MOTOR_SET_VELO;
-    else if (command == "opening-velocity") return MOTOR_SET_OPVELO;
-    else if (command == "closing-velocity") return MOTOR_SET_CLVELO;
-    else if (command == "acceleration") return MOTOR_SET_ACCL;
-    else if (command == "opening-acceleration") return MOTOR_SET_OPACCL;
-    else if (command == "closing-acceleration") return MOTOR_SET_CLACCL;
+    else if (command == "velocity") return MOTOR_VELOCITY;
+    else if (command == "opening-velocity") return MOTOR_OPVELOCITY;
+    else if (command == "closing-velocity") return MOTOR_CLVELOCITY;
+    else if (command == "acceleration") return MOTOR_ACCEL;
+    else if (command == "opening-acceleration") return MOTOR_OPACCEL;
+    else if (command == "closing-acceleration") return MOTOR_CLACCEL;
     else if (command == "current") return MOTOR_CURRENT;
     else if (command == "opening-current") return MOTOR_OPCURRENT;
     else if (command == "closing-current") return MOTOR_CLCURRENT;
@@ -41,18 +41,18 @@ String hash (Command command) {
     if (command == GET_MOTOR_POS) return "get position";
     else if (command == ERROR_COMMAND) return "error";
 
-    else if (command == MOTOR_MOVE) return "position";
+    else if (command == MOTOR_PERECENT) return "perecent";
     else if (command == MOTOR_STOP) return "stop";
     else if (command == MOTOR_SET_MIN) return "set-min";
     else if (command == MOTOR_SET_MAX) return "set-max";
-    else if (command == MOTOR_STNDBY) return "standby";
+    else if (command == MOTOR_STDBY) return "standby";
     else if (command == MOTOR_OPENCLOSE) return "open-close";
-    else if (command == MOTOR_SET_VELO) return "velocity";
-    else if (command == MOTOR_SET_OPVELO) return "opening-velocity";
-    else if (command == MOTOR_SET_CLVELO) return "closing-velocity";
-    else if (command == MOTOR_SET_ACCL) return "acceleration";
-    else if (command == MOTOR_SET_OPACCL) return "opening-acceleration";
-    else if (command == MOTOR_SET_CLACCL) return "closing-acceleration";
+    else if (command == MOTOR_VELOCITY) return "velocity";
+    else if (command == MOTOR_OPVELOCITY) return "opening-velocity";
+    else if (command == MOTOR_CLVELOCITY) return "closing-velocity";
+    else if (command == MOTOR_ACCEL) return "acceleration";
+    else if (command == MOTOR_OPACCEL) return "opening-acceleration";
+    else if (command == MOTOR_CLACCEL) return "closing-acceleration";
     else if (command == MOTOR_CURRENT) return "current";
     else if (command == MOTOR_OPCURRENT) return "opening-current";
     else if (command == MOTOR_CLCURRENT) return "closing-current";
@@ -75,7 +75,7 @@ String hash (Command command) {
 
 String listMotorCommands() {
     String list = "";
-    for (int command = MOTOR_MOVE; command <= MOTOR_TPWMTHRS; command++) {
+    for (int command = MOTOR_PERECENT; command <= MOTOR_TPWMTHRS; command++) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);

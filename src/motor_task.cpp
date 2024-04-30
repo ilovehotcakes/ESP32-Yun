@@ -47,7 +47,7 @@ void MotorTask::run() {
                 case MOTOR_STOP:
                     stop();
                     break;
-                case MOTOR_MOVE:
+                case MOTOR_PERECENT:
                     moveToPercent(inbox_.parameter);
                     break;
                 case MOTOR_SET_MAX:
@@ -56,68 +56,68 @@ void MotorTask::run() {
                 case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case MOTOR_STNDBY:
+                case MOTOR_STDBY:
                     if (inbox_.parameter == 1) driverStandby();
                     else driverStartup();
                     break;
                 case MOTOR_OPENCLOSE:
-                    setMotorSetting(open_close_, inbox_.parameter, "open_close_");
+                    setAndSave(open_close_, inbox_.parameter, "open_close_");
                     break;
-                case MOTOR_SET_VELO:
-                    setMotorSetting(open_velocity_, inbox_.parameterf, "open_velocity_");
-                    setMotorSetting(clos_velocity_, inbox_.parameterf, "clos_velocity_");
+                case MOTOR_VELOCITY:
+                    setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
+                    setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_SET_OPVELO:
-                    if (open_close_) setMotorSetting(open_velocity_, inbox_.parameterf, "open_velocity_");
+                case MOTOR_OPVELOCITY:
+                    if (open_close_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
-                case MOTOR_SET_CLVELO:
-                    if (open_close_) setMotorSetting(clos_velocity_, inbox_.parameterf, "clos_velocity_");
+                case MOTOR_CLVELOCITY:
+                    if (open_close_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_SET_ACCL:
-                    setMotorSetting(open_accel_, inbox_.parameterf, "open_accel_");
-                    setMotorSetting(clos_accel_, inbox_.parameterf, "clos_accel_");
+                case MOTOR_ACCEL:
+                    setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
+                    setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
-                case MOTOR_SET_OPACCL:
-                    if (open_close_) setMotorSetting(open_accel_, inbox_.parameterf, "open_accel_");
+                case MOTOR_OPACCEL:
+                    if (open_close_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
-                case MOTOR_SET_CLACCL:
-                    if (open_close_) setMotorSetting(clos_accel_, inbox_.parameterf, "clos_accel_");
+                case MOTOR_CLACCEL:
+                    if (open_close_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
-                    setMotorSetting(open_current_, inbox_.parameter, "open_current_");
-                    setMotorSetting(clos_current_, inbox_.parameter, "clos_current_");
+                    setAndSave(open_current_, inbox_.parameter, "open_current_");
+                    setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_OPCURRENT:
-                    if (open_close_) setMotorSetting(open_current_, inbox_.parameter, "open_current_");
+                    if (open_close_) setAndSave(open_current_, inbox_.parameter, "open_current_");
                     break;
                 case MOTOR_CLCURRENT:
-                    if (open_close_) setMotorSetting(clos_current_, inbox_.parameter, "clos_current_");
+                    if (open_close_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
-                    setMotorSetting(direction_, inbox_.parameter, "direction_");
+                    setAndSave(direction_, inbox_.parameter, "direction_");
                     break;
                 case MOTOR_MICROSTEPS:
-                    setMotorSetting(microsteps_, inbox_.parameter, "microsteps_");
+                    setAndSave(microsteps_, inbox_.parameter, "microsteps_");
                     calculateTotalMicrosteps();
                     break;
                 case MOTOR_FULLSTEPS:
-                    setMotorSetting(fullsteps_, inbox_.parameter, "fullsteps_");
+                    setAndSave(fullsteps_, inbox_.parameter, "fullsteps_");
                     calculateTotalMicrosteps();
                     break;
                 case MOTOR_STALLGUARD:
-                    setMotorSetting(stallguard_en_, inbox_.parameter, "stallguard_en_");
+                    setAndSave(stallguard_en_, inbox_.parameter, "stallguard_en_");
                     break;
                 case MOTOR_TCOOLTHRS:
-                    setMotorSetting(coolstep_thrs_, inbox_.parameter, "coolstep_thrs_");
+                    setAndSave(coolstep_thrs_, inbox_.parameter, "coolstep_thrs_");
                     break;
                 case MOTOR_SGTHRS:
-                    setMotorSetting(stallguard_th_, inbox_.parameter, "stallguard_th_");
+                    setAndSave(stallguard_th_, inbox_.parameter, "stallguard_th_");
                     break;
                 case MOTOR_SPREADCYCL:
-                    setMotorSetting(spreadcycl_en_, inbox_.parameter, "spreadcycl_en_");
+                    setAndSave(spreadcycl_en_, inbox_.parameter, "spreadcycl_en_");
                     break;
                 case MOTOR_TPWMTHRS:
-                    setMotorSetting(spreadcycl_th_, inbox_.parameter, "spreadcycl_th_");
+                    setAndSave(spreadcycl_th_, inbox_.parameter, "spreadcycl_th_");
                     break;
             }
         }
@@ -159,7 +159,7 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 
 void MotorTask::loadSettings() {
-    settings_.begin("local", false);
+    settings_.begin("motor", false);
 
     open_current_   = settings_.getInt("open_current_", 200);
     clos_current_   = settings_.getInt("clos_current_", 75);
@@ -169,7 +169,7 @@ void MotorTask::loadSettings() {
     // coolstep_thrs_
     stallguard_th_  = settings_.getInt("stallguard_th_", 10);
     spreadcycl_en_  = settings_.getBool("spreadcycl_en_", false);
-    spreadcycl_th_  = settings_.getInt("spreadcycl_th_", 33);
+    spreadcycl_th_  = settings_.getInt("spreadcycl_th_", 40);
 
     fullsteps_      = settings_.getInt("fullsteps_", 200);
     open_close_     = settings_.getBool("open_close_", true);
@@ -178,13 +178,12 @@ void MotorTask::loadSettings() {
     open_accel_     = settings_.getFloat("open_accel_", 0.5);
     clos_accel_     = settings_.getFloat("clos_accel_", 0.5);
 
-    encod_max_pos_         = settings_.getInt("encod_max_pos_", 4096 * 20);
-    int32_t encod_curr_pos = settings_.getInt("encod_curr_pos_", 0);
-    encoder_.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
-    motor_->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
+    encod_max_pos_  = settings_.getInt("encod_max_pos_", 4096 * 20);
+    encoder_.resetCumulativePosition(0);  // Set encoder to previous position
+    motor_->setCurrentPosition(positionToSteps(0));  // Set motor to previous position
     calculateTotalMicrosteps();
 
-    LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
+    LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
 }
 
 
@@ -275,24 +274,6 @@ bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
         driver_.toff(0);
     }
     return value;
-}
-
-
-void MotorTask::setMotorSetting(int &setting, int value, const char *key) {
-    setting = value;
-    settings_.putInt(key, value);
-}
-
-
-void MotorTask::setMotorSetting(bool &setting, bool value, const char *key) {
-    setting = value;
-    settings_.putBool(key, value);
-}
-
-
-void MotorTask::setMotorSetting(float &setting, float_t value, const char *key){
-    setting = value;
-    settings_.putFloat(key, value);
 }
 
 
