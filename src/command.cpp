@@ -23,15 +23,15 @@ Command hash (String command) {
     else if (command == "direction") return MOTOR_DIRECTION;
     else if (command == "microsteps") return MOTOR_MICROSTEPS;
     else if (command == "full-steps-per-rev") return MOTOR_FULLSTEPS;
-    else if (command == "stallguard-enable") return MOTOR_STALLGUARD;
+    else if (command == "stallguard") return MOTOR_STALLGUARD;
     else if (command == "coolstep-threshold") return MOTOR_TCOOLTHRS;
     else if (command == "stallguard-threshold") return MOTOR_SGTHRS;
-    else if (command == "fastmode-enable") return MOTOR_SPREADCYCL;
+    else if (command == "fastmode") return MOTOR_SPREADCYCL;
     else if (command == "fastmode-threshold") return MOTOR_TPWMTHRS;
 
-    else if (command == "system-standby") return SYSTEM_STNDBY;
-    else if (command == "system-reboot")  return SYSTEM_REBOOT;
-    else if (command == "system-reset")   return SYSTEM_RESET;
+    else if (command == "sleep") return SYSTEM_SLEEP;
+    else if (command == "reboot") return SYSTEM_REBOOT;
+    else if (command == "reset") return SYSTEM_RESET;
 
     return ERROR_COMMAND;
 }
@@ -59,15 +59,15 @@ String hash (Command command) {
     else if (command == MOTOR_DIRECTION) return "direction";
     else if (command == MOTOR_MICROSTEPS) return "microsteps";
     else if (command == MOTOR_FULLSTEPS) return "full-steps-per-rev";
-    else if (command == MOTOR_STALLGUARD) return "stallguard-enable";
+    else if (command == MOTOR_STALLGUARD) return "stallguard";
     else if (command == MOTOR_TCOOLTHRS) return "coolstep-threshold";
     else if (command == MOTOR_SGTHRS) return "stallguard-threshold";
-    else if (command == MOTOR_SPREADCYCL) return "fastmode-enable";
+    else if (command == MOTOR_SPREADCYCL) return "fastmode";
     else if (command == MOTOR_TPWMTHRS) return "fastmode-threshold";
 
-    else if (command == SYSTEM_STNDBY) return "system-standby";
-    else if (command == SYSTEM_REBOOT)  return "system-reboot";
-    else if (command == SYSTEM_RESET)   return "system-reset";
+    else if (command == SYSTEM_SLEEP) return "sleep";
+    else if (command == SYSTEM_REBOOT) return "reboot";
+    else if (command == SYSTEM_RESET) return "reset";
 
     return "error";
 }
@@ -84,7 +84,7 @@ String listMotorCommands() {
 
 String listSystemCommands() {
     String list = "";
-    for (int command = SYSTEM_STNDBY; command >= SYSTEM_RESET; command--) {
+    for (int command = SYSTEM_SLEEP; command >= SYSTEM_RESET; command--) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);

@@ -17,16 +17,19 @@
     Modified by Jason Chen, 2024
 **/
 #include <Arduino.h>
-#include "command.h"
+#include <Preferences.h>
 #include "logger.h"
+#include "command.h"
 
 
 struct Message {
-    Message(Command command, int parameter = INT_MIN) : command(command), parameter(parameter) {}
-    String toString() { return "command=" + hash(command) 
-                        + (parameter == INT_MIN ? "" : ", parameter=" + String(parameter)); }
+    Message(Command command, int parameter) : command(command), parameter(parameter) {}
+    Message(Command command, float parameterf) : command(command), parameterf(parameterf) {}
+    String toString() { return "command=" + hash(command) + ", parameter="
+                                + (parameter != INT_MIN ? String(parameter) : String(parameterf)); }
     Command command;
-    int parameter;
+    int parameter = INT_MIN;
+    float parameterf = 0.0;
 };
 
 
@@ -72,6 +75,8 @@ public:
         BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_, this, priority_, &task_handle_, core_id_);
         assert(result == pdPASS && "Failed to create task");
     }
+
+    Preferences settings_;
 
 protected:
     const char* const name_;

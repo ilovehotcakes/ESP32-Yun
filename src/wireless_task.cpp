@@ -7,7 +7,10 @@ WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
+    esp_task_wdt_init(10, true);  // Restart system if wd hasn't been fed in 10 seconds
+
     // connectWifi();  // For AP mode
+
     while (1) {
         if (WiFi.status() != WL_CONNECTED) {
             connectWifi();
@@ -74,24 +77,23 @@ void WirelessTask::connectWifi() {
 
 
 void WirelessTask::routing() {
-    // Root to get UI web page
+    // Root serves UI web page
     webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
         request->send(200, "text/html", index_html);
     });
 
-    // RESTful api for turning on/off LED
-    webserver.on("/led", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        if (!request->hasParam("state")) {
-            request->send(400, "text/plain", "failed: <param>=state, i.e. /led?state=<value>");
+    // HTTP RESTful API for managing system
+    webserver.on("/system", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (request->params() > 1) {
+            request->send(400, "text/plain", "failed: can only perform one system action at a time");
             return;
         }
-        int state = request->getParam("state")->value().toInt();
-        if (state != 0 && state!= 1) {
-            request->send(400, "text/plain", "failed: state=0 is off; state=1 is on");
+        if (httpRequestHandler(request, hash(SYSTEM_SLEEP), [=](int val) -> bool { return false; }, "", system_task_)
+            || httpRequestHandler(request, hash(SYSTEM_REBOOT), [=](int val) -> bool { return false; }, "", system_task_)
+            || httpRequestHandler(request, hash(SYSTEM_RESET), [=](int val) -> bool { return false; }, "", system_task_)) {
             return;
         }
-        digitalWrite(LED_PIN, state);
-        request->send(200, "text/plain", "success");
+        request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listSystemCommands());
     });
 
     // HTTP RESTful API for moving motor and changing motor settings
@@ -101,52 +103,52 @@ void WirelessTask::routing() {
             return;
         }
         if (httpRequestHandler(request, hash(MOTOR_MOVE), [=](int val) -> bool { return val > 100 || val < 0; },
-                                           "position=0~100 (%); 0 to open; 100 to close")  // float?
-            || httpRequestHandler(request, hash(MOTOR_STOP), [=](int val) -> bool { return false; }, "")
-            || httpRequestHandler(request, hash(MOTOR_SET_MIN), [=](int val) -> bool { return false; }, "")
-            || httpRequestHandler(request, hash(MOTOR_SET_MAX), [=](int val) -> bool { return false; }, "")
+                                  "position=0~100 (%); 0 to open; 100 to close", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_STOP), [=](int val) -> bool { return false; }, "", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_SET_MIN), [=](int val) -> bool { return false; }, "", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_SET_MAX), [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_STNDBY), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "standby=0 | 1; 1 to standby motor driver; 0 to wake")
+                                  "standby=0 | 1; 1 to standby motor driver; 0 to wake", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_OPENCLOSE), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "open-close=0 | 1; 0 to keep opening/closing settings the same")
-            || httpRequestHandler(request, hash(MOTOR_SET_VELO), [=](int val) -> bool { return val <= 0; },
-                                           "velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_OPVELO), [=](int val) -> bool { return val <= 0; },
-                                           "opening-velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_CLVELO), [=](int val) -> bool { return val <= 0; },
-                                           "closing-velocity (Hz) has to be greater than 0")  // float
-            || httpRequestHandler(request, hash(MOTOR_SET_ACCL), [=](int val) -> bool { return val <= 0; },
-                                           "acceleration has to be greater than 0")   // float
-            || httpRequestHandler(request, hash(MOTOR_SET_OPACCL), [=](int val) -> bool { return val <= 0; },
-                                           "opening-acceleration has to be greater than 0")   // float
-            || httpRequestHandler(request, hash(MOTOR_SET_CLACCL), [=](int val) -> bool { return val <= 0; },
-                                           "closing-acceleration has to be greater than 0")   // float
+                                  "open-close=0 | 1; 0 to keep opening/closing settings the same", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_SET_VELO), [=](float val) -> bool { return val <= 0.0; },
+                                  "velocity (Hz) has to be greater than 0", motor_task_)  // float
+            || httpRequestHandler(request, hash(MOTOR_SET_OPVELO), [=](float val) -> bool { return val <= 0.0; },
+                                  "opening-velocity (Hz) has to be greater than 0", motor_task_)  // float
+            || httpRequestHandler(request, hash(MOTOR_SET_CLVELO), [=](float val) -> bool { return val <= 0.0; },
+                                  "closing-velocity (Hz) has to be greater than 0", motor_task_)  // float
+            || httpRequestHandler(request, hash(MOTOR_SET_ACCL), [=](float val) -> bool { return val <= 0.0; },
+                                  "acceleration has to be greater than 0.0", motor_task_)   // float
+            || httpRequestHandler(request, hash(MOTOR_SET_OPACCL), [=](float val) -> bool { return val <= 0.0; },
+                                  "opening-acceleration has to be greater than 0", motor_task_)   // float
+            || httpRequestHandler(request, hash(MOTOR_SET_CLACCL), [=](float val) -> bool { return val <= 0.0; },
+                                  "closing-acceleration has to be greater than 0", motor_task_)   // float
             || httpRequestHandler(request, hash(MOTOR_CURRENT), [=](int val) -> bool { return val <= 0 || val > 2000; },
-                                           "current=1~2000 (mA); please refer to motor datasheet for max RMS")
+                                  "current=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_OPCURRENT), [=](int val) -> bool { return val <= 0 || val > 2000; },
-                                           "opening-current=1~2000 (mA); please refer to motor datasheet for max RMS")
+                                  "opening-current=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_CLCURRENT), [=](int val) -> bool { return val <= 0 || val > 2000; },
-                                           "closing-current=1~2000 (mA); please refer to motor datasheet for max RMS")
+                                  "closing-current=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_DIRECTION), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "direction=0 | 1")
+                                  "direction=0 | 1", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_MICROSTEPS), [=](int val) -> bool { return val != 0 && val != 2 
                                                                                     && val != 4 && val != 8
                                                                                     && val != 16 && val != 32
                                                                                     && val != 64 && val != 128
                                                                                     && val != 256; },
-                                           "microsteps=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256")
+                                  "microsteps=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_FULLSTEPS), [=](int val) -> bool { return val <= 0; },
-                                           "full-step-per-rev has to be greater than 0")
+                                  "full-step-per-rev has to be greater than 0", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_STALLGUARD), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "stallguard-enable=0 | 1; 0 to disable; 1 to enable")
+                                  "stallguard=0 | 1; 0 to disable; 1 to enable", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_TCOOLTHRS), [=](int val) -> bool { return val < 0 || val > 1048575; },
-                                           "coolstep-threshold=0~1048575; lower threshold velocity for switching on stallguard")
+                                  "coolstep-threshold=0~1048575; lower threshold velocity for switching on stallguard", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_SGTHRS), [=](int val) -> bool { return val < 0 || val > 255; },
-                                           "stallguard-threshold=0~255; the greater, the easier to stall")
+                                  "stallguard-threshold=0~255; the greater, the easier to stall", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_SPREADCYCL), [=](int val) -> bool { return val != 0 && val != 1; },
-                                           "fastmode-enable=0 | 1; 0 to disable; 1 to enable")
+                                  "fastmode=0 | 1; 0 to disable; 1 to enable", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_TPWMTHRS), [=](int val) -> bool { return val < 0 || val > 1048575; },
-                                           "fastmode-threshold=0~1048575; upper threshold to switch to fastmode")) {
+                                  "fastmode-threshold=0~1048575; upper threshold to switch to fastmode", motor_task_)) {
             return;
         }
         request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listMotorCommands());
@@ -154,7 +156,10 @@ void WirelessTask::routing() {
 }
 
 
-bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message) {
+bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String param,
+                                      bool (*eval)(int), String error_message, Task *task) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
     if (request->hasParam(param)) {
         String value_str = request->getParam(param)->value();  // To check if param="0" is value=0
         int value = value_str.toInt();
@@ -163,8 +168,27 @@ bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String par
             return true;
         }
         LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
-        sendTo(motor_task_, Message(hash(param), value), 0);
         request->send(200, "text/plain", "success");
+        sendTo(task, Message(hash(param), value), 0);
+        return true;
+    }
+    return false;
+}
+
+
+bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, String param,
+                                      bool (*eval)(float), String error_message, Task *task) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
+    if (request->hasParam(param)) {
+        float value = request->getParam(param)->value().toFloat();
+        if (eval(value)) {
+            request->send(400, "text/plain", "failed: " + error_message);
+            return true;
+        }
+        LOGI("Parsed HTTP request: param=%s, value=%.1f", param.c_str(), value);
+        request->send(200, "text/plain", "success");
+        sendTo(task, Message(hash(param), value), 0);
         return true;
     }
     return false;
@@ -213,16 +237,12 @@ void WirelessTask::wsEventDataProcessor(void *arg, uint8_t *data, size_t len) {
 }
 
 
-void WirelessTask::addSystemTaskQueue(QueueHandle_t queue) {
-    system_task_queue_ = queue;
-}
-
-
-void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
-    system_sleep_timer_ = timer;
-}
-
-
 void WirelessTask::addMotorTask(void *task) {
     motor_task_ = static_cast<Task*>(task);
+}
+
+
+void WirelessTask::addSystemTask(void *task) {
+    system_task_ = static_cast<Task*>(task);
+    system_sleep_timer_ = static_cast<SystemTask*>(task)->getSystemSleepTimer();
 }

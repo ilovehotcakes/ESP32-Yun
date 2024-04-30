@@ -32,7 +32,7 @@ enum Command {
     MOTOR_TPWMTHRS   = 23,
 
     // System commands < 0
-    SYSTEM_STNDBY    = -1,
+    SYSTEM_SLEEP     = -1,
     SYSTEM_REBOOT    = -2,
     SYSTEM_RESET     = -3
 };
@@ -41,3 +41,4 @@ enum Command {
 Command hash (String command);
 String hash (Command command);
 String listMotorCommands();
+String listSystemCommands();
