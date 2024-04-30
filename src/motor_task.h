@@ -87,9 +87,6 @@ private:
     void calculateTotalMicrosteps();
     inline int getPercent();
     inline int positionToSteps(int encoder_position);
-    void setMotorSetting(int &setting, int value, const char *key);
-    void setMotorSetting(bool &setting, bool value, const char *key);
-    void setMotorSetting(float &setting, float_t value, const char *key);
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32

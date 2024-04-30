@@ -50,7 +50,7 @@ void SystemTask::run() {
                     Serial.println("System sleep");
                     break;
                 case SYSTEM_RESET:
-                    LOGI("System factory reset")
+                    LOGI("System factory reset");
                     motor_task_->settings_.clear();
                     // wireless_task_->settings_.clear();
                     // settings_.clear();

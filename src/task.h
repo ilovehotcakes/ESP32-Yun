@@ -26,7 +26,7 @@ struct Message {
     Message(Command command, int parameter) : command(command), parameter(parameter) {}
     Message(Command command, float parameterf) : command(command), parameterf(parameterf) {}
     String toString() { return "command=" + hash(command) + ", parameter="
-                                + (parameter != INT_MIN ? String(parameter) : String(parameterf)); }
+                               + (parameter != INT_MIN ? String(parameter) : String(parameterf)); }
     Command command;
     int parameter = INT_MIN;
     float parameterf = 0.0;
@@ -54,12 +54,10 @@ public:
         vQueueDelete(queue_);
     }
 
-    TaskHandle_t getTaskHandle() {
-        return task_handle_;
-    }
-
-    QueueHandle_t getQueueHandle() {
-        return queue_;
+    void init() {
+        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_,
+                                                    this, priority_, &task_handle_, core_id_);
+        assert(result == pdPASS && "Failed to create task");
     }
 
     bool sendTo(Task *task, Message message, int timeout) {
@@ -71,9 +69,32 @@ public:
         return true;
     }
 
-    void init() {
-        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_, this, priority_, &task_handle_, core_id_);
-        assert(result == pdPASS && "Failed to create task");
+    void setAndSave(int &setting, int value, const char *key) {
+        setting = value;
+        settings_.putInt(key, value);
+    }
+
+    void setAndSave(bool &setting, bool value, const char *key) {
+        setting = value;
+        settings_.putBool(key, value);
+    }
+
+    void setAndSave(float &setting, float_t value, const char *key) {
+        setting = value;
+        settings_.putFloat(key, value);
+    }
+
+    void setAndSave(float &setting, String value, const char *key) {
+        setting = value;
+        settings_.putString(key, value);
+    }
+
+    TaskHandle_t getTaskHandle() {
+        return task_handle_;
+    }
+
+    QueueHandle_t getQueueHandle() {
+        return queue_;
     }
 
     Preferences settings_;
