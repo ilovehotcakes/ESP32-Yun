@@ -143,7 +143,7 @@ void MotorTask::run() {
         int current_percent = getPercent();
         if (current_percent >= 0 && current_percent <= 100) {
             last_updated_percent_ = current_percent;
-            sendTo(wireless_task_, Message(GET_MOTOR_POS, current_percent), 0);
+            sendTo(wireless_task_, Message(UPDATE_POSITION, current_percent), 0);
         }
 
         vTaskDelay(1);  // Finished all task within loop, yielding control back to scheduler
@@ -179,8 +179,9 @@ void MotorTask::loadSettings() {
     clos_accel_     = settings_.getFloat("clos_accel_", 0.5);
 
     encod_max_pos_  = settings_.getInt("encod_max_pos_", 4096 * 20);
-    encoder_.resetCumulativePosition(0);  // Set encoder to previous position
-    motor_->setCurrentPosition(positionToSteps(0));  // Set motor to previous position
+    encod_pos_      = 0;
+    encoder_.resetCumulativePosition(encod_pos_);
+    motor_->setCurrentPosition(positionToSteps(encod_pos_));
     calculateTotalMicrosteps();
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
@@ -211,40 +212,37 @@ void MotorTask::moveToPercent(int target) {
     int32_t new_position = static_cast<int>(target * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToSteps(new_position));
 
-    LOGD("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
+    LOGI("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
 }
 
 
 void MotorTask::stop() {
     motor_->forceStop();
-    // Without a slight delay, sometimes fastaccelstepper restarts after forceStop() is called.
-    // It is uncertain why but it might be due to the constant resetting of fastaccelstepper's
-    // position in the while loop. Author of fastaccelstepper recommends for ESP32 to only call
-    // setCurrentPosition when motor is in standstill.
     vTaskDelay(2 / portTICK_PERIOD_MS);
     LOGD("Motor stopped(curr/max): %d/%d", encod_pos_, encod_max_pos_);
 }
 
 
 bool MotorTask::setMin() {
-    if (encoder_.getCumulativePosition() >= encod_max_pos_) {
+    if (encod_pos_ >= encod_max_pos_) {
         return false;
     }
-    encod_max_pos_ -= encoder_.getCumulativePosition();
+    encod_max_pos_ -= encod_pos_;
     settings_.putInt("encod_max_pos_", encod_max_pos_);
+    encod_pos_ = 0;
     encoder_.resetCumulativePosition(0);
-    LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
+    LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
 
 
 bool MotorTask::setMax() {
-    if (encoder_.getCumulativePosition() < 0) {
+    if (encod_pos_ < 0) {
         return false;
     }
-    encod_max_pos_ = encoder_.getCumulativePosition();
+    encod_max_pos_ = encod_pos_;
     settings_.putInt("encod_max_pos_", encod_max_pos_);
-    LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
+    LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
 
@@ -315,7 +313,7 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
 
 void MotorTask::driverStartup() {
     if (!driver_stdby_) {
-        LOGD("Driver already started");
+        LOGI("Driver already started");
         return;
     }
 
@@ -372,10 +370,10 @@ void MotorTask::driverStartup() {
 
 void MotorTask::driverStandby() {
     if (driver_stdby_) {
-        LOGD("Driver already in standby");
+        LOGI("Driver already in standby");
         return;
     } else if (motor_->isRunning()) {
-        LOGD("Driver can't be put in standby while motor is running");
+        LOGI("Driver can't be put in standby while motor is running");
         return;
     }
 
