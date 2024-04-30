@@ -47,6 +47,8 @@ private:
 
     void connectWifi();
     void routing();
+    bool isPrefetch(AsyncWebServerRequest *request);
+    bool isOneParam(AsyncWebServerRequest *request);
     bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message, Task *task);
     bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(float), String error_message, Task *task);
     void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
