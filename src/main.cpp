@@ -33,14 +33,13 @@ void setup() {
     system_task.addMotorTask(&motor_task);
 
     wireless_task.init();
-    wireless_task.addMotorTask((void*) &motor_task);
-    wireless_task.addSystemTask((void*) &system_task);
-    wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
+    wireless_task.addMotorTask(static_cast<void*>(&motor_task));
+    wireless_task.addSystemTask(static_cast<void*>(&system_task));
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position. TODO not start motor task on wake to reduce boot time
     motor_task.init();
-    motor_task.addWirelessTask((void*) &wireless_task);
+    motor_task.addWirelessTask(static_cast<void*>(&wireless_task));
     motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // Delete setup/loop task

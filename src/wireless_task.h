@@ -5,14 +5,13 @@
 
     WirelessTask establishes and maintains WiFi connection and MQTT connection.
 **/
-#include <Arduino.h>
-#include <queue>
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <FunctionalInterrupt.h>  // std:bind()
 #include <esp_task_wdt.h>
 #include "task.h"
+#include "system_task.h"
 #include "index.h"
 #include "secrets.h"
 
@@ -29,7 +28,6 @@ public:
     ~WirelessTask();
     void addMotorTask(void *task);
     void addSystemTask(void *task);
-    void addSystemSleepTimer(TimerHandle_t timer);
 
 protected:
     void run();

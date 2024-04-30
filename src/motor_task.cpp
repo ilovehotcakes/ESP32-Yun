@@ -61,64 +61,63 @@ void MotorTask::run() {
                     else driverStartup();
                     break;
                 case MOTOR_OPENCLOSE:
-                    open_close_ = inbox_.parameter;
-                    // motor_settings_.putBool("open_close_", open_close_);
+                    setMotorSetting(open_close_, inbox_.parameter, "open_close_");
                     break;
                 case MOTOR_SET_VELO:
-                    opening_velocity_ = inbox_.parameterf;
-                    closing_velocity_ = inbox_.parameterf;
+                    setMotorSetting(open_velocity_, inbox_.parameterf, "open_velocity_");
+                    setMotorSetting(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_SET_OPVELO:
-                    if (open_close_) opening_velocity_ = inbox_.parameterf;
+                    if (open_close_) setMotorSetting(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
                 case MOTOR_SET_CLVELO:
-                    if (open_close_) closing_velocity_ = inbox_.parameterf;
+                    if (open_close_) setMotorSetting(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_SET_ACCL:
-                    opening_acceleration_ = inbox_.parameterf;
-                    closing_acceleration_ = inbox_.parameterf;
+                    setMotorSetting(open_accel_, inbox_.parameterf, "open_accel_");
+                    setMotorSetting(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_SET_OPACCL:
-                    if (open_close_) opening_acceleration_ = inbox_.parameterf;
+                    if (open_close_) setMotorSetting(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
                 case MOTOR_SET_CLACCL:
-                    if (open_close_) closing_acceleration_ = inbox_.parameterf;
+                    if (open_close_) setMotorSetting(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
-                    opening_current_ = inbox_.parameter;
-                    closing_current_ = inbox_.parameter;
+                    setMotorSetting(open_current_, inbox_.parameter, "open_current_");
+                    setMotorSetting(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_OPCURRENT:
-                    if (open_close_) opening_current_ = inbox_.parameter;
+                    if (open_close_) setMotorSetting(open_current_, inbox_.parameter, "open_current_");
                     break;
                 case MOTOR_CLCURRENT:
-                    if (open_close_) closing_current_ = inbox_.parameter;
+                    if (open_close_) setMotorSetting(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
-                    direction_ = inbox_.parameter;
+                    setMotorSetting(direction_, inbox_.parameter, "direction_");
                     break;
                 case MOTOR_MICROSTEPS:
-                    microsteps_ = inbox_.parameter;
+                    setMotorSetting(microsteps_, inbox_.parameter, "microsteps_");
                     calculateTotalMicrosteps();
                     break;
                 case MOTOR_FULLSTEPS:
-                    full_steps_per_rev_ = inbox_.parameter;
+                    setMotorSetting(fullsteps_, inbox_.parameter, "fullsteps_");
                     calculateTotalMicrosteps();
                     break;
                 case MOTOR_STALLGUARD:
-                    stallguard_enable_ = inbox_.parameter;
+                    setMotorSetting(stallguard_en_, inbox_.parameter, "stallguard_en_");
                     break;
                 case MOTOR_TCOOLTHRS:
-                    coolstep_threshold_ = inbox_.parameter;
+                    setMotorSetting(coolstep_thrs_, inbox_.parameter, "coolstep_thrs_");
                     break;
                 case MOTOR_SGTHRS:
-                    stallguard_threshold_ = inbox_.parameter;
+                    setMotorSetting(stallguard_th_, inbox_.parameter, "stallguard_th_");
                     break;
                 case MOTOR_SPREADCYCL:
-                    spreadcycle_enable_ = inbox_.parameter;
+                    setMotorSetting(spreadcycl_en_, inbox_.parameter, "spreadcycl_en_");
                     break;
                 case MOTOR_TPWMTHRS:
-                    spreadcycle_threshold_ = inbox_.parameter;
+                    setMotorSetting(spreadcycl_th_, inbox_.parameter, "spreadcycl_th_");
                     break;
             }
         }
@@ -152,7 +151,6 @@ void MotorTask::run() {
 }
 
 
-// For StallGuard
 void IRAM_ATTR MotorTask::stallguardInterrupt() {
     portENTER_CRITICAL(&stalled_mux_);
     stalled_ = true;
@@ -161,30 +159,30 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 
 void MotorTask::loadSettings() {
-    motor_settings_.begin("local", false);
+    settings_.begin("local", false);
 
-    // opening_current_       = motor_settings_.getInt("opening_current_", 200);
-    // closing_current_       = motor_settings_.getInt("closing_current_", 75);
-    // direction_             = motor_settings_.getBool("direction_", false);
-    // microsteps_            = motor_settings_.getInt("microsteps_", 200);
-    // stallguard_enable_     = motor_settings_.getBool("stallguard_enable_", true);
-    // // coolstep_threshold_
-    // stallguard_threshold_  = motor_settings_.getInt("stallguard_threshold_", 10);
-    // spreadcycle_enable_    = motor_settings_.getBool("spreadcycle_enable_", false);
-    // spreadcycle_threshold_ = motor_settings_.getInt("spreadcycle_threshold_", 33);
+    open_current_   = settings_.getInt("open_current_", 200);
+    clos_current_   = settings_.getInt("clos_current_", 75);
+    direction_      = settings_.getBool("direction_", false);
+    microsteps_     = settings_.getInt("microsteps_", 200);
+    stallguard_en_  = settings_.getBool("stallguard_en_", true);
+    // coolstep_thrs_
+    stallguard_th_  = settings_.getInt("stallguard_th_", 10);
+    spreadcycl_en_  = settings_.getBool("spreadcycl_en_", false);
+    spreadcycl_th_  = settings_.getInt("spreadcycl_th_", 33);
 
-    // full_steps_per_rev_    = motor_settings_.getInt("full_steps_per_rev_", 200);
-    // open_close_            = motor_settings_.getBool("open_close_", true);
-    // opening_velocity_      = motor_settings_.getFloat("opening_velocity_", 3.0);
-    // closing_velocity_      = motor_settings_.getFloat("closing_velocity_", 3.0);
-    // opening_acceleration_  = motor_settings_.getFloat("opening_acceleration_", 0.5);
-    // closing_acceleration_  = motor_settings_.getFloat("closing_acceleration_", 0.5);
+    fullsteps_      = settings_.getInt("fullsteps_", 200);
+    open_close_     = settings_.getBool("open_close_", true);
+    open_velocity_  = settings_.getFloat("open_velocity_", 3.0);
+    clos_velocity_  = settings_.getFloat("clos_velocity_", 3.0);
+    open_accel_     = settings_.getFloat("open_accel_", 0.5);
+    clos_accel_     = settings_.getFloat("clos_accel_", 0.5);
 
-    encod_max_pos_         = motor_settings_.getInt("encod_max_pos_", 4096 * 20);
-    int32_t encod_curr_pos = motor_settings_.getInt("encod_curr_pos_", 0);
+    encod_max_pos_         = settings_.getInt("encod_max_pos_", 4096 * 20);
+    int32_t encod_curr_pos = settings_.getInt("encod_curr_pos_", 0);
     encoder_.resetCumulativePosition(encod_curr_pos);  // Set encoder to previous position
     motor_->setCurrentPosition(positionToSteps(encod_curr_pos));  // Set motor to previous position
-    // calculateTotalMicrosteps();
+    calculateTotalMicrosteps();
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", encod_curr_pos, encod_max_pos_);
 }
@@ -200,15 +198,15 @@ void MotorTask::moveToPercent(int target) {
         return;
     }
 
-    while (driver_standby_) {
+    while (driver_stdby_) {
         driverStartup();
         vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
     if (target > getPercent() && open_close_) {
-        updateMotorSettings(closing_velocity_, closing_acceleration_, closing_current_);
+        updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     } else {
-        updateMotorSettings(opening_velocity_, opening_acceleration_, opening_current_);
+        updateMotorSettings(open_velocity_, open_accel_, open_current_);
     }
 
     int32_t new_position = static_cast<int>(target * encod_max_pos_ / 100.0 + 0.5);
@@ -234,7 +232,7 @@ bool MotorTask::setMin() {
         return false;
     }
     encod_max_pos_ -= encoder_.getCumulativePosition();
-    motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    settings_.putInt("encod_max_pos_", encod_max_pos_);
     encoder_.resetCumulativePosition(0);
     LOGD("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
     return true;  // TODO: check new max_pos_
@@ -246,14 +244,14 @@ bool MotorTask::setMax() {
         return false;
     }
     encod_max_pos_ = encoder_.getCumulativePosition();
-    motor_settings_.putInt("encod_max_pos_", encod_max_pos_);
+    settings_.putInt("encod_max_pos_", encod_max_pos_);
     LOGD("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
 
 
 void MotorTask::calculateTotalMicrosteps() {
-    microsteps_per_rev_ = full_steps_per_rev_ * microsteps_;
+    microsteps_per_rev_ = fullsteps_ * microsteps_;
     motor_encoder_ratio_ = microsteps_per_rev_ / 4096.0;
     encoder_motor_ratio_ = 4096.0 / microsteps_per_rev_;
 }
@@ -280,6 +278,24 @@ bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
 }
 
 
+void MotorTask::setMotorSetting(int &setting, int value, const char *key) {
+    setting = value;
+    settings_.putInt(key, value);
+}
+
+
+void MotorTask::setMotorSetting(bool &setting, bool value, const char *key) {
+    setting = value;
+    settings_.putBool(key, value);
+}
+
+
+void MotorTask::setMotorSetting(float &setting, float_t value, const char *key){
+    setting = value;
+    settings_.putFloat(key, value);
+}
+
+
 void MotorTask::updateMotorSettings(float velocity, float acceleration, int current) {
     motor_->setSpeedInHz(static_cast<int>(microsteps_per_rev_ * velocity));
     motor_->setAcceleration(static_cast<int>(microsteps_per_rev_ * velocity * acceleration));
@@ -300,10 +316,10 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
     // 1=SpreadCycle only; 0=StealthChop PWM mode (below velocity threshold) + SpreadCycle (above
     // velocity threshold); set register TPWMTHRS to determine the velocity threshold
     // SpreadCycle for high velocity but is audible; StealthChop is quiet and more torque.
-    driver_.en_spreadCycle(spreadcycle_enable_);
-    driver_.TPWMTHRS(spreadcycle_threshold_);
+    driver_.en_spreadCycle(spreadcycl_en_);
+    driver_.TPWMTHRS(spreadcycl_th_);
 
-    if (stallguard_enable_) {
+    if (stallguard_en_) {
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
         driver_.TCOOLTHRS(3089838.00 * pow(microsteps_per_rev_ * velocity, -1.00161534));
 
@@ -311,13 +327,13 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more
         // sensitive and requires less torque to stall. The double of this value is compared to
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
-        driver_.SGTHRS(stallguard_threshold_);
+        driver_.SGTHRS(stallguard_th_);
     }
 }
 
 
 void MotorTask::driverStartup() {
-    if (!driver_standby_) {
+    if (!driver_stdby_) {
         LOGD("Driver already started");
         return;
     }
@@ -351,7 +367,7 @@ void MotorTask::driverStartup() {
     driver_.hend(12);
 
     // StallGuard setup; refer to p29 and p73 of TMC2209's datasheet rev1.09 for tuning SG.
-    if (stallguard_enable_) {
+    if (stallguard_en_) {
         // 0=disable CoolStep
         // CoolStep lower threshold [0... 15].
         // If SG_RESULT goes below this threshold, CoolStep increases the current to both coils.
@@ -367,14 +383,14 @@ void MotorTask::driverStartup() {
     }
 
     // TODO: check via UART driver register read/write ok?
-    driver_standby_ = false;
+    driver_stdby_ = false;
 
     LOGI("Driver has started");
 }
 
 
 void MotorTask::driverStandby() {
-    if (driver_standby_) {
+    if (driver_stdby_) {
         LOGD("Driver already in standby");
         return;
     } else if (motor_->isRunning()) {
@@ -382,7 +398,7 @@ void MotorTask::driverStandby() {
         return;
     }
 
-    driver_standby_ = true;
+    driver_stdby_ = true;
 
     // Need to disable StallGuard or else it will stall the motor when disabling the driver
     detachInterrupt(DIAG_PIN);

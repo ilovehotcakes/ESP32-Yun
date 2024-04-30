@@ -17,8 +17,9 @@
     Modified by Jason Chen, 2024
 **/
 #include <Arduino.h>
-#include "command.h"
+#include <Preferences.h>
 #include "logger.h"
+#include "command.h"
 
 
 struct Message {
@@ -74,6 +75,8 @@ public:
         BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_, this, priority_, &task_handle_, core_id_);
         assert(result == pdPASS && "Failed to create task");
     }
+
+    Preferences settings_;
 
 protected:
     const char* const name_;

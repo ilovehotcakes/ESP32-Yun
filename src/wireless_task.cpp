@@ -237,16 +237,12 @@ void WirelessTask::wsEventDataProcessor(void *arg, uint8_t *data, size_t len) {
 }
 
 
-void WirelessTask::addSystemTask(void *task) {
-    system_task_ = static_cast<Task*>(task);
-}
-
-
-void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
-    system_sleep_timer_ = timer;
-}
-
-
 void WirelessTask::addMotorTask(void *task) {
     motor_task_ = static_cast<Task*>(task);
+}
+
+
+void WirelessTask::addSystemTask(void *task) {
+    system_task_ = static_cast<Task*>(task);
+    system_sleep_timer_ = static_cast<SystemTask*>(task)->getSystemSleepTimer();
 }
