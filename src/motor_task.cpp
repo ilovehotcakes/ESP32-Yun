@@ -47,7 +47,7 @@ void MotorTask::run() {
                 case MOTOR_STOP:
                     stop();
                     break;
-                case MOTOR_MOVE:
+                case MOTOR_PERECENT:
                     moveToPercent(inbox_.parameter);
                     break;
                 case MOTOR_SET_MAX:
@@ -56,31 +56,31 @@ void MotorTask::run() {
                 case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case MOTOR_STNDBY:
+                case MOTOR_STDBY:
                     if (inbox_.parameter == 1) driverStandby();
                     else driverStartup();
                     break;
                 case MOTOR_OPENCLOSE:
                     setAndSave(open_close_, inbox_.parameter, "open_close_");
                     break;
-                case MOTOR_SET_VELO:
+                case MOTOR_VELOCITY:
                     setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_SET_OPVELO:
+                case MOTOR_OPVELOCITY:
                     if (open_close_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
-                case MOTOR_SET_CLVELO:
+                case MOTOR_CLVELOCITY:
                     if (open_close_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_SET_ACCL:
+                case MOTOR_ACCEL:
                     setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
-                case MOTOR_SET_OPACCL:
+                case MOTOR_OPACCEL:
                     if (open_close_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
-                case MOTOR_SET_CLACCL:
+                case MOTOR_CLACCEL:
                     if (open_close_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
