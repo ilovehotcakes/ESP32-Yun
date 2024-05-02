@@ -130,12 +130,10 @@ void MotorTask::run() {
 
         if (motor_->isRunning()) {
             xTimerStart(system_sleep_timer_, 0);
-            vTaskDelay(1);
             continue;
         }
 
         if (last_updated_percent_ == getPercent()) {
-            vTaskDelay(1);
             continue;
         }
 
@@ -145,8 +143,6 @@ void MotorTask::run() {
             last_updated_percent_ = current_percent;
             sendTo(wireless_task_, Message(UPDATE_POSITION, current_percent), 0);
         }
-
-        vTaskDelay(1);  // Finished all task within loop, yielding control back to scheduler
     }
 }
 
