@@ -36,8 +36,9 @@ void MotorTask::run() {
     LOGI("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
-
+    int start;
     while (1) {
+        start = micros();
         encod_pos_ = encoder_.getCumulativePosition();
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
 
@@ -134,6 +135,7 @@ void MotorTask::run() {
         }
 
         if (last_updated_percent_ == getPercent()) {
+            Serial.println(micros() - start);
             continue;
         }
 
@@ -155,30 +157,33 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 
 void MotorTask::loadSettings() {
-    settings_.begin("motor", false);
+    // Load settings from file
+    // clearSettings deletes file
 
-    open_current_   = settings_.getInt("open_current_", 200);
-    clos_current_   = settings_.getInt("clos_current_", 75);
-    direction_      = settings_.getBool("direction_", false);
-    microsteps_     = settings_.getInt("microsteps_", 200);
-    stallguard_en_  = settings_.getBool("stallguard_en_", true);
+    open_current_   = getOrDefault(open_current_, "open_current_");
+    clos_current_   = getOrDefault(clos_current_, "clos_current_");
+    direction_      = getOrDefault(direction_, "direction_");
+    microsteps_     = getOrDefault(microsteps_, "microsteps_");
+    stallguard_en_  = getOrDefault(stallguard_en_, "stallguard_en_");
     // coolstep_thrs_
-    stallguard_th_  = settings_.getInt("stallguard_th_", 10);
-    spreadcycl_en_  = settings_.getBool("spreadcycl_en_", false);
-    spreadcycl_th_  = settings_.getInt("spreadcycl_th_", 40);
+    stallguard_th_  = getOrDefault(stallguard_th_, "stallguard_th_");
+    spreadcycl_en_  = getOrDefault(spreadcycl_en_, "spreadcycl_en_");
+    spreadcycl_th_  = getOrDefault(spreadcycl_th_, "spreadcycl_th_");
 
-    fullsteps_      = settings_.getInt("fullsteps_", 200);
-    open_close_     = settings_.getBool("open_close_", true);
-    open_velocity_  = settings_.getFloat("open_velocity_", 3.0);
-    clos_velocity_  = settings_.getFloat("clos_velocity_", 3.0);
-    open_accel_     = settings_.getFloat("open_accel_", 0.5);
-    clos_accel_     = settings_.getFloat("clos_accel_", 0.5);
+    fullsteps_      = getOrDefault(fullsteps_, "fullsteps_");
+    open_close_     = getOrDefault(open_close_, "open_close_");
+    open_velocity_  = getOrDefault(open_velocity_, "open_velocity_");
+    clos_velocity_  = getOrDefault(clos_velocity_, "clos_velocity_");
+    open_accel_     = getOrDefault(open_accel_, "open_accel_");
+    clos_accel_     = getOrDefault(clos_accel_, "clos_accel_");
 
-    encod_max_pos_  = settings_.getInt("encod_max_pos_", 4096 * 20);
+    encod_max_pos_  = getOrDefault(encod_max_pos_, "encod_max_pos_");
     encod_pos_      = 0;
     encoder_.resetCumulativePosition(encod_pos_);
     motor_->setCurrentPosition(positionToSteps(encod_pos_));
     calculateTotalMicrosteps();
+
+    serializeJsonPretty(settings_, Serial);
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
 }
@@ -224,7 +229,7 @@ bool MotorTask::setMin() {
         return false;
     }
     encod_max_pos_ -= encod_pos_;
-    settings_.putInt("encod_max_pos_", encod_max_pos_);
+    // settings_.putInt("encod_max_pos_", encod_max_pos_);
     encod_pos_ = 0;
     encoder_.resetCumulativePosition(0);
     LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
@@ -237,7 +242,7 @@ bool MotorTask::setMax() {
         return false;
     }
     encod_max_pos_ = encod_pos_;
-    settings_.putInt("encod_max_pos_", encod_max_pos_);
+    // settings_.putInt("encod_max_pos_", encod_max_pos_);
     LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }

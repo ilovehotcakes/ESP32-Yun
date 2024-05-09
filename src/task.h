@@ -17,7 +17,7 @@
     Modified by Jason Chen, 2024
 **/
 #include <Arduino.h>
-#include <Preferences.h>
+#include <ArduinoJson.h>
 #include "logger.h"
 #include "command.h"
 
@@ -60,6 +60,20 @@ public:
         assert(result == pdPASS && "Failed to create task");
     }
 
+    TaskHandle_t getTaskHandle() {
+        return task_handle_;
+    }
+
+    QueueHandle_t getQueueHandle() {
+        return queue_;
+    }
+
+protected:
+    const char* name_;
+    Message inbox_;
+    QueueHandle_t queue_;
+    JsonDocument settings_;
+
     bool sendTo(Task *task, Message message, int timeout) {
         LOGI("Sending message from %s to %s", name_, task->name_);
         if (xQueueSend(task->getQueueHandle(), (void*) &message, timeout) != pdTRUE) {
@@ -69,49 +83,30 @@ public:
         return true;
     }
 
-    void setAndSave(int &setting, int value, const char *key) {
+    template<typename t>
+    void setAndSave(t &setting, t value, const char *key) {
         setting = value;
-        settings_.putInt(key, value);
+        settings_[key] = value;
+        serializeJson(settings_, Serial);
+        Serial.println();
     }
 
-    void setAndSave(bool &setting, bool value, const char *key) {
-        setting = value;
-        settings_.putBool(key, value);
+    template<typename t>
+    t getOrDefault(t setting, const char *key) {
+        if (!settings_.containsKey(key)) {
+            settings_[key] = setting;
+        }
+        return settings_[key];
     }
-
-    void setAndSave(float &setting, float_t value, const char *key) {
-        setting = value;
-        settings_.putFloat(key, value);
-    }
-
-    void setAndSave(float &setting, String value, const char *key) {
-        setting = value;
-        settings_.putString(key, value);
-    }
-
-    TaskHandle_t getTaskHandle() {
-        return task_handle_;
-    }
-
-    QueueHandle_t getQueueHandle() {
-        return queue_;
-    }
-
-    Preferences settings_;
-
-protected:
-    const char* const name_;
-    QueueHandle_t queue_;
-    Message inbox_;
 
 private:
-    static void taskFunction(void* params) {
-        T* t = static_cast<T*>(params);
-        t->run();
-    }
-
     uint32_t stack_depth_;
     UBaseType_t priority_;
     TaskHandle_t task_handle_;
     const BaseType_t core_id_;
+
+    static void taskFunction(void* params) {
+        T* t = static_cast<T*>(params);
+        t->run();
+    }
 };
