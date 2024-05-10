@@ -254,12 +254,12 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
 }
 
 
-void WirelessTask::addMotorTask(void *task) {
-    motor_task_ = static_cast<Task*>(task);
+void WirelessTask::addMotorTask(Task *task) {
+    motor_task_ = task;
 }
 
 
-void WirelessTask::addSystemTask(void *task) {
-    system_task_ = static_cast<Task*>(task);
+void WirelessTask::addSystemTask(Task *task) {
+    system_task_ = task;
     system_sleep_timer_ = static_cast<SystemTask*>(task)->getSystemSleepTimer();
 }

@@ -24,6 +24,7 @@ SystemTask::~SystemTask() {
 
 void SystemTask::run() {
     pinMode(BUTTON_PIN, INPUT);
+    pinMode(LED_PIN, OUTPUT);
 
     long xStart = xTaskGetTickCount();
 
@@ -50,10 +51,9 @@ void SystemTask::run() {
                     Serial.println("System sleep");
                     break;
                 case SYSTEM_RESET:
-                    LOGI("System factory reset");
-                    motor_task_->settings_.clear();
-                    // wireless_task_->settings_.clear();
-                    // settings_.clear();
+                    LOGI("System factory reset\n");
+                    LITTLEFS.format();
+                    reset_ = true;
                     ESP.restart();
                     break;
                 case SYSTEM_REBOOT:

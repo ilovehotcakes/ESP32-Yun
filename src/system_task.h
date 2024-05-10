@@ -2,9 +2,7 @@
 #include "task.h"
 
 
-class SystemTask: public Task<SystemTask> {
-    friend class Task<SystemTask>;
-
+class SystemTask: public Task {
 public:
     SystemTask(const uint8_t task_core);
     ~SystemTask();
@@ -21,6 +19,7 @@ private:
     int system_wake_time_ = 5000;      // mSec
     int system_sleep_time_ = 5000000;  // uSec
     bool sleep_enabled_ = false;
+    bool reset_ = false;
 
     void systemSleep(TimerHandle_t timer);
 };

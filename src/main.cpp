@@ -23,9 +23,6 @@ void setup() {
     // Initializing serial output if compiled
     LOG_INIT(115200, LogLevel::INFO);
 
-    // Initializing LED
-    pinMode(LED_PIN, OUTPUT);
-
     // setCpuFrequencyMhz(80);
 
     // The system task performs coordination between all tasks
@@ -33,13 +30,13 @@ void setup() {
     system_task.addMotorTask(&motor_task);
 
     wireless_task.init();
-    wireless_task.addMotorTask(static_cast<void*>(&motor_task));
-    wireless_task.addSystemTask(static_cast<void*>(&system_task));
+    wireless_task.addMotorTask(&motor_task);
+    wireless_task.addSystemTask(&system_task);
 
     // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
     // position. TODO not start motor task on wake to reduce boot time
     motor_task.init();
-    motor_task.addWirelessTask(static_cast<void*>(&wireless_task));
+    motor_task.addWirelessTask(&wireless_task);
     motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // Delete setup/loop task

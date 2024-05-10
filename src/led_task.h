@@ -1,9 +1,7 @@
 #pragma once
 #include "task.h"
 
-class LedTask: public Task<LedTask> {
-    friend class Task<LedTask>;
-
+class LedTask: public Task {
 public:
     LedTask();
     ~LedTask();

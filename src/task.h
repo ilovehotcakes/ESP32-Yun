@@ -1,23 +1,15 @@
 #pragma once
 /**
-    Copyright 2020 Scott Bezek and the splitflap contributors
+    task.h - A base wrapper class to instantiate FreeRTOS tasks with extra shared functions.
+    Author: Jason Chen, 2024
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
-    Modified by Jason Chen, 2024
+    Inspired by SmartKnob by Scott Bezek and
+    https://fjrg76.wordpress.com/2018/05/20/objectifying-task-creation-in-freertos/
 **/
 #include <Arduino.h>
-#include <Preferences.h>
+#include <ArduinoJson.h>
+#include "FS.h"
+#include <LITTLEFS.h>
 #include "logger.h"
 #include "command.h"
 
@@ -33,10 +25,6 @@ struct Message {
 };
 
 
-// Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete
-// implementations should implement a run() method.
-// Inspired by https://fjrg76.wordpress.com/2018/05/23/objectifying-task-creation-in-freertos-ii/
-template<class T>
 class Task {
 public:
     Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
@@ -47,7 +35,7 @@ public:
             priority_ {priority},
             core_id_ {core_id} {
         queue_ = xQueueCreate(queue_length, sizeof(Message));
-        assert(queue_ != NULL && "Failed to create task_queue_");
+        assert(queue_ != NULL && "Failed to create task queue_");
     }
 
     ~Task() {
@@ -60,6 +48,20 @@ public:
         assert(result == pdPASS && "Failed to create task");
     }
 
+    TaskHandle_t getTaskHandle() {
+        return task_handle_;
+    }
+
+    QueueHandle_t getQueueHandle() {
+        return queue_;
+    }
+
+protected:
+    const char* name_;
+    Message inbox_;
+    QueueHandle_t queue_;
+    JsonDocument settings_;
+
     bool sendTo(Task *task, Message message, int timeout) {
         LOGI("Sending message from %s to %s", name_, task->name_);
         if (xQueueSend(task->getQueueHandle(), (void*) &message, timeout) != pdTRUE) {
@@ -69,49 +71,85 @@ public:
         return true;
     }
 
-    void setAndSave(int &setting, int value, const char *key) {
+    template<typename t>
+    void setAndSave(t &setting, t value, const char *key) {
         setting = value;
-        settings_.putInt(key, value);
+        settings_[key] = value;
+        writeToDisk();
     }
 
-    void setAndSave(bool &setting, bool value, const char *key) {
-        setting = value;
-        settings_.putBool(key, value);
+    template<typename t>
+    t getOrDefault(t setting, const char *key) {
+        if (!settings_.containsKey(key)) {
+            settings_[key] = setting;
+        }
+        return settings_[key];
     }
 
-    void setAndSave(float &setting, float_t value, const char *key) {
-        setting = value;
-        settings_.putFloat(key, value);
+    bool writeToDisk() {
+        String temp = String(String("/") + name_ + ".txt");
+        const char *path = temp.c_str();
+
+        LOGI("Writing file to: %s", path);
+        if(!LITTLEFS.begin(true)) {
+            LOGI("Failed to mount LittleFS");
+            return false;
+        }
+
+        File file = LITTLEFS.open(path, FILE_WRITE);
+
+        if(!file) {
+            LOGI("Failed to open file for writing");
+            return false;
+        }
+
+        if(serializeJson(settings_, file)) {
+            LOGI("Successfully written file");
+        } else {
+            LOGI("Failed to write to file");
+        }
+
+        file.close();
+        LITTLEFS.end();
+        return true;
     }
 
-    void setAndSave(float &setting, String value, const char *key) {
-        setting = value;
-        settings_.putString(key, value);
+    bool readFromDisk() {
+        String temp = String(String("/") + name_ + ".txt");
+        const char *path = temp.c_str();
+
+        LOGI("Reading file from: %s", path);
+        if(!LITTLEFS.begin(true)) {
+            LOGI("Failed to mount LittleFS");
+            return false;
+        }
+
+        File file = LITTLEFS.open(path, FILE_READ);
+
+        if(!file) {
+            LOGI("Failed to open file for reading");
+            return false;
+        }
+
+        while(file.available()) {
+            deserializeJson(settings_, file);
+        }
+
+        file.close();
+        LITTLEFS.end();
+        return true;
     }
 
-    TaskHandle_t getTaskHandle() {
-        return task_handle_;
-    }
-
-    QueueHandle_t getQueueHandle() {
-        return queue_;
-    }
-
-    Preferences settings_;
-
-protected:
-    const char* const name_;
-    QueueHandle_t queue_;
-    Message inbox_;
+    virtual void run() = 0;
 
 private:
-    static void taskFunction(void* params) {
-        T* t = static_cast<T*>(params);
-        t->run();
-    }
-
     uint32_t stack_depth_;
     UBaseType_t priority_;
     TaskHandle_t task_handle_;
     const BaseType_t core_id_;
+
+    static void taskFunction(void* params) {
+        Task *t = static_cast<Task*>(params);
+        t->run();
+    }
 };

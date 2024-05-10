@@ -20,14 +20,12 @@
 #endif
 
 
-class WirelessTask : public Task<WirelessTask> {
-    friend class Task<WirelessTask>;
-
+class WirelessTask : public Task {
 public:
     WirelessTask(const uint8_t task_core);
     ~WirelessTask();
-    void addMotorTask(void *task);
-    void addSystemTask(void *task);
+    void addMotorTask(Task *task);
+    void addSystemTask(Task *task);
 
 protected:
     void run();
