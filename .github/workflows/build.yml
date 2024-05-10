@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    runs-on:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
