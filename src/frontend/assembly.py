@@ -16,7 +16,7 @@ def process_html():
 
     assembled_html += ")rawliteral\";"
 
-    with open("./src/index.h", 'w') as output:
+    with open("./include/index.h", 'w') as output:
         output.write(assembled_html)
 
 process_html()
