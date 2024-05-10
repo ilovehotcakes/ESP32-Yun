@@ -24,10 +24,6 @@ jobs:
               source-url: https://github.com/platformio/platform-espressif32/archive/refs/tags/v3.5.0.zip
           libraries: |
             - name: TMCStepper
-	          - name: FastAccelStepper
-	          - name: AS5600
-            -	source-url: https://github.com/me-no-dev/ESPAsyncWebServer.git
-	          - name: ArduinoJson
-            - name: LittleFS_esp32
+              version: 0.7.3
           sketch-paths: |
             - src
