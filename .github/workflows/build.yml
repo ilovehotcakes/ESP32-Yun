@@ -31,5 +31,9 @@ jobs:
               version: 7.0.4
             - name: LittleFS_esp32
               verison: 1.0.6
+            - name: AsyncTCP
+              version: 1.1.1
+            - name: ArduinoOTA
+              version: 1.0
           sketch-paths: |
             - src
