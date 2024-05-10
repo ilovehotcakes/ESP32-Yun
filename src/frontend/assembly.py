@@ -1,4 +1,3 @@
-import os
 def process_html():
     assembled_html = "const char index_html[] = R\"rawliteral("
     with open("./src/frontend/index.html", 'r') as html_file:
