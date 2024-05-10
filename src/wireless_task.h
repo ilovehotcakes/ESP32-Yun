@@ -13,7 +13,7 @@
 #include "task.h"
 #include "system_task.h"
 #include "index.h"
-#include "secrets.h"
+// #include "secrets.h"
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
@@ -35,8 +35,8 @@ private:
     AsyncWebServer webserver;
     AsyncWebSocket websocket;
     String ap_ssid_  = "ESP32 Motorcover";  // SSID (hostname) for AP
-    String ssid_     = secretSSID;          // SSID (hostname) for WiFi
-    String password_ = secretPass;          // Network password for WiFi
+    String ssid_     = "secretSSID";          // SSID (hostname) for WiFi
+    String password_ = "secretPass";          // Network password for WiFi
 
     Task *motor_task_;    // To send messages to motor task
     Task *system_task_;   // To send messages to system task
