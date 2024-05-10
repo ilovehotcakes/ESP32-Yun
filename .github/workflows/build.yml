@@ -24,4 +24,4 @@ jobs:
               source-url: https://github.com/platformio/platform-espressif32.git
               version: 1ebe574
           sketch-paths: |
-            - src/main.cpp
+            - src
