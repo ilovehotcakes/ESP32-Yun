@@ -22,7 +22,7 @@ jobs:
           platforms: |
             - name: esp32:esp32
               source-url: https://github.com/platformio/platform-espressif32/archive/refs/tags/v3.5.0.zip
-          libraries: |
+          libraries: [
             - name: TMCStepper
               version: 0.7.3
 	          - name: FastAccelStepper
@@ -34,5 +34,6 @@ jobs:
               version: 7.0.4
             - name: LittleFS_esp32
               verison: 1.0.6
+            ]
           sketch-paths: |
             - src
