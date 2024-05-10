@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- go to https://base64.guru/converter/encode/image/ico to convert favicon to base64 image -->
+    <link rel="shortcut icon" href="data:image/x-icon;base64,UklGRl4AAABXRUJQVlA4TFIAAAAvOQATADdAEECSeT5D7DLJGgSCEK0zw3hHkAlYrIYc+lfxOkUw//E/JqtVKghkBkUBQDgiiCCECDTRP8XtPT8R/Z8A6DKqpOf1E0oug7T/ip4C" />
+    <title>ESP32 Motorcover</title>
+    <style>
+        /* index.css */
+    </style>
+</head>
+<body>
+    <h1>ESP32 Motorcover</h1>
+    <div>
+        <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
+        <button id="stop-button" class="button" onclick="motorStop(this)">STOP</button>
+        <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
+    </div>
+    
+    <div>
+        <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
+    </div>
+    <script>
+        /* index.js */
+    </script>
+</body>
+</html>

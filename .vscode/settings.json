@@ -40,6 +40,10 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "utility": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "random": "cpp",
+        "bitset": "cpp",
+        "list": "cpp",
+        "regex": "cpp"
     }
 }
