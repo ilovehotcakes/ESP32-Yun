@@ -23,3 +23,5 @@ jobs:
             - name: esp32:esp32
               source-url: https://github.com/platformio/platform-espressif32.git
               version: 1ebe574
+          sketch-paths: |
+            - src
