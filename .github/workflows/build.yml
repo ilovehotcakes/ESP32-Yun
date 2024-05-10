@@ -26,7 +26,8 @@ jobs:
               version: 0.27.5
             - name: AS5600
               version: 0.4.1
-            -	source-url: https://github.com/me-no-dev/ESPAsyncWebServer.git
+            -	name: ESPAsyncWebServer
+              version: 1.2.3
             - name: ArduinoJson
               version: 7.0.4
             - name: LittleFS_esp32
