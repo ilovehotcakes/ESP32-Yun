@@ -114,9 +114,9 @@ window.addEventListener('load', () => {
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
     if (element == '0' || element == '100') {
-        xhr.open('GET', '/motor?position=' + element, true);
+        xhr.open('GET', '/motor?percent=' + element, true);
     } else {
-        xhr.open('GET', '/motor?position=' + percentage_slider_.value, true);
+        xhr.open('GET', '/motor?percent=' + percentage_slider_.value, true);
     }
     xhr.send();
 }
