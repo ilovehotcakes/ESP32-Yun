@@ -12,8 +12,8 @@
 #include <esp_task_wdt.h>
 #include "task.h"
 #include "system_task.h"
-#include "../include/index.h"
-#include "../include/secrets.h"
+#include "index.h"
+#include "secrets.h"
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
