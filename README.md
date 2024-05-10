@@ -5,6 +5,8 @@ ESP32 motorcover is an affordable, reliable, and user-friendly wireless stepper 
 
 Under active development. **WARNING:** requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
 
+[![PlatformIO CI](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml/badge.svg)](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml)
+
 
 ## Design
 In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the **[[demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)]** for full demonstration.

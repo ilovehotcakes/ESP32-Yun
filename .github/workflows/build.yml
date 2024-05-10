@@ -1,16 +1,16 @@
 name: PlatformIO CI
 
-on: [push]
-  # push:
-  #   paths: 'src/**'
+on:
+  push:
+    paths: 'src/**'
 
 jobs:
   build:
-    runs-on: windows-latest
-    # runs-on: ${{ matrix.os }}
-    # strategy:
-    #   matrix:
-    #     os: [ubuntu-latest, windows-latest]
+    runs-on:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout repository
