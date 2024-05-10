@@ -23,9 +23,6 @@ void setup() {
     // Initializing serial output if compiled
     LOG_INIT(115200, LogLevel::INFO);
 
-    // Initializing LED
-    pinMode(LED_PIN, OUTPUT);
-
     // setCpuFrequencyMhz(80);
 
     // The system task performs coordination between all tasks
