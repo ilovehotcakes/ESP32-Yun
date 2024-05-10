@@ -26,4 +26,4 @@ jobs:
             - name: TMCStepper
               version: 0.7.3
           sketch-paths: |
-            - src
+            - ./
