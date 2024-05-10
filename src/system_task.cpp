@@ -53,6 +53,7 @@ void SystemTask::run() {
                 case SYSTEM_RESET:
                     LOGI("System factory reset\n");
                     LITTLEFS.format();
+                    reset_ = true;
                     ESP.restart();
                     break;
                 case SYSTEM_REBOOT:

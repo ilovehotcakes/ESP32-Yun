@@ -1,20 +1,10 @@
 #pragma once
 /**
-    Copyright 2020 Scott Bezek and the splitflap contributors
+    task.h - A base wrapper class to instantiate FreeRTOS tasks with extra shared functions.
+    Author: Jason Chen, 2024
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
-    Modified by Jason Chen, 2024
+    Inspired by SmartKnob by Scott Bezek and
+    https://fjrg76.wordpress.com/2018/05/20/objectifying-task-creation-in-freertos/
 **/
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -35,10 +25,6 @@ struct Message {
 };
 
 
-// Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete
-// implementations should implement a run() method.
-// Inspired by https://fjrg76.wordpress.com/2018/05/23/objectifying-task-creation-in-freertos-ii/
-template<class T>
 class Task {
 public:
     Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
@@ -49,7 +35,7 @@ public:
             priority_ {priority},
             core_id_ {core_id} {
         queue_ = xQueueCreate(queue_length, sizeof(Message));
-        assert(queue_ != NULL && "Failed to create task_queue_");
+        assert(queue_ != NULL && "Failed to create task queue_");
     }
 
     ~Task() {
@@ -100,21 +86,21 @@ protected:
         return settings_[key];
     }
 
-    void writeToDisk() {
+    bool writeToDisk() {
         String temp = String(String("/") + name_ + ".txt");
         const char *path = temp.c_str();
 
         LOGI("Writing file to: %s", path);
         if(!LITTLEFS.begin(true)) {
-            LOGI("LittleFS mount failed");
-            return;
+            LOGI("Failed to mount LittleFS");
+            return false;
         }
 
         File file = LITTLEFS.open(path, FILE_WRITE);
 
         if(!file) {
             LOGI("Failed to open file for writing");
-            return;
+            return false;
         }
 
         if(serializeJson(settings_, file)) {
@@ -125,26 +111,24 @@ protected:
 
         file.close();
         LITTLEFS.end();
+        return true;
     }
 
-    void readFromDisk() {
+    bool readFromDisk() {
         String temp = String(String("/") + name_ + ".txt");
         const char *path = temp.c_str();
 
         LOGI("Reading file from: %s", path);
         if(!LITTLEFS.begin(true)) {
-            LOGI("LittleFS mount failed");
-            return;
+            LOGI("Failed to mount LittleFS");
+            return false;
         }
 
         File file = LITTLEFS.open(path, FILE_READ);
 
         if(!file) {
             LOGI("Failed to open file for reading");
-            file.close();
-            LITTLEFS.end();
-            writeToDisk();
-            return;
+            return false;
         }
 
         while(file.available()) {
@@ -153,7 +137,10 @@ protected:
 
         file.close();
         LITTLEFS.end();
+        return true;
     }
+
+    virtual void run() = 0;
 
 private:
     uint32_t stack_depth_;
@@ -162,7 +149,7 @@ private:
     const BaseType_t core_id_;
 
     static void taskFunction(void* params) {
-        T* t = static_cast<T*>(params);
+        Task *t = static_cast<Task*>(params);
         t->run();
     }
 };

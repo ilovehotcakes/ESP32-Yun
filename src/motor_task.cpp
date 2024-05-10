@@ -36,9 +36,9 @@ void MotorTask::run() {
     LOGI("Encoder automatic gain control: %d/128", encoder_.readAGC());  // 56-68 is preferable
 
     loadSettings();
-    int start;
+    // int start;
     while (1) {
-        start = micros();
+        // start = micros();
         encod_pos_ = encoder_.getCumulativePosition();
         motor_->setCurrentPosition(positionToSteps(encod_pos_));
 
@@ -157,7 +157,8 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 
 void MotorTask::loadSettings() {
-    readFromDisk();
+    bool load = readFromDisk();
+    serializeJsonPretty(settings_, Serial);
 
     open_current_   = getOrDefault(open_current_, "open_current_");
     clos_current_   = getOrDefault(clos_current_, "clos_current_");
@@ -177,12 +178,13 @@ void MotorTask::loadSettings() {
     clos_accel_     = getOrDefault(clos_accel_, "clos_accel_");
 
     encod_max_pos_  = getOrDefault(encod_max_pos_, "encod_max_pos_");
-    encod_pos_      = 0;
     encoder_.resetCumulativePosition(encod_pos_);
     motor_->setCurrentPosition(positionToSteps(encod_pos_));
     calculateTotalMicrosteps();
 
-    // serializeJsonPretty(settings_, Serial);
+    if (!load) {
+        writeToDisk();
+    }
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
 }
@@ -227,8 +229,7 @@ bool MotorTask::setMin() {
     if (encod_pos_ >= encod_max_pos_) {
         return false;
     }
-    encod_max_pos_ -= encod_pos_;
-    // settings_.putInt("encod_max_pos_", encod_max_pos_);
+    setAndSave(encod_max_pos_, encod_max_pos_ - encod_pos_, "encod_max_pos_");
     encod_pos_ = 0;
     encoder_.resetCumulativePosition(0);
     LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
@@ -240,8 +241,7 @@ bool MotorTask::setMax() {
     if (encod_pos_ < 0) {
         return false;
     }
-    encod_max_pos_ = encod_pos_;
-    // settings_.putInt("encod_max_pos_", encod_max_pos_);
+    setAndSave(encod_max_pos_, encod_pos_, "encod_max_pos_");
     LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;  // TODO: check new max_pos_
 }
@@ -388,8 +388,8 @@ void MotorTask::driverStandby() {
 }
 
 
-void MotorTask::addWirelessTask(void *task) {
-    wireless_task_ = static_cast<Task*>(task);
+void MotorTask::addWirelessTask(Task *task) {
+    wireless_task_ = task;
 }
 
 

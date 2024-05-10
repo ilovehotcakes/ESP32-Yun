@@ -2,9 +2,7 @@
 #include "task.h"
 
 
-class SystemTask: public Task<SystemTask> {
-    friend class Task<SystemTask>;
-
+class SystemTask: public Task {
 public:
     SystemTask(const uint8_t task_core);
     ~SystemTask();

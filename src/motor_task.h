@@ -15,13 +15,11 @@
 #include "task.h"
 
 
-class MotorTask : public Task<MotorTask> {
-    friend class Task<MotorTask>;
-
+class MotorTask : public Task {
 public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
-    void addWirelessTask(void *task);
+    void addWirelessTask(Task *task);
     void addSystemSleepTimer(xTimerHandle timer);
 
 protected:
