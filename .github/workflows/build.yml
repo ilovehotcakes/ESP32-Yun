@@ -1,6 +1,8 @@
-name: Arduino Build
+name: PlatformIO CI
 
 on: [push]
+  # push:
+  #   paths: 'src/**'
 
 jobs:
   build:
@@ -14,26 +16,22 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      
-      - name: Arduino build
-        uses: arduino/compile-sketches@v1
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
         with:
-          fqbn: "esp32:esp32:esp32"
-          libraries: |
-            - name: TMCStepper
-              version: 0.7.3
-            - name: FastAccelStepper
-              version: 0.27.5
-            - name: AS5600
-              version: 0.4.1
-            - source-url: https://github.com/me-no-dev/ESPAsyncWebServer.git
-            - name: ArduinoJson
-              version: 7.0.4
-            - name: LittleFS_esp32
-              verison: 1.0.6
-            - name: AsyncTCP
-              version: 1.1.1
-            - name: ArduinoOTA
-              version: 1.0.0
-          sketch-paths: |
-            - src
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Run PlatformIO
+        run: pio run
