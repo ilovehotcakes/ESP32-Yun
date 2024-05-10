@@ -19,9 +19,6 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: "esp32:esp32:esp32"
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://github.com/platformio/platform-espressif32/archive/refs/tags/v3.5.0.zip
           libraries: |
             - name: TMCStepper
               version: 0.7.3
