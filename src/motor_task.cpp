@@ -135,7 +135,7 @@ void MotorTask::run() {
         }
 
         if (last_updated_percent_ == getPercent()) {
-            Serial.println(micros() - start);
+            // Serial.println(micros() - start);
             continue;
         }
 
@@ -157,8 +157,7 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 
 void MotorTask::loadSettings() {
-    // Load settings from file
-    // clearSettings deletes file
+    readFromDisk();
 
     open_current_   = getOrDefault(open_current_, "open_current_");
     clos_current_   = getOrDefault(clos_current_, "clos_current_");
@@ -183,7 +182,7 @@ void MotorTask::loadSettings() {
     motor_->setCurrentPosition(positionToSteps(encod_pos_));
     calculateTotalMicrosteps();
 
-    serializeJsonPretty(settings_, Serial);
+    // serializeJsonPretty(settings_, Serial);
 
     LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
 }

@@ -18,6 +18,8 @@
 **/
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "FS.h"
+#include <LITTLEFS.h>
 #include "logger.h"
 #include "command.h"
 
@@ -87,8 +89,7 @@ protected:
     void setAndSave(t &setting, t value, const char *key) {
         setting = value;
         settings_[key] = value;
-        serializeJson(settings_, Serial);
-        Serial.println();
+        writeToDisk();
     }
 
     template<typename t>
@@ -97,6 +98,61 @@ protected:
             settings_[key] = setting;
         }
         return settings_[key];
+    }
+
+    void writeToDisk() {
+        String temp = String(String("/") + name_ + ".txt");
+        const char *path = temp.c_str();
+
+        LOGI("Writing file to: %s", path);
+        if(!LITTLEFS.begin(true)) {
+            LOGI("LittleFS mount failed");
+            return;
+        }
+
+        File file = LITTLEFS.open(path, FILE_WRITE);
+
+        if(!file) {
+            LOGI("Failed to open file for writing");
+            return;
+        }
+
+        if(serializeJson(settings_, file)) {
+            LOGI("Successfully written file");
+        } else {
+            LOGI("Failed to write to file");
+        }
+
+        file.close();
+        LITTLEFS.end();
+    }
+
+    void readFromDisk() {
+        String temp = String(String("/") + name_ + ".txt");
+        const char *path = temp.c_str();
+
+        LOGI("Reading file from: %s", path);
+        if(!LITTLEFS.begin(true)) {
+            LOGI("LittleFS mount failed");
+            return;
+        }
+
+        File file = LITTLEFS.open(path, FILE_READ);
+
+        if(!file) {
+            LOGI("Failed to open file for reading");
+            file.close();
+            LITTLEFS.end();
+            writeToDisk();
+            return;
+        }
+
+        while(file.available()) {
+            deserializeJson(settings_, file);
+        }
+
+        file.close();
+        LITTLEFS.end();
     }
 
 private:
