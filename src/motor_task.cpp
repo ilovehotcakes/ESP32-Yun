@@ -11,7 +11,7 @@ void MotorTask::run() {
     pinMode(STBY_PIN, OUTPUT);
     pinMode(DIAG_PIN, INPUT);
 
-    // Using UART to read/write data to/from TMC2209 stepper motor driver
+    // Using UART(Serial1) to read/write data to/from TMC2209 stepper motor driver
     Serial1.begin(115200, SERIAL_8N1, RXD1, TXD1);
     while(!Serial1);
 
@@ -40,7 +40,7 @@ void MotorTask::run() {
     while (1) {
         // start = micros();
         encod_pos_ = encoder_.getCumulativePosition();
-        motor_->setCurrentPosition(positionToSteps(encod_pos_));
+        motor_->setCurrentPosition(positionToStep(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
             LOGI("MotorTask received message: %s", inbox_.toString().c_str());
@@ -50,6 +50,15 @@ void MotorTask::run() {
                     break;
                 case MOTOR_PERECENT:
                     moveToPercent(inbox_.parameter);
+                    break;
+                case MOTOR_STEP:
+                    moveToStep(inbox_.parameter);
+                    break;
+                case MOTOR_FORWARD:
+                    run(true);
+                    break;
+                case MOTOR_BACKWARD:
+                    run(false);
                     break;
                 case MOTOR_SET_MAX:
                     setMax();
@@ -99,11 +108,11 @@ void MotorTask::run() {
                     break;
                 case MOTOR_MICROSTEPS:
                     setAndSave(microsteps_, inbox_.parameter, "microsteps_");
-                    calculateTotalMicrosteps();
+                    calculateMicrosteps();
                     break;
                 case MOTOR_FULLSTEPS:
                     setAndSave(fullsteps_, inbox_.parameter, "fullsteps_");
-                    calculateTotalMicrosteps();
+                    calculateMicrosteps();
                     break;
                 case MOTOR_STALLGUARD:
                     setAndSave(stallguard_en_, inbox_.parameter, "stallguard_en_");
@@ -158,14 +167,13 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 
 void MotorTask::loadSettings() {
     bool load = readFromDisk();
-    serializeJsonPretty(settings_, Serial);
 
     open_current_   = getOrDefault(open_current_, "open_current_");
     clos_current_   = getOrDefault(clos_current_, "clos_current_");
     direction_      = getOrDefault(direction_, "direction_");
     microsteps_     = getOrDefault(microsteps_, "microsteps_");
     stallguard_en_  = getOrDefault(stallguard_en_, "stallguard_en_");
-    // coolstep_thrs_
+    // coolstep_thrs_  = getOrDefault(stallguard_cs_, "stallguard_cs_");
     stallguard_th_  = getOrDefault(stallguard_th_, "stallguard_th_");
     spreadcycl_en_  = getOrDefault(spreadcycl_en_, "spreadcycl_en_");
     spreadcycl_th_  = getOrDefault(spreadcycl_th_, "spreadcycl_th_");
@@ -179,8 +187,7 @@ void MotorTask::loadSettings() {
 
     encod_max_pos_  = getOrDefault(encod_max_pos_, "encod_max_pos_");
     encoder_.resetCumulativePosition(encod_pos_);
-    motor_->setCurrentPosition(positionToSteps(encod_pos_));
-    calculateTotalMicrosteps();
+    calculateMicrosteps();
 
     if (!load) {
         writeToDisk();
@@ -190,13 +197,13 @@ void MotorTask::loadSettings() {
 }
 
 
-void MotorTask::moveToPercent(int target) {
+void MotorTask::prepareToMove(bool check, bool direction) {
     if (motor_->isRunning()) {
         stop();
         return;
     }
 
-    if (target == getPercent()) {
+    if (check) {
         return;
     }
 
@@ -205,15 +212,37 @@ void MotorTask::moveToPercent(int target) {
         vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
-    if (target > getPercent() && open_close_) {
+    if (direction && open_close_) {
         updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     } else {
         updateMotorSettings(open_velocity_, open_accel_, open_current_);
     }
+}
 
-    int32_t new_position = static_cast<int>(target * encod_max_pos_ / 100.0 + 0.5);
-    motor_->moveTo(positionToSteps(new_position));
 
+void MotorTask::run(bool direction) {
+    prepareToMove(false, direction);
+    if (direction) {
+        motor_->runForward();
+        LOGI("Motor running forward");
+    } else {
+        motor_->runBackward();
+        LOGI("Motor running backward");
+    }
+}
+
+
+void MotorTask::moveToStep(int target_step) {
+    int current_step = positionToStep(encod_pos_);
+    prepareToMove(target_step == current_step, target_step > current_step);
+    motor_->moveTo(target_step);
+}
+
+
+void MotorTask::moveToPercent(int target_percent) {
+    prepareToMove(target_percent == getPercent(), target_percent > getPercent());
+    int32_t new_position = static_cast<int32_t>(target_percent * encod_max_pos_ / 100.0 + 0.5);
+    motor_->moveTo(positionToStep(new_position));
     LOGI("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
 }
 
@@ -230,24 +259,23 @@ bool MotorTask::setMin() {
         return false;
     }
     setAndSave(encod_max_pos_, encod_max_pos_ - encod_pos_, "encod_max_pos_");
-    encod_pos_ = 0;
     encoder_.resetCumulativePosition(0);
     LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
-    return true;  // TODO: check new max_pos_
+    return true;
 }
 
 
 bool MotorTask::setMax() {
-    if (encod_pos_ < 0) {
+    if (encod_pos_ <= 0) {
         return false;
     }
     setAndSave(encod_max_pos_, encod_pos_, "encod_max_pos_");
     LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
-    return true;  // TODO: check new max_pos_
+    return true;
 }
 
 
-void MotorTask::calculateTotalMicrosteps() {
+void MotorTask::calculateMicrosteps() {
     microsteps_per_rev_ = fullsteps_ * microsteps_;
     motor_encoder_ratio_ = microsteps_per_rev_ / 4096.0;
     encoder_motor_ratio_ = 4096.0 / microsteps_per_rev_;
@@ -260,7 +288,7 @@ inline int MotorTask::getPercent() {
 }
 
 
-inline int MotorTask::positionToSteps(int encoder_position) {
+inline int MotorTask::positionToStep(int encoder_position) {
     return static_cast<int>(motor_encoder_ratio_ * encoder_position + 0.5);
 }
 
@@ -290,7 +318,6 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
     // Number of microsteps [0, 2, 4, 8, 16, 32, 64, 126, 256] per full step
     // Set MRES register via UART
     driver_.microsteps(microsteps_);
-    calculateTotalMicrosteps();
 
     // 1=SpreadCycle only; 0=StealthChop PWM mode (below velocity threshold) + SpreadCycle (above
     // velocity threshold); set register TPWMTHRS to determine the velocity threshold

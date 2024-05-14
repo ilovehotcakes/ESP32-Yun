@@ -1,17 +1,20 @@
 #pragma once
 /**
-    motor_task.h - A class that contains all functions to control a bipolar stepper motor.
+    motor_task.h - A class that contains all functions to control a two-phase bipolar steppermotor.
     Author: Jason Chen, 2022
 
     To control the stepper motor, send PWM signals to the stepper motor driver, TMC2209. To operate
     the driver: (1) start the driver by taking it out of STANDBY), and (2) ENABLE the motor coils.
     Both are done automatically.
+
+    Keep track. Absolute position (1) position refers to the encoder's position, 4096 per revolution; (2) steps refers
+    to stepper motor microsteps; (3) percentage refers to the overall percentage.
 **/
 #include <HardwareSerial.h>       // Hardwareserial for uart
+#include <FunctionalInterrupt.h>  // std:bind()
 #include <TMCStepper.h>
 #include <FastAccelStepper.h>
 #include <AS5600.h>
-#include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
 
 
@@ -77,14 +80,20 @@ private:
 
     void stallguardInterrupt();
     void loadSettings();  // Load motor settings from flash
-    void moveToPercent(int percent);
+    /*
+        run, moveToStep, moveToPercent all call move which checks if motor is running and sets proper motor settings, and starts the driver
+    */
+    void prepareToMove(bool check, bool direction);
+    void run(bool direction);
+    void moveToStep(int target_step);
+    void moveToPercent(int target_percent);
     void stop();
     bool setMin();
     bool setMax();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
-    void calculateTotalMicrosteps();
+    void calculateMicrosteps();
     inline int getPercent();
-    inline int positionToSteps(int encoder_position);
+    inline int positionToStep(int encoder_position);
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
     // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
     // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32

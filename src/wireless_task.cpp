@@ -112,12 +112,16 @@ void WirelessTask::routing() {
             return;
         }
         if (httpRequestHandler(request, hash(MOTOR_PERECENT), [=](int val) -> bool { return val > 100 || val < 0; },
-                                  "position=0~100 (%); 0 to open; 100 to close", motor_task_)
+                                  "percent=0~100 (%); 0 to open; 100 to close", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_STEP), [=](int val) -> bool { return val < 0; },
+                                  "step>=0", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_STOP), [=](int val) -> bool { return false; }, "", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_FORWARD), [=](int val) -> bool { return false; }, "", motor_task_)
+            || httpRequestHandler(request, hash(MOTOR_BACKWARD), [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_SET_MIN), [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_SET_MAX), [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_STDBY), [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "standby=0 | 1; 1 to standby motor driver; 0 to wake", motor_task_)
+                                  "standby=0 | 1; 1 to standby motor driver; 0 to start", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_OPENCLOSE), [=](int val) -> bool { return val != 0 && val != 1; },
                                   "open-close=0 | 1; 0 to keep opening/closing settings the same", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_VELOCITY), [=](float val) -> bool { return val <= 0.0; },
@@ -147,7 +151,7 @@ void WirelessTask::routing() {
                                                                                     && val != 256; },
                                   "microsteps=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_FULLSTEPS), [=](int val) -> bool { return val <= 0; },
-                                  "full-step-per-rev has to be greater than 0", motor_task_)
+                                  "full-steps-per-rev has to be greater than 0", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_STALLGUARD), [=](int val) -> bool { return val != 0 && val != 1; },
                                   "stallguard=0 | 1; 0 to disable; 1 to enable", motor_task_)
             || httpRequestHandler(request, hash(MOTOR_TCOOLTHRS), [=](int val) -> bool { return val < 0 || val > 1048575; },

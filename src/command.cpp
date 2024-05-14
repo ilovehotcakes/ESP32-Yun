@@ -1,12 +1,15 @@
 #include "command.h"
 
 
-Command hash (String command) {
+Command hash(String command) {
     if (command == "update-position") return UPDATE_POSITION;
     else if (command == "error") return ERROR_COMMAND;
 
-    else if (command == "percent") return MOTOR_PERECENT;
     else if (command == "stop") return MOTOR_STOP;
+    else if (command == "percent") return MOTOR_PERECENT;
+    else if (command == "step") return MOTOR_STEP;
+    else if (command == "forward") return MOTOR_FORWARD;
+    else if (command == "backward") return MOTOR_BACKWARD;
     else if (command == "set-min") return MOTOR_SET_MIN;
     else if (command == "set-max") return MOTOR_SET_MAX;
     else if (command == "standby") return MOTOR_STDBY;
@@ -37,12 +40,15 @@ Command hash (String command) {
 }
 
 
-String hash (Command command) {
+String hash(Command command) {
     if (command == UPDATE_POSITION) return "update-position";
     else if (command == ERROR_COMMAND) return "error";
 
-    else if (command == MOTOR_PERECENT) return "percent";
     else if (command == MOTOR_STOP) return "stop";
+    else if (command == MOTOR_PERECENT) return "percent";
+    else if (command == MOTOR_STEP) return "step";
+    else if (command == MOTOR_FORWARD) return "forward";
+    else if (command == MOTOR_BACKWARD) return "backward";
     else if (command == MOTOR_SET_MIN) return "set-min";
     else if (command == MOTOR_SET_MAX) return "set-max";
     else if (command == MOTOR_STDBY) return "standby";
@@ -75,7 +81,7 @@ String hash (Command command) {
 
 String listMotorCommands() {
     String list = "";
-    for (int command = MOTOR_PERECENT; command <= MOTOR_TPWMTHRS; command++) {
+    for (int command = MOTOR_STOP; command <= MOTOR_TPWMTHRS; command++) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);
