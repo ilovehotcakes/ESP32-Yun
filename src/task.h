@@ -56,6 +56,10 @@ public:
         return queue_;
     }
 
+    JsonDocument getSettings() {
+        return settings_;
+    }
+
 protected:
     const char* name_;
     Message inbox_;

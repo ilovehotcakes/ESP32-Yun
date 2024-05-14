@@ -166,12 +166,14 @@ void WirelessTask::routing() {
         request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listMotorCommands());
     });
 
-    webserver.on("/json", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        String json;
-        settings_["password"] = "1234567";
-        // Aggregate system, wireless, and motor settings
-        serializeJson(settings_, json);
-        request->send(200, "application/json", json);
+    webserver.on("/settings", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        JsonDocument all_settings;
+        all_settings["system"] = system_task_->getSettings();
+        all_settings["wireless"] = getSettings();
+        all_settings["motor"] = motor_task_->getSettings();
+        String result;
+        serializeJson(all_settings, result);
+        request->send(200, "application/json", result);
     });
 
     webserver.onNotFound([=](AsyncWebServerRequest *request) {
