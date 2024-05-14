@@ -1,14 +1,17 @@
 #pragma once
 /**
-    motor_task.h - A class that contains all functions to control a two-phase bipolar steppermotor.
+    motor_task.h - A class that contains all functions to control a two-phase bipolar stepper motor.
     Author: Jason Chen, 2022
 
-    To control the stepper motor, send PWM signals to the stepper motor driver, TMC2209. To operate
-    the driver: (1) start the driver by taking it out of STANDBY), and (2) ENABLE the motor coils.
-    Both are done automatically.
+    The MCU sends PWM signals to the stepper motor driver, TMC2209, to control the current to the
+    motor and thereby moving the motor. Higher voltages and current generate more torque and higher
+    RPMs. To operate the driver: (1) start the driver by taking it out of STANDBY, and (2) ENABLE
+    the motor coils. Both are done automatically before moving.
 
-    Keep track. Absolute position (1) position refers to the encoder's position, 4096 per revolution; (2) steps refers
-    to stepper motor microsteps; (3) percentage refers to the overall percentage.
+    The position of the system is absolute and it is translated between 3 different methods:
+        (1) "Position" refers to the encoder's position, main method of internal position tracking
+        (2) "Steps" refers to the motor's position, used for moving the motor
+        (3) "Percentage" refers to the overall percentage, used by UI
 **/
 #include <HardwareSerial.h>       // Hardwareserial for uart
 #include <FunctionalInterrupt.h>  // std:bind()
@@ -80,18 +83,15 @@ private:
 
     void stallguardInterrupt();
     void loadSettings();  // Load motor settings from flash
-    /*
-        run, moveToStep, moveToPercent all call move which checks if motor is running and sets proper motor settings, and starts the driver
-    */
     void prepareToMove(bool check, bool direction);
-    void run(bool direction);
+    void move(bool direction);
     void moveToStep(int target_step);
     void moveToPercent(int target_percent);
     void stop();
     bool setMin();
     bool setMax();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
-    void calculateMicrosteps();
+    void calculateTotalSteps();
     inline int getPercent();
     inline int positionToStep(int encoder_position);
     // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09

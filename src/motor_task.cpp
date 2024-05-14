@@ -55,10 +55,10 @@ void MotorTask::run() {
                     moveToStep(inbox_.parameter);
                     break;
                 case MOTOR_FORWARD:
-                    run(true);
+                    move(true);
                     break;
                 case MOTOR_BACKWARD:
-                    run(false);
+                    move(false);
                     break;
                 case MOTOR_SET_MAX:
                     setMax();
@@ -108,11 +108,11 @@ void MotorTask::run() {
                     break;
                 case MOTOR_MICROSTEPS:
                     setAndSave(microsteps_, inbox_.parameter, "microsteps_");
-                    calculateMicrosteps();
+                    calculateTotalSteps();
                     break;
                 case MOTOR_FULLSTEPS:
                     setAndSave(fullsteps_, inbox_.parameter, "fullsteps_");
-                    calculateMicrosteps();
+                    calculateTotalSteps();
                     break;
                 case MOTOR_STALLGUARD:
                     setAndSave(stallguard_en_, inbox_.parameter, "stallguard_en_");
@@ -187,7 +187,7 @@ void MotorTask::loadSettings() {
 
     encod_max_pos_  = getOrDefault(encod_max_pos_, "encod_max_pos_");
     encoder_.resetCumulativePosition(encod_pos_);
-    calculateMicrosteps();
+    calculateTotalSteps();
 
     if (!load) {
         writeToDisk();
@@ -220,7 +220,7 @@ void MotorTask::prepareToMove(bool check, bool direction) {
 }
 
 
-void MotorTask::run(bool direction) {
+void MotorTask::move(bool direction) {
     prepareToMove(false, direction);
     if (direction) {
         motor_->runForward();
@@ -275,7 +275,7 @@ bool MotorTask::setMax() {
 }
 
 
-void MotorTask::calculateMicrosteps() {
+void MotorTask::calculateTotalSteps() {
     microsteps_per_rev_ = fullsteps_ * microsteps_;
     motor_encoder_ratio_ = microsteps_per_rev_ / 4096.0;
     encoder_motor_ratio_ = 4096.0 / microsteps_per_rev_;
