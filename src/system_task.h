@@ -19,7 +19,7 @@ private:
     int system_wake_time_ = 5000;      // mSec
     int system_sleep_time_ = 5000000;  // uSec
     bool sleep_enabled_ = false;
-    // bool reset_ = false;
+    bool reset_ = false;
     // String serial_ = "abc";
 
     void systemSleep(TimerHandle_t timer);
