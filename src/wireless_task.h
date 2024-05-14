@@ -42,6 +42,7 @@ private:
     Task *system_task_;   // To send messages to system task
     TimerHandle_t system_sleep_timer_;  // Prevent system sleeping before processing incoming messages
     String motor_position_;
+    // String mode_ = "AP";
 
     void connectWifi();
     void routing();

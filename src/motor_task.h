@@ -6,10 +6,10 @@
     The MCU sends PWM signals to the stepper motor driver, TMC2209, to control the current to the
     motor and thereby moving the motor. Higher voltages and current generate more torque and higher
     RPMs. To operate the driver: (1) start the driver by taking it out of STANDBY, and (2) ENABLE
-    the motor coils. Both are done automatically before moving.
+    the motor coils. Both are done automatically.
 
     The position of the system is absolute and it is translated between 3 different methods:
-        (1) "Position" refers to the encoder's position, main method of internal position tracking
+        (1) "Position" refers to the encoder's position, used for internal position tracking
         (2) "Steps" refers to the motor's position, used for moving the motor
         (3) "Percentage" refers to the overall percentage, used by UI
 **/
@@ -36,35 +36,36 @@ private:
     // registers for setting speed, acceleration, current, etc.
     TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
-    // User adjustable TMC2209 motor driver settings, updated to registers via UART
-    int open_current_  = 200;
-    int clos_current_  = 75;
-    int direction_     = false;
-    int microsteps_    = 16;
-    int stallguard_en_ = true;
-    int coolstep_thrs_ = 0;
-    int stallguard_th_ = 10;
-    int spreadcycl_en_ = false;
-    int spreadcycl_th_ = 33;
+    // User adjustable TMC2209 motor driver settings, updated to driver registers via UART
+    int   driver_stdby_  = false;
+    int   open_close_    = true;  // If true, opeining/closing settings should be different
+    float open_velocity_ = 3.0;
+    float clos_velocity_ = 3.0;
+    float open_accel_    = 0.5;
+    float clos_accel_    = 0.5;
+    int   open_current_  = 200;
+    int   clos_current_  = 75;
+    int   direction_     = false;
+    int   microsteps_    = 16;
+    int   full_steps_    = 200;   // NEMA motors have 200 full steps/rev
+    int   stallguard_en_ = true;
+    int   coolstep_thrs_ = 0;
+    int   stallguard_th_ = 10;
+    int   spreadcycl_en_ = false;
+    int   spreadcycl_th_ = 33;
 
     // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
     // and stop/deccelerate the stepper motor.
     FastAccelStepperEngine engine_ = FastAccelStepperEngine();
     FastAccelStepper *motor_       = NULL;
 
-    // User adjustable motor settings/states. Managed by MotorTask.
-    int   fullsteps_     = 200;   // NEMA motors have 200 full steps/rev
-    int   driver_stdby_  = false;
-    int   open_close_    = true;  // If opeining/closing settings should be different
-    float open_velocity_ = 3.0;
-    float clos_velocity_ = 3.0;
-    float open_accel_    = 0.5;
-    float clos_accel_    = 0.5;
-
-    // Not adjustable motor states.
+    // None user adjustable motor states. Managed by MotorTask.
     int8_t  last_updated_percent_ = -100;
     volatile bool stalled_        = false;
     portMUX_TYPE stalled_mux_     = portMUX_INITIALIZER_UNLOCKED;
+    // bool motor_opening = false;
+    // bool motor_closing = false;
+    // bool motor_move_completed = false;
 
     // Rotary encoder for keeping track of motor's actual position because motor could slip and
     // cause the position to be incorrect. A closed-loop system.
@@ -74,9 +75,9 @@ private:
     // motor's position and percentage.
     int32_t encod_pos_         = 0;
     int32_t encod_max_pos_     = 4096 * 20;
-    int microsteps_per_rev_    = fullsteps_ * microsteps_;
-    float motor_encoder_ratio_ = microsteps_per_rev_ / 4096.0;
-    float encoder_motor_ratio_ = 4096.0 / microsteps_per_rev_;
+    int   total_steps_         = full_steps_ * microsteps_;
+    float motor_encoder_ratio_ = total_steps_ / 4096.0;
+    float encoder_motor_ratio_ = 4096.0 / total_steps_;
 
     Task *wireless_task_;              // To receive messages from wireless task
     xTimerHandle system_sleep_timer_;  // To prevent system from sleeping before motor stops

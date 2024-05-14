@@ -137,10 +137,12 @@ window.addEventListener('load', () => {
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-    if (/android/i.test(userAgent) || /iphone/i.test(userAgent) || /ipad/i.test(userAgent)) {
+    // Is mobile device
+    if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
         return true;
     }
 
+    // Is desktop device
     $('.mobile-only-elements').hide();
     $('.desktop-only-elements').show();
     return false;

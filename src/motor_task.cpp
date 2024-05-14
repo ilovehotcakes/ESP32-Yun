@@ -70,37 +70,37 @@ void MotorTask::run() {
                     if (inbox_.parameter == 1) driverStandby();
                     else driverStartup();
                     break;
-                case MOTOR_OPENCLOSE:
+                case MOTOR_OPEN_CLOSE:
                     setAndSave(open_close_, inbox_.parameter, "open_close_");
                     break;
-                case MOTOR_VELOCITY:
+                case MOTOR_SPEED:
                     setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_OPVELOCITY:
+                case MOTOR_OP_SPEED:
                     if (open_close_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
-                case MOTOR_CLVELOCITY:
+                case MOTOR_CL_SPEED:
                     if (open_close_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_ACCEL:
                     setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
-                case MOTOR_OPACCEL:
+                case MOTOR_OP_ACCEL:
                     if (open_close_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
-                case MOTOR_CLACCEL:
+                case MOTOR_CL_ACCEL:
                     if (open_close_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
                     setAndSave(open_current_, inbox_.parameter, "open_current_");
                     setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
-                case MOTOR_OPCURRENT:
+                case MOTOR_OP_CURRENT:
                     if (open_close_) setAndSave(open_current_, inbox_.parameter, "open_current_");
                     break;
-                case MOTOR_CLCURRENT:
+                case MOTOR_CL_CURRENT:
                     if (open_close_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
@@ -110,8 +110,8 @@ void MotorTask::run() {
                     setAndSave(microsteps_, inbox_.parameter, "microsteps_");
                     calculateTotalSteps();
                     break;
-                case MOTOR_FULLSTEPS:
-                    setAndSave(fullsteps_, inbox_.parameter, "fullsteps_");
+                case MOTOR_FULL_STEPS:
+                    setAndSave(full_steps_, inbox_.parameter, "full_steps_");
                     calculateTotalSteps();
                     break;
                 case MOTOR_STALLGUARD:
@@ -178,7 +178,7 @@ void MotorTask::loadSettings() {
     spreadcycl_en_  = getOrDefault(spreadcycl_en_, "spreadcycl_en_");
     spreadcycl_th_  = getOrDefault(spreadcycl_th_, "spreadcycl_th_");
 
-    fullsteps_      = getOrDefault(fullsteps_, "fullsteps_");
+    full_steps_      = getOrDefault(full_steps_, "full_steps_");
     open_close_     = getOrDefault(open_close_, "open_close_");
     open_velocity_  = getOrDefault(open_velocity_, "open_velocity_");
     clos_velocity_  = getOrDefault(clos_velocity_, "clos_velocity_");
@@ -276,9 +276,9 @@ bool MotorTask::setMax() {
 
 
 void MotorTask::calculateTotalSteps() {
-    microsteps_per_rev_ = fullsteps_ * microsteps_;
-    motor_encoder_ratio_ = microsteps_per_rev_ / 4096.0;
-    encoder_motor_ratio_ = 4096.0 / microsteps_per_rev_;
+    total_steps_ = full_steps_ * microsteps_;
+    motor_encoder_ratio_ = total_steps_ / 4096.0;
+    encoder_motor_ratio_ = 4096.0 / total_steps_;
 }
 
 
@@ -304,8 +304,8 @@ bool MotorTask::motorEnable(uint8_t enable_pin, uint8_t value) {
 
 
 void MotorTask::updateMotorSettings(float velocity, float acceleration, int current) {
-    motor_->setSpeedInHz(static_cast<int>(microsteps_per_rev_ * velocity));
-    motor_->setAcceleration(static_cast<int>(microsteps_per_rev_ * velocity * acceleration));
+    motor_->setSpeedInHz(static_cast<int>(total_steps_ * velocity));
+    motor_->setAcceleration(static_cast<int>(total_steps_ * velocity * acceleration));
 
     // Set motor RMS current via UART, higher torque requires more current. The default holding
     // current (ihold) is 50% of irun but the ratio be adjusted with optional second argument, i.e.
@@ -327,7 +327,7 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
 
     if (stallguard_en_) {
         // Lower threshold velocity for switching on CoolStep and StallGuard to DIAG output
-        driver_.TCOOLTHRS(3089838.00 * pow(microsteps_per_rev_ * velocity, -1.00161534));
+        driver_.TCOOLTHRS(3089838.00 * pow(total_steps_ * velocity, -1.00161534));
 
         // StallGuard threshold [0... 255] level for stall detection. It compensates for motor
         // specific characteristics and controls sensitivity. A higher value makes StallGuard more
