@@ -33,7 +33,7 @@ void MotorTask::run() {
     // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder");
     Wire.setClock(1000000);         // Increase I2C bus speed to 1MHz which is AS5600's max bus speed
     encoder_.setConfigure(0x2904);  // Hysteresis=1LSB, fast filter=10LSBs, slow filter=8x, WD=ON
-    LOGI("Encoder automatic gain control (56-68 is preferable): %d/128", encoder_.readAGC());
+    LOGI("Encoder automatic gain control(56-68 is preferable): %d/128", encoder_.readAGC());
 
     loadSettings();
     // int start;

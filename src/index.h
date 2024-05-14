@@ -46,6 +46,12 @@ p {
     transform: translateY(4px);
     transform: translateY(4px);
 }
+.desktop-only-elements {
+    display: none;
+}
+.mobile-only-elements {
+    display: inline-block;
+}
 .slider {
     -webkit-appearance: none;
     appearance: none;
@@ -69,17 +75,34 @@ p {
     <h1>ESP32 Motorcover</h1>
     <div>
         <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
-        <button id="stop-button" class="button" onclick="motorStop(this)">STOP</button>
+        <button id="stop-button" class="button" onclick="motorStop()">STOP</button>
         <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
     </div>
+
+    <div class="desktop-only-elements">
+        <button id="forward-button" class="button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
+        <button id="backward-button" class="button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
+    </div>
     
+    <div class="mobile-only-elements">
+        <button id="forward-button" class="button" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
+        <button id="backward-button" class="button" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
+    </div>
+
+    <div>
+        <button id="set-min-button" class="button" onmousedown="motorSetMin()" onmouseup="motorStop()">SET MIN</button>
+        <button id="set-max-button" class="button" onmousedown="motorSetMax()" onmouseup="motorStop()">SET MAX</button>
+    </div>
+
     <div>
         <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 const percentage_slider_ = document.getElementById('percentage-slider');
 
 window.addEventListener('load', () => {
+    isMobileDevice();
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
 
@@ -111,6 +134,18 @@ window.addEventListener('load', () => {
     }
 });
 
+function isMobileDevice() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/android/i.test(userAgent) || /iphone/i.test(userAgent) || /ipad/i.test(userAgent)) {
+        return true;
+    }
+
+    $('.mobile-only-elements').hide();
+    $('.desktop-only-elements').show();
+    return false;
+}
+
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
     if (element == '0' || element == '100') {
@@ -121,10 +156,51 @@ function motorMove(element) {
     xhr.send();
 }
 
-function motorStop(element) {
+function motorStop() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?stop=1', true);
     xhr.send();
-}    </script>
+}
+
+function motorForward() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?forward=1', true);
+    xhr.send();
+}
+
+function motorBackward() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?backward=1', true);
+    xhr.send();
+}
+
+function motorSetMin() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?set-min=1', true);
+    xhr.send();
+}
+
+function motorSetMax() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?set-max=1', true);
+    xhr.send();
+}
+
+
+// wifi name
+// wifi password
+// step
+// openclose
+// velocity
+// current
+// acceleration
+// sg
+// tcoolsthresh
+// sg thresh
+// fastmode
+// fastmode thresh
+// direction
+// microstep
+    </script>
 </body>
 </html>)rawliteral";

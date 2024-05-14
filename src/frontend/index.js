@@ -1,6 +1,7 @@
 const percentage_slider_ = document.getElementById('percentage-slider');
 
 window.addEventListener('load', () => {
+    isMobileDevice();
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
 
@@ -32,6 +33,20 @@ window.addEventListener('load', () => {
     }
 });
 
+function isMobileDevice() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Is mobile device
+    if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
+        return true;
+    }
+
+    // Is desktop device
+    $('.mobile-only-elements').hide();
+    $('.desktop-only-elements').show();
+    return false;
+}
+
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
     if (element == '0' || element == '100') {
@@ -42,8 +57,48 @@ function motorMove(element) {
     xhr.send();
 }
 
-function motorStop(element) {
+function motorStop() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?stop=1', true);
     xhr.send();
 }
+
+function motorForward() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?forward=1', true);
+    xhr.send();
+}
+
+function motorBackward() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?backward=1', true);
+    xhr.send();
+}
+
+function motorSetMin() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?set-min=1', true);
+    xhr.send();
+}
+
+function motorSetMax() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?set-max=1', true);
+    xhr.send();
+}
+
+
+// wifi name
+// wifi password
+// step
+// openclose
+// velocity
+// current
+// acceleration
+// sg
+// tcoolsthresh
+// sg thresh
+// fastmode
+// fastmode thresh
+// direction
+// microstep

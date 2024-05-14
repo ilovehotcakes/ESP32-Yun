@@ -38,6 +38,12 @@ p {
     transform: translateY(4px);
     transform: translateY(4px);
 }
+.desktop-only-elements {
+    display: none;
+}
+.mobile-only-elements {
+    display: inline-block;
+}
 .slider {
     -webkit-appearance: none;
     appearance: none;

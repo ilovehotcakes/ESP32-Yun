@@ -13,13 +13,29 @@
     <h1>ESP32 Motorcover</h1>
     <div>
         <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
-        <button id="stop-button" class="button" onclick="motorStop(this)">STOP</button>
+        <button id="stop-button" class="button" onclick="motorStop()">STOP</button>
         <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
     </div>
+
+    <div class="desktop-only-elements">
+        <button id="forward-button" class="button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
+        <button id="backward-button" class="button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
+    </div>
     
+    <div class="mobile-only-elements">
+        <button id="forward-button" class="button" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
+        <button id="backward-button" class="button" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
+    </div>
+
+    <div>
+        <button id="set-min-button" class="button" onmousedown="motorSetMin()" onmouseup="motorStop()">SET MIN</button>
+        <button id="set-max-button" class="button" onmousedown="motorSetMax()" onmouseup="motorStop()">SET MAX</button>
+    </div>
+
     <div>
         <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         /* index.js */
     </script>
