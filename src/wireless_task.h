@@ -40,15 +40,17 @@ private:
 
     Task *motor_task_;    // To send messages to motor task
     Task *system_task_;   // To send messages to system task
-    TimerHandle_t system_sleep_timer_;  // Prevent system from sleeping before processing incoming messages
+    TimerHandle_t system_sleep_timer_;  // Prevent system sleeping before processing incoming messages
     String motor_position_;
 
     void connectWifi();
     void routing();
     bool isPrefetch(AsyncWebServerRequest *request);
-    bool isOneParam(AsyncWebServerRequest *request);
-    bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(int), String error_message, Task *task);
-    bool httpRequestHandler(AsyncWebServerRequest *request, String param, bool (*eval)(float), String error_message, Task *task);
+    bool hasOneParam(AsyncWebServerRequest *request);
+    bool httpRequestHandler(AsyncWebServerRequest *request, Command command,
+                            bool (*eval)(int), String error_message, Task *task);
+    bool httpRequestHandler(AsyncWebServerRequest *request, Command command,
+                            bool (*eval)(float), String error_message, Task *task);
     void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         AwsEventType type, void *arg, uint8_t *data, size_t len);
 };
