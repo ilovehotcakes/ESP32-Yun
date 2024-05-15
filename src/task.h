@@ -35,7 +35,7 @@ public:
             priority_ {priority},
             core_id_ {core_id} {
         queue_ = xQueueCreate(queue_length, sizeof(Message));
-        assert(queue_ != NULL && "Failed to create task queue_");
+        assert(queue_ != NULL);
     }
 
     ~Task() {
@@ -45,7 +45,7 @@ public:
     void init() {
         BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_,
                                                     this, priority_, &task_handle_, core_id_);
-        assert(result == pdPASS && "Failed to create task");
+        assert(result == pdPASS);
     }
 
     TaskHandle_t getTaskHandle() {
@@ -83,55 +83,56 @@ protected:
     }
 
     template<typename t>
-    t getOrDefault(t setting, const char *key) {
+    t getOrDefault(const char *key, t default_value) {
         if (!settings_.containsKey(key)) {
-            settings_[key] = setting;
+            settings_[key] = default_value;
         }
         return settings_[key];
     }
 
     bool writeToDisk() {
-        String temp = String(String("/") + name_ + ".txt");
-        const char *path = temp.c_str();
-
-        LOGI("Writing file to: %s", path);
-
+        String path = String("/") + name_ + ".txt";
+        LOGI("%s writing file to %s", name_, path.c_str());
         File file = LITTLEFS.open(path, FILE_WRITE);
-
-        if(!file) {
-            LOGI("Failed to open file for writing");
+        if (!file) {
+            LOGI("%s failed to open file for writing", name_);
             return false;
         }
-
-        if(serializeJson(settings_, file)) {
-            LOGI("Successfully written to file");
+        if (serializeJson(settings_, file)) {
+            LOGI("%s successfully written to file", name_);
         } else {
-            LOGI("Failed to write to file");
+            LOGI("%s failed to write to file", name_);
         }
-
         file.close();
         return true;
     }
 
     bool readFromDisk() {
-        String temp = String(String("/") + name_ + ".txt");
-        const char *path = temp.c_str();
-
-        LOGI("Reading file from: %s", path);
-
+        String path = String("/") + name_ + ".txt";
+        LOGI("%s reading file from %s", name_, path.c_str());
         File file = LITTLEFS.open(path, FILE_READ);
-
-        if(!file) {
-            LOGI("Failed to open file for reading");
+        if (!file) {
+            LOGI("%s failed to open file for reading", name_);
             return false;
         }
-
-        while(file.available()) {
+        while (file.available()) {
             deserializeJson(settings_, file);
         }
-
         file.close();
         return true;
+    }
+
+    String getSerialNumber() {
+        uint8_t mac_address[6];
+        esp_read_mac(mac_address, ESP_MAC_WIFI_STA);
+        String serial = "";
+        for (int i = 0; i < 6; i++) {
+            char hexidecimal[2];
+            sprintf(hexidecimal, "%02X", mac_address[i]);
+            serial += hexidecimal;
+        }
+        serial.toLowerCase();
+        return serial;
     }
 
     virtual void run() = 0;
