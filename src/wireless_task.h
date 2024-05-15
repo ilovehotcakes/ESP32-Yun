@@ -18,6 +18,9 @@
     #include <ArduinoOTA.h>
 #endif
 
+#define MAX_ATTEMPTS 4
+#define WDT_DURATION 8  // Sec
+
 
 class WirelessTask : public Task {
 public:
@@ -38,6 +41,7 @@ private:
     String sta_password_ = "";  // Password for WiFi
     bool   setup_mode_   = false;
     bool   initialized_  = true;
+    int    attempts_     = 1;
 
     Task *motor_task_;    // To send messages to motor task
     Task *system_task_;   // To send messages to system task

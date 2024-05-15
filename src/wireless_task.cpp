@@ -4,7 +4,7 @@
 WirelessTask::WirelessTask(const uint8_t task_core) : 
         Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {
     pinMode(LED_PIN, OUTPUT);
-    esp_task_wdt_init(10, true);  // Restart system if watchdog hasn't been fed in 10 seconds
+    esp_task_wdt_init(WDT_DURATION, true);  // Restart system if watchdog hasn't been fed
 }
 
 
@@ -29,7 +29,6 @@ void WirelessTask::run() {
                     break;
                 case WIRELESS_SETUP:
                     setAndSave(setup_mode_, static_cast<bool>(inbox_.parameter), "setup_mode_");
-                    ESP.restart();
                     break;
             }
         }
@@ -54,8 +53,10 @@ void WirelessTask::loadSettings() {
     }
     sta_ssid_ = getOrDefault("sta_ssid_", sta_ssid_);
     sta_password_ = getOrDefault("sta_password_", sta_password_);
-    if (sta_ssid_ == "") {
+    attempts_ = getOrDefault("attempts_", attempts_);
+    if (sta_ssid_ == "" || attempts_ > MAX_ATTEMPTS) {
         setup_mode_ = true;
+        setAndSave(setup_mode_, true, "setup_mode_");
     } else {
         setup_mode_ = getOrDefault("setup_mode_", setup_mode_);
     }
@@ -64,7 +65,7 @@ void WirelessTask::loadSettings() {
         writeToDisk();
     }
 
-    LOGI("Wireless settings loaded");
+    LOGI("Wireless settings loaded, attempt #%u", attempts_);
 }
 
 
@@ -73,9 +74,10 @@ void WirelessTask::connectWifi() {
     digitalWrite(LED_PIN, HIGH);
 
     if (!setup_mode_) {
-        esp_task_wdt_add(getTaskHandle());
         // ESP32 in STA mode
-        LOGI("Attempting to connect to WiFi, SSID: %s", sta_ssid_.c_str());
+        LOGI("Attempting to connect to WiFi, SSID=%s, password=%s", sta_ssid_.c_str(), sta_password_.c_str());
+        setAndSave(attempts_, attempts_ + 1, "attempts_");
+        esp_task_wdt_add(getTaskHandle());
         WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
         while (WiFi.status() != WL_CONNECTED) {
             delay(1000);
@@ -104,6 +106,8 @@ void WirelessTask::connectWifi() {
     #if COMPILEOTA
         ArduinoOTA.begin();  // TODO: check if OTA needs to be restarted after reconnection
     #endif
+
+    setAndSave(attempts_, 1, "attempts_");
 
     digitalWrite(LED_PIN, LOW);
 }
