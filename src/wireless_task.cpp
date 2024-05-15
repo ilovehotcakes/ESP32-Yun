@@ -2,13 +2,16 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {}
+        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {
+    pinMode(LED_PIN, OUTPUT);
+    esp_task_wdt_init(10, true);  // Restart system if watchdog hasn't been fed in 10 seconds
+}
+
+
 WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
-    esp_task_wdt_init(10, true);  // Restart system if watchdog hasn't been fed in 10 seconds
-
     loadSettings();
 
     while (1) {
@@ -16,11 +19,19 @@ void WirelessTask::run() {
             connectWifi();
         }
 
-        // If motor has changed position(%), broadcast it to all WS clients
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
             LOGI("WirelessTask received message: %s", inbox_.toString().c_str());
-            motor_position_ = static_cast<String>(inbox_.parameter);
-            websocket.textAll(motor_position_);
+            switch (inbox_.command) {
+                case UPDATE_POSITION:
+                    // If motor has changed position(%), broadcast it to all WS clients
+                    motor_position_ = static_cast<String>(inbox_.parameter);
+                    websocket.textAll(motor_position_);
+                    break;
+                case WIRELESS_SETUP:
+                    setAndSave(setup_mode_, static_cast<bool>(inbox_.parameter), "setup_mode_");
+                    ESP.restart();
+                    break;
+            }
         }
 
         websocket.cleanupClients();  // Remove disconnected WS clients
@@ -37,10 +48,17 @@ void WirelessTask::run() {
 void WirelessTask::loadSettings() {
     bool load = readFromDisk();
 
-    ap_ssid_ = getOrDefault(ap_ssid_, "ap_ssid_");
-    sta_ssid_ = getOrDefault(sta_ssid_, "sta_ssid_");
-    sta_password_ = getOrDefault(sta_password_, "sta_password_");
-    setup_mode_ = getOrDefault(setup_mode_, "setup_mode_");
+    ap_ssid_ = getOrDefault("ap_ssid_",ap_ssid_);
+    if (ap_ssid_ == "") {  // Factory reset
+        ap_ssid_ = "yun-" + getSerialNumber().substring(6, 12);
+    }
+    sta_ssid_ = getOrDefault("sta_ssid_", sta_ssid_);
+    sta_password_ = getOrDefault("sta_password_", sta_password_);
+    if (sta_ssid_ == "") {
+        setup_mode_ = true;
+    } else {
+        setup_mode_ = getOrDefault("setup_mode_", setup_mode_);
+    }
 
     if (!load) {
         writeToDisk();
@@ -51,22 +69,19 @@ void WirelessTask::loadSettings() {
 
 
 void WirelessTask::connectWifi() {
+    // Turn on LED to indicate not connected
+    digitalWrite(LED_PIN, HIGH);
+
     if (!setup_mode_) {
         esp_task_wdt_add(getTaskHandle());
-
-        // Turn on LED to indicate not connected
-        digitalWrite(LED_PIN, HIGH);
-
         // ESP32 in STA mode
         LOGI("Attempting to connect to WiFi, SSID: %s", sta_ssid_.c_str());
         WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
         while (WiFi.status() != WL_CONNECTED) {
             delay(1000);
         }
-
         // Remove wireless task from watchdog timer to avoid manually feeding WDT
         esp_task_wdt_delete(getTaskHandle());
-
         LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
     } else {
         // ESP32 in AP mode which acts as an router
@@ -114,11 +129,28 @@ void WirelessTask::routing() {
             return;
         }
         if (httpRequestHandler(request, SYSTEM_SLEEP, [=](int val) -> bool { return false; }, "", system_task_)
-            || httpRequestHandler(request, SYSTEM_REBOOT, [=](int val) -> bool { return false; }, "", system_task_)
+            || httpRequestHandler(request, SYSTEM_RESTART, [=](int val) -> bool { return false; }, "", system_task_)
             || httpRequestHandler(request, SYSTEM_RESET, [=](int val) -> bool { return false; }, "", system_task_)) {
             return;
         }
         request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listSystemCommands());
+    });
+
+    // HTTP RESTful API for managing wireless settings
+    webserver.on("/wireless", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (isPrefetch(request)) {
+            return;
+        }
+        if (!hasOneParam(request)) {
+            return;
+        }
+        if (httpRequestHandler(request, WIRELESS_SETUP, [=](int val) -> bool { return val != 0 && val != 1; },
+                                  "=0 | 1; 1 to enter setup mode", this)
+            || httpRequestHandler(request, WIRELESS_SSID, sta_ssid_, "sta_ssid_")
+            || httpRequestHandler(request, WIRELESS_PASS, sta_password_, "sta_password_")) {
+            return;
+        }
+        request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listWirelessCommands());
     });
 
     // HTTP RESTful API for moving motor and changing motor settings
@@ -196,7 +228,7 @@ void WirelessTask::routing() {
 
     webserver.onNotFound([=](AsyncWebServerRequest *request) {
         if(request->method() == HTTP_GET) {
-            request->send(404, "text/plain", "failed: use /motor or /system or /json" );
+            request->send(404, "text/plain", "failed: use /motor or /system or /wireless or /json" );
         }
     });
 }
@@ -204,8 +236,10 @@ void WirelessTask::routing() {
 
 bool WirelessTask::isPrefetch(AsyncWebServerRequest *request) {
     for(int i = 0; i < request->headers(); i++){
-        AsyncWebHeader* header = request->getHeader(i);
-        if (header->name() == "Purpose" && header->value() == "prefetch") {
+        AsyncWebHeader *header = request->getHeader(i);
+        if ((header->name() == "Purpose" && header->value() == "prefetch")    // Chrome/Safari/Edge
+         || (header->name() == "X-Purpose" && header->value() == "prefetch")  // Safari (old)
+         || (header->name() == "X-moz" && header->value() == "prefetch")) {   // Firefox
             return true;
         }
     }
@@ -223,10 +257,26 @@ bool WirelessTask::hasOneParam(AsyncWebServerRequest *request) {
 
 
 bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                                      bool (*eval)(int), String error_message, Task *task) {
-    String param = hash(command);
+                                      String &setting, const char *key) {
     // Prevent the system task from sleeping before finishing processing HTTP requests
     xTimerStart(system_sleep_timer_, portMAX_DELAY);
+    String param = hash(command);
+    if (request->hasParam(param)) {
+        String value = request->getParam(param)->value();
+        LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value);
+        request->send(200, "text/plain", "success");
+        setAndSave(setting, value, key);
+        return true;
+    }
+    return false;
+}
+
+
+bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
+                                      bool (*eval)(int), String error_message, Task *task) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
+    String param = hash(command);
     if (request->hasParam(param)) {
         String value_str = request->getParam(param)->value();  // To check if param="0" is value=0
         int value = value_str.toInt();
@@ -245,8 +295,8 @@ bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command co
 
 bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
                                       bool (*eval)(float), String error_message, Task *task) {
-    String param = hash(command);
     // Prevent the system task from sleeping before finishing processing HTTP requests
+    String param = hash(command);
     xTimerStart(system_sleep_timer_, portMAX_DELAY);
     if (request->hasParam(param)) {
         float value = request->getParam(param)->value().toFloat();
@@ -294,10 +344,9 @@ void WirelessTask::addMotorTask(Task *task) {
 
 void WirelessTask::addSystemTask(Task *task) {
     system_task_ = task;
-    system_sleep_timer_ = static_cast<SystemTask*>(task)->getSystemSleepTimer();
 }
 
 
-void WirelessTask::setAPSSID(String ssid) {
-    ap_ssid_ = ssid;
+void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
+    system_sleep_timer_ = timer;
 }
