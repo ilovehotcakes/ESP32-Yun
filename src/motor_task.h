@@ -21,6 +21,10 @@
 #include "task.h"
 
 
+#define DEFAULT_MOTOR_FULLSTEPS   200      // NEMA motors have 200 full steps/rev
+#define DEFAULT_ENCODER_POSITIONS 4096.0f  // AS5600 absolute position is 12-bit
+
+
 class MotorTask : public Task {
 public:
     MotorTask(const uint8_t task_core);
@@ -47,7 +51,7 @@ private:
     int   clos_current_  = 75;
     int   direction_     = false;
     int   microsteps_    = 16;
-    int   full_steps_    = 200;   // NEMA motors have 200 full steps/rev
+    int   full_steps_    = DEFAULT_MOTOR_FULLSTEPS;
     int   stallguard_en_ = true;
     int   coolstep_thrs_ = 0;
     int   stallguard_th_ = 10;
@@ -74,10 +78,10 @@ private:
     // Keeping track of the overall position via encoder's position and then  convert it into
     // motor's position and percentage.
     int32_t encod_pos_         = 0;
-    int32_t encod_max_pos_     = 4096 * 20;
+    int32_t encod_max_pos_     = static_cast<int32_t>(DEFAULT_ENCODER_POSITIONS) * 10;
     int   total_steps_         = full_steps_ * microsteps_;
-    float motor_encoder_ratio_ = total_steps_ / 4096.0;
-    float encoder_motor_ratio_ = 4096.0 / total_steps_;
+    float motor_encoder_ratio_ = total_steps_ / DEFAULT_ENCODER_POSITIONS;
+    float encoder_motor_ratio_ = DEFAULT_ENCODER_POSITIONS / total_steps_;
 
     Task *wireless_task_;              // To receive messages from wireless task
     xTimerHandle system_sleep_timer_;  // To prevent system from sleeping before motor stops

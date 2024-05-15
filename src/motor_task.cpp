@@ -135,7 +135,7 @@ void MotorTask::run() {
         if (stalled_) {
             stop();
             stalled_ = false;
-            LOGD("Motor stalled");
+            LOGE("Motor stalled");
         }
 
         if (motor_->isRunning()) {
@@ -249,7 +249,7 @@ void MotorTask::moveToPercent(int target_percent) {
 void MotorTask::stop() {
     motor_->forceStop();
     vTaskDelay(2 / portTICK_PERIOD_MS);
-    LOGD("Motor stopped(curr/max): %d/%d", encod_pos_, encod_max_pos_);
+    LOGI("Motor stopped(curr/max): %d/%d", encod_pos_, encod_max_pos_);
 }
 
 
@@ -276,8 +276,8 @@ bool MotorTask::setMax() {
 
 void MotorTask::calculateTotalSteps() {
     total_steps_ = full_steps_ * microsteps_;
-    motor_encoder_ratio_ = total_steps_ / 4096.0;
-    encoder_motor_ratio_ = 4096.0 / total_steps_;
+    motor_encoder_ratio_ = total_steps_ / DEFAULT_ENCODER_POSITIONS;
+    encoder_motor_ratio_ = DEFAULT_ENCODER_POSITIONS / total_steps_;
 }
 
 

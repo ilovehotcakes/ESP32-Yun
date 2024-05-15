@@ -23,7 +23,7 @@ void setup() {
     LOG_INIT(115200, LogLevel::INFO);
 
     if (!LITTLEFS.begin(true)) {
-        LOGI("Failed to mount filesystem");
+        LOGE("Failed to mount filesystem");
     }
 
     // setCpuFrequencyMhz(80);
