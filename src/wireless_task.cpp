@@ -9,12 +9,10 @@ WirelessTask::~WirelessTask() {}
 void WirelessTask::run() {
     esp_task_wdt_init(10, true);  // Restart system if watchdog hasn't been fed in 10 seconds
 
-    // connectWifi();  // For AP mode
-
     loadSettings();
 
     while (1) {
-        if (WiFi.status() != WL_CONNECTED) {
+        if (initialized_ && WiFi.status() != WL_CONNECTED) {
             connectWifi();
         }
 
@@ -42,6 +40,7 @@ void WirelessTask::loadSettings() {
     ap_ssid_ = getOrDefault(ap_ssid_, "ap_ssid_");
     sta_ssid_ = getOrDefault(sta_ssid_, "sta_ssid_");
     sta_password_ = getOrDefault(sta_password_, "sta_password_");
+    setup_mode_ = getOrDefault(setup_mode_, "setup_mode_");
 
     if (!load) {
         writeToDisk();
@@ -52,22 +51,29 @@ void WirelessTask::loadSettings() {
 
 
 void WirelessTask::connectWifi() {
-    esp_task_wdt_add(getTaskHandle());
+    if (!setup_mode_) {
+        esp_task_wdt_add(getTaskHandle());
 
-    // Turn on LED to indicate not connected
-    digitalWrite(LED_PIN, HIGH);
+        // Turn on LED to indicate not connected
+        digitalWrite(LED_PIN, HIGH);
 
-    // ESP32 in STA mode
-    LOGI("Attempting to connect to WPA SSID: %s", sta_ssid_.c_str());
-    WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
+        // ESP32 in STA mode
+        LOGI("Attempting to connect to WiFi, SSID: %s", sta_ssid_.c_str());
+        WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
+        while (WiFi.status() != WL_CONNECTED) {
+            delay(1000);
+        }
+
+        // Remove wireless task from watchdog timer to avoid manually feeding WDT
+        esp_task_wdt_delete(getTaskHandle());
+
+        LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
+    } else {
+        // ESP32 in AP mode which acts as an router
+        LOGI("Starting AP, SSID: %s", ap_ssid_.c_str());
+        WiFi.softAP(ap_ssid_.c_str());
+        initialized_ = false;
     }
-
-    // Setup ESPS32 as WiFi in access point (AP) mode; leave out password for no password
-    // WiFi.softAP(ap_ssid_.c_str());
-    // // Set ESP32's IP to 192.168.1.2
-    // WiFi.softAPConfig(IPAddress(192, 168, 1, 2), IPAddress(192, 168, 1, 2), IPAddress(255, 255, 255, 0));
 
     // Websocket server
     webserver.begin();
@@ -85,11 +91,6 @@ void WirelessTask::connectWifi() {
     #endif
 
     digitalWrite(LED_PIN, LOW);
-
-    // Remove wireless task from watchdog timer to avoid manually feeding WDT
-    esp_task_wdt_delete(getTaskHandle());
-
-    LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
 }
 
 
@@ -294,4 +295,9 @@ void WirelessTask::addMotorTask(Task *task) {
 void WirelessTask::addSystemTask(Task *task) {
     system_task_ = task;
     system_sleep_timer_ = static_cast<SystemTask*>(task)->getSystemSleepTimer();
+}
+
+
+void WirelessTask::setAPSSID(String ssid) {
+    ap_ssid_ = ssid;
 }

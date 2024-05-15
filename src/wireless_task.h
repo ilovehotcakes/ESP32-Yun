@@ -13,7 +13,6 @@
 #include "task.h"
 #include "system_task.h"
 #include "index.h"
-// #include "secrets.h"
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
@@ -26,6 +25,7 @@ public:
     ~WirelessTask();
     void addMotorTask(Task *task);
     void addSystemTask(Task *task);
+    void setAPSSID(String ssid);
 
 protected:
     void run();
@@ -34,9 +34,11 @@ private:
     // Create AsyncWebServer object on port 80
     AsyncWebServer webserver;
     AsyncWebSocket websocket;
-    String ap_ssid_      = "";          // SSID (hostname) for AP
-    String sta_ssid_     = "secretSSID";  // SSID (hostname) for WiFi
-    String sta_password_ = "secretPass";  // Network password for WiFi
+    String ap_ssid_      = "ESP32";     // SSID (hostname) for AP
+    String sta_ssid_     = "";  // SSID (hostname) for WiFi
+    String sta_password_ = "";  // Network password for WiFi
+    bool   setup_mode_   = false;
+    bool   initialized_  = true;
 
     Task *motor_task_;    // To send messages to motor task
     Task *system_task_;   // To send messages to system task

@@ -36,7 +36,7 @@ void MotorTask::run() {
     LOGI("Encoder automatic gain control(56-68 is preferable): %d/128", encoder_.readAGC());
 
     loadSettings();
-    // int start;
+    // int start = 0;
     while (1) {
         // start = micros();
         encod_pos_ = encoder_.getCumulativePosition();
@@ -193,7 +193,7 @@ void MotorTask::loadSettings() {
         writeToDisk();
     }
 
-    LOGI("Encoder settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
+    LOGI("Motor settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
 }
 
 

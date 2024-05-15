@@ -26,6 +26,10 @@ void SystemTask::run() {
     pinMode(BUTTON_PIN, INPUT);
     pinMode(LED_PIN, OUTPUT);
 
+    if(!LITTLEFS.begin(false)) {
+        LOGI("Failed to mount filesystem");
+    }
+
     if (factory_reset_) {
         factory_reset_ = false;
         uint8_t mac_address[6];
@@ -36,6 +40,9 @@ void SystemTask::run() {
             serial_ += temp;
         }
         serial_.toLowerCase();
+
+        // setAPSSID("");
+        // setup mode
     }
 
     loadSettings();
@@ -65,8 +72,7 @@ void SystemTask::run() {
             button_press_duration_ = xTaskGetTickCount() - button_press_start_;
             if (button_press_duration_ > 5000 && button_press_duration_ < 10000) {
                 LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
-                setAndSave(setup_mode_, true, "setup_mode_");
-                // ESP.restart();
+                // send to wireless task
             } else if (button_press_duration_ > 10000) {
                 LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
                 systemReset();
@@ -88,7 +94,6 @@ void SystemTask::loadSettings() {
 
     serial_ = getOrDefault(serial_, "serial_");
     factory_reset_ = getOrDefault(factory_reset_, "factory_reset_");
-    setup_mode_ = getOrDefault(setup_mode_, "setup_mode_");
     system_wake_time_ = getOrDefault(system_wake_time_, "system_wake_time_");
     system_sleep_time_ = getOrDefault(system_sleep_time_, "system_sleep_time_");
 

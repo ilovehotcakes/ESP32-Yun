@@ -95,10 +95,6 @@ protected:
         const char *path = temp.c_str();
 
         LOGI("Writing file to: %s", path);
-        if(!LITTLEFS.begin(true)) {
-            LOGI("Failed to mount filesystem");
-            return false;
-        }
 
         File file = LITTLEFS.open(path, FILE_WRITE);
 
@@ -114,7 +110,6 @@ protected:
         }
 
         file.close();
-        LITTLEFS.end();
         return true;
     }
 
@@ -123,10 +118,6 @@ protected:
         const char *path = temp.c_str();
 
         LOGI("Reading file from: %s", path);
-        if(!LITTLEFS.begin(true)) {
-            LOGI("Failed to mount filesystem");
-            return false;
-        }
 
         File file = LITTLEFS.open(path, FILE_READ);
 
@@ -140,7 +131,6 @@ protected:
         }
 
         file.close();
-        LITTLEFS.end();
         return true;
     }
 

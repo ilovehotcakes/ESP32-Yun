@@ -1,5 +1,6 @@
 #pragma once
 #include "task.h"
+#include "wireless_task.h"
 
 
 class SystemTask: public Task {
@@ -15,7 +16,6 @@ protected:
 private:
     String serial_ = "";
     bool factory_reset_ = true;
-    bool setup_mode_ = true;  // 0=AP setup; 1=STA regular
     int system_wake_time_ = 5000;      // mSec
     int system_sleep_time_ = 5000000;  // uSec
 
