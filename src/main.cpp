@@ -1,11 +1,10 @@
 /**
-    ESP32 Motorcover
     Aurthor: Jason Chen, 2022
     Licence: TODO
 
-    An ESP32-based low-powered wireless motor controller that works with bipolar stepper motors.
-    It is a closed-loop system so it is capable of keeping track of its position while the motor is
-    off.
+    An ESP32-based low-powered wireless motor controller that works with two-phase bipolar stepper
+    motors. It is a closed-loop system so it is capable of keeping track of its position even when
+    the motor is off.
 
     You can use it to motorize and automate the opening & closing of blinds/shades/windows etc.
 **/
@@ -23,18 +22,21 @@ void setup() {
     // Initializing serial output if compiled
     LOG_INIT(115200, LogLevel::INFO);
 
+    if (!LITTLEFS.begin(true)) {
+        LOGI("Failed to mount filesystem");
+    }
+
     // setCpuFrequencyMhz(80);
 
-    // The system task performs coordination between all tasks
     system_task.init();
     system_task.addMotorTask(&motor_task);
+    system_task.addWirelessTask(&wireless_task);
 
     wireless_task.init();
     wireless_task.addMotorTask(&motor_task);
     wireless_task.addSystemTask(&system_task);
+    wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
-    // The motor task runs the motor and checks the rotary encoder to keep track of the motor's
-    // position. TODO not start motor task on wake to reduce boot time
     motor_task.init();
     motor_task.addWirelessTask(&wireless_task);
     motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
