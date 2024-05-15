@@ -33,8 +33,12 @@ Command hash(String command) {
     else if (command == "fastmode-threshold") return MOTOR_TPWMTHRS;
 
     else if (command == "sleep") return SYSTEM_SLEEP;
-    else if (command == "reboot") return SYSTEM_REBOOT;
+    else if (command == "restart") return SYSTEM_RESTART;
     else if (command == "reset") return SYSTEM_RESET;
+
+    else if (command == "setup") return WIRELESS_SETUP;
+    else if (command == "ssid") return WIRELESS_SSID;
+    else if (command == "password") return WIRELESS_PASS;
 
     return ERROR_COMMAND;
 }
@@ -72,8 +76,12 @@ String hash(Command command) {
     else if (command == MOTOR_TPWMTHRS) return "fastmode-threshold";
 
     else if (command == SYSTEM_SLEEP) return "sleep";
-    else if (command == SYSTEM_REBOOT) return "reboot";
+    else if (command == SYSTEM_RESTART) return "restart";
     else if (command == SYSTEM_RESET) return "reset";
+
+    else if (command == WIRELESS_SETUP) return "setup";
+    else if (command == WIRELESS_SSID) return "ssid";
+    else if (command == WIRELESS_PASS) return "password";
 
     return "error";
 }
@@ -91,6 +99,15 @@ String listMotorCommands() {
 String listSystemCommands() {
     String list = "";
     for (int command = SYSTEM_SLEEP; command >= SYSTEM_RESET; command--) {
+        list = list + hash(Command(command)) + " | ";
+    }
+    return list.substring(0, list.length() - 3);
+}
+
+
+String listWirelessCommands() {
+    String list = "";
+    for (int command = WIRELESS_SETUP; command >= WIRELESS_PASS; command--) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);

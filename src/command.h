@@ -36,8 +36,12 @@ enum Command {
 
     // System commands < 0
     SYSTEM_SLEEP     = -1,
-    SYSTEM_REBOOT    = -2,
-    SYSTEM_RESET     = -3
+    SYSTEM_RESTART   = -2,
+    SYSTEM_RESET     = -3,
+
+    WIRELESS_SETUP   = -51,
+    WIRELESS_SSID    = -52,
+    WIRELESS_PASS    = -53
 };
 
 
@@ -45,3 +49,4 @@ Command hash (String command);
 String hash (Command command);
 String listMotorCommands();
 String listSystemCommands();
+String listWirelessCommands();
