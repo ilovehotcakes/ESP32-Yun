@@ -2,9 +2,8 @@
 
 
 SystemTask::SystemTask(const uint8_t task_core) : 
-        Task{"SystemTask", 8192, 1, task_core} {
-    queue_ = xQueueCreate(2, sizeof(Message));
-    assert(queue_ != NULL && "Failed to create SystemTask queue_");
+        Task{"SystemTask", 8192, 1, task_core, 2} {
+    pinMode(BUTTON_PIN, INPUT);
 
     // FreeRTOS implemented in C so can't use std::bind
     auto on_timer = [](TimerHandle_t timer) {
@@ -13,7 +12,7 @@ SystemTask::SystemTask(const uint8_t task_core) :
         temp_system_ptr->systemSleep(timer);
     };
     system_sleep_timer_ = xTimerCreate("System_sleep_timer_", system_wake_time_, pdFALSE, this, on_timer);
-    assert(system_sleep_timer_ != NULL && "Failed to create system_sleep_timer_");
+    assert(system_sleep_timer_ != NULL);
 }
 
 
@@ -23,28 +22,6 @@ SystemTask::~SystemTask() {
 
 
 void SystemTask::run() {
-    pinMode(BUTTON_PIN, INPUT);
-    pinMode(LED_PIN, OUTPUT);
-
-    if(!LITTLEFS.begin(false)) {
-        LOGI("Failed to mount filesystem");
-    }
-
-    if (factory_reset_) {
-        factory_reset_ = false;
-        uint8_t mac_address[6];
-        esp_read_mac(mac_address, ESP_MAC_WIFI_STA);
-        for (int i = 0; i < 6; i++) {
-            char temp[2];
-            sprintf(temp, "%02X", mac_address[i]);
-            serial_ += temp;
-        }
-        serial_.toLowerCase();
-
-        // setAPSSID("");
-        // setup mode
-    }
-
     loadSettings();
 
     while (1) {
@@ -58,27 +35,13 @@ void SystemTask::run() {
                 case SYSTEM_RESET:
                     systemReset();
                     break;
-                case SYSTEM_REBOOT:
+                case SYSTEM_RESTART:
                     ESP.restart();
                     break;
             }
         }
 
-        // Check button presses for wireless setup mode and factory reset
-        if (digitalRead(BUTTON_PIN) == LOW && !button_pressed_) {
-            button_press_start_ = xTaskGetTickCount();
-            button_pressed_ = true;
-        } else if (digitalRead(BUTTON_PIN) == HIGH && button_pressed_) {
-            button_press_duration_ = xTaskGetTickCount() - button_press_start_;
-            if (button_press_duration_ > 5000 && button_press_duration_ < 10000) {
-                LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
-                // send to wireless task
-            } else if (button_press_duration_ > 10000) {
-                LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
-                systemReset();
-            }
-            button_pressed_ = false;
-        }
+        checkButtonPress();
 
         // if (xTimerIsTimerActive(system_sleep_timer_) == pdFALSE) {
         //     xTimerStart(system_sleep_timer_, portMAX_DELAY);
@@ -92,16 +55,38 @@ void SystemTask::run() {
 void SystemTask::loadSettings() {
     bool load = readFromDisk();
 
-    serial_ = getOrDefault(serial_, "serial_");
-    factory_reset_ = getOrDefault(factory_reset_, "factory_reset_");
-    system_wake_time_ = getOrDefault(system_wake_time_, "system_wake_time_");
-    system_sleep_time_ = getOrDefault(system_sleep_time_, "system_sleep_time_");
+    serial_ = getOrDefault("serial_", serial_);
+    if (serial_ == "") {  // Factory reset
+        serial_ = getSerialNumber();
+    }
+    system_wake_time_ = getOrDefault("system_wake_time_", system_wake_time_);
+    system_sleep_time_ = getOrDefault("system_sleep_time_", system_sleep_time_);
 
     if (!load) {
         writeToDisk();
     }
 
     LOGI("System settings loaded, serial#: %s", serial_.c_str());
+}
+
+
+inline void SystemTask::checkButtonPress() {
+    // Check button presses for wireless setup mode and factory reset
+    if (digitalRead(BUTTON_PIN) == LOW && !button_pressed_) {
+        button_pressed_ = true;
+        button_press_start_ = esp_timer_get_time();
+    } else if (digitalRead(BUTTON_PIN) == HIGH && button_pressed_) {
+        button_pressed_ = false;
+        button_press_duration_ = (esp_timer_get_time() - button_press_start_) / 1000;
+        if (button_press_duration_ > 5000 && button_press_duration_ < 15000) {
+            LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
+            sendTo(wireless_task_, Message(WIRELESS_SETUP, 1), 10);
+        } else if (button_press_duration_ > 15000) {
+            LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
+            systemReset();
+        }
+        LOGI("No action, button pressed for %dms", button_press_duration_);
+    }
 }
 
 
@@ -119,14 +104,18 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
 
 void SystemTask::systemReset() {
     LOGI("System factory reset\n");
-    factory_reset_ = true;
     LITTLEFS.format();
     ESP.restart();
 }
 
 
-void SystemTask::addMotorTask(void *task) {
-    motor_task_ = static_cast<Task*>(task);
+void SystemTask::addMotorTask(Task *task) {
+    motor_task_ = task;
+}
+
+
+void SystemTask::addWirelessTask(Task *task) {
+    wireless_task_ = task;
 }
 
 

@@ -18,7 +18,7 @@ void MotorTask::run() {
     // FastAccelStepper setup
     engine_.init(1);
     motor_ = engine_.stepperConnectToPin(STEP_PIN);
-    assert(motor_ && "Failed to initialize FastAccelStepper");
+    assert(motor_ != NULL);
     motor_->setEnablePin(100, false);
     motor_->setExternalEnableCall(std::bind(&MotorTask::motorEnable, this,
                                   std::placeholders::_1, std::placeholders::_2));
@@ -30,7 +30,7 @@ void MotorTask::run() {
 
     // AS5600 rotary encoder setup
     encoder_.begin(SDA_PIN, SCL_PIN);
-    // assert(encoder_.isConnected() && "Failed to initialize AS5600 rotary encoder");
+    // assert(encoder_.isConnected());
     Wire.setClock(1000000);         // Increase I2C bus speed to 1MHz which is AS5600's max bus speed
     encoder_.setConfigure(0x2904);  // Hysteresis=1LSB, fast filter=10LSBs, slow filter=8x, WD=ON
     LOGI("Encoder automatic gain control(56-68 is preferable): %d/128", encoder_.readAGC());
@@ -168,24 +168,23 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     bool load = readFromDisk();
 
-    open_current_   = getOrDefault(open_current_, "open_current_");
-    clos_current_   = getOrDefault(clos_current_, "clos_current_");
-    direction_      = getOrDefault(direction_, "direction_");
-    microsteps_     = getOrDefault(microsteps_, "microsteps_");
-    stallguard_en_  = getOrDefault(stallguard_en_, "stallguard_en_");
-    // coolstep_thrs_  = getOrDefault(stallguard_cs_, "stallguard_cs_");
-    stallguard_th_  = getOrDefault(stallguard_th_, "stallguard_th_");
-    spreadcycl_en_  = getOrDefault(spreadcycl_en_, "spreadcycl_en_");
-    spreadcycl_th_  = getOrDefault(spreadcycl_th_, "spreadcycl_th_");
+    open_close_     = getOrDefault("open_close_", open_close_);
+    open_velocity_  = getOrDefault("open_velocity_", open_velocity_);
+    clos_velocity_  = getOrDefault("clos_velocity_",clos_velocity_);
+    open_accel_     = getOrDefault("open_accel_", open_accel_);
+    clos_accel_     = getOrDefault("clos_accel_", clos_accel_);
+    open_current_   = getOrDefault("open_current_", open_current_);
+    clos_current_   = getOrDefault("clos_current_",clos_current_);
+    direction_      = getOrDefault("direction_", direction_);
+    microsteps_     = getOrDefault("microsteps_", microsteps_);
+    full_steps_     = getOrDefault("full_steps_", full_steps_);
+    stallguard_en_  = getOrDefault("stallguard_en_", stallguard_en_);
+    // coolstep_thrs_  = getOrDefault("stallguard_cs_", stallguard_cs_);
+    stallguard_th_  = getOrDefault("stallguard_th_", stallguard_th_);
+    spreadcycl_en_  = getOrDefault("spreadcycl_en_", spreadcycl_en_);
+    spreadcycl_th_  = getOrDefault("spreadcycl_th_", spreadcycl_th_);
 
-    full_steps_      = getOrDefault(full_steps_, "full_steps_");
-    open_close_     = getOrDefault(open_close_, "open_close_");
-    open_velocity_  = getOrDefault(open_velocity_, "open_velocity_");
-    clos_velocity_  = getOrDefault(clos_velocity_, "clos_velocity_");
-    open_accel_     = getOrDefault(open_accel_, "open_accel_");
-    clos_accel_     = getOrDefault(clos_accel_, "clos_accel_");
-
-    encod_max_pos_  = getOrDefault(encod_max_pos_, "encod_max_pos_");
+    encod_max_pos_  = getOrDefault("encod_max_pos_", encod_max_pos_);
     encoder_.resetCumulativePosition(encod_pos_);
     calculateTotalSteps();
 
