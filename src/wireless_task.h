@@ -34,16 +34,16 @@ private:
     // Create AsyncWebServer object on port 80
     AsyncWebServer webserver;
     AsyncWebSocket websocket;
-    String ap_ssid_  = "ESP32 Motorcover";  // SSID (hostname) for AP
-    String ssid_     = "secretSSID";          // SSID (hostname) for WiFi
-    String password_ = "secretPass";          // Network password for WiFi
+    String ap_ssid_      = "";          // SSID (hostname) for AP
+    String sta_ssid_     = "secretSSID";  // SSID (hostname) for WiFi
+    String sta_password_ = "secretPass";  // Network password for WiFi
 
     Task *motor_task_;    // To send messages to motor task
     Task *system_task_;   // To send messages to system task
-    TimerHandle_t system_sleep_timer_;  // Prevent system sleeping before processing incoming messages
+    TimerHandle_t system_sleep_timer_;  // Prevent system sleep before processing incoming messages
     String motor_position_;
-    // String mode_ = "AP";
 
+    void loadSettings();
     void connectWifi();
     void routing();
     bool isPrefetch(AsyncWebServerRequest *request);

@@ -96,7 +96,7 @@ protected:
 
         LOGI("Writing file to: %s", path);
         if(!LITTLEFS.begin(true)) {
-            LOGI("Failed to mount LittleFS");
+            LOGI("Failed to mount filesystem");
             return false;
         }
 
@@ -108,7 +108,7 @@ protected:
         }
 
         if(serializeJson(settings_, file)) {
-            LOGI("Successfully written file");
+            LOGI("Successfully written to file");
         } else {
             LOGI("Failed to write to file");
         }
@@ -124,7 +124,7 @@ protected:
 
         LOGI("Reading file from: %s", path);
         if(!LITTLEFS.begin(true)) {
-            LOGI("Failed to mount LittleFS");
+            LOGI("Failed to mount filesystem");
             return false;
         }
 

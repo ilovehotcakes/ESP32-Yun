@@ -7,9 +7,11 @@ WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
-    esp_task_wdt_init(10, true);  // Restart system if wd hasn't been fed in 10 seconds
+    esp_task_wdt_init(10, true);  // Restart system if watchdog hasn't been fed in 10 seconds
 
     // connectWifi();  // For AP mode
+
+    loadSettings();
 
     while (1) {
         if (WiFi.status() != WL_CONNECTED) {
@@ -34,6 +36,21 @@ void WirelessTask::run() {
 }
 
 
+void WirelessTask::loadSettings() {
+    bool load = readFromDisk();
+
+    ap_ssid_ = getOrDefault(ap_ssid_, "ap_ssid_");
+    sta_ssid_ = getOrDefault(sta_ssid_, "sta_ssid_");
+    sta_password_ = getOrDefault(sta_password_, "sta_password_");
+
+    if (!load) {
+        writeToDisk();
+    }
+
+    LOGI("Wireless settings loaded");
+}
+
+
 void WirelessTask::connectWifi() {
     esp_task_wdt_add(getTaskHandle());
 
@@ -41,8 +58,8 @@ void WirelessTask::connectWifi() {
     digitalWrite(LED_PIN, HIGH);
 
     // ESP32 in STA mode
-    LOGI("Attempting to connect to WPA SSID: %s", ssid_.c_str());
-    WiFi.begin(ssid_.c_str(), password_.c_str());
+    LOGI("Attempting to connect to WPA SSID: %s", sta_ssid_.c_str());
+    WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
     }

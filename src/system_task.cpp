@@ -26,21 +26,19 @@ void SystemTask::run() {
     pinMode(BUTTON_PIN, INPUT);
     pinMode(LED_PIN, OUTPUT);
 
-    long xStart = xTaskGetTickCount();
-
-    // vTaskDelay(500);
-
-    // If button is not pressed for within the first few seconds, don't enter setup mode
-    // Todo: if not first boot, skip this part (for deep sleep)
-    while (digitalRead(BUTTON_PIN) == LOW)
-
-    if (xTaskGetTickCount() - xStart > 5000) {
-        Serial.println("......triggered setup function.......");
+    if (factory_reset_) {
+        factory_reset_ = false;
+        uint8_t mac_address[6];
+        esp_read_mac(mac_address, ESP_MAC_WIFI_STA);
+        for (int i = 0; i < 6; i++) {
+            char temp[2];
+            sprintf(temp, "%02X", mac_address[i]);
+            serial_ += temp;
+        }
+        serial_.toLowerCase();
     }
 
-    if (xTaskGetTickCount() - xStart > 20000) {
-        Serial.println("......triggered hard reset.......");
-    }
+    loadSettings();
 
     while (1) {
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
@@ -48,19 +46,32 @@ void SystemTask::run() {
             switch (inbox_.command) {
                 case SYSTEM_SLEEP:
                     // systemSleep(system_sleep_timer_);
-                    Serial.println("System sleep");
+                    LOGI("System sleep");  // TODO
                     break;
                 case SYSTEM_RESET:
-                    LOGI("System factory reset\n");
-                    LITTLEFS.format();
-                    reset_ = true;
-                    ESP.restart();
+                    systemReset();
                     break;
                 case SYSTEM_REBOOT:
-                    LOGD("");
                     ESP.restart();
                     break;
             }
+        }
+
+        // Check button presses for wireless setup mode and factory reset
+        if (digitalRead(BUTTON_PIN) == LOW && !button_pressed_) {
+            button_press_start_ = xTaskGetTickCount();
+            button_pressed_ = true;
+        } else if (digitalRead(BUTTON_PIN) == HIGH && button_pressed_) {
+            button_press_duration_ = xTaskGetTickCount() - button_press_start_;
+            if (button_press_duration_ > 5000 && button_press_duration_ < 10000) {
+                LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
+                setAndSave(setup_mode_, true, "setup_mode_");
+                // ESP.restart();
+            } else if (button_press_duration_ > 10000) {
+                LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
+                systemReset();
+            }
+            button_pressed_ = false;
         }
 
         // if (xTimerIsTimerActive(system_sleep_timer_) == pdFALSE) {
@@ -69,6 +80,23 @@ void SystemTask::run() {
 
         vTaskDelay(1);  // Finished all task within loop, yielding control back to scheduler
     }
+}
+
+
+void SystemTask::loadSettings() {
+    bool load = readFromDisk();
+
+    serial_ = getOrDefault(serial_, "serial_");
+    factory_reset_ = getOrDefault(factory_reset_, "factory_reset_");
+    setup_mode_ = getOrDefault(setup_mode_, "setup_mode_");
+    system_wake_time_ = getOrDefault(system_wake_time_, "system_wake_time_");
+    system_sleep_time_ = getOrDefault(system_sleep_time_, "system_sleep_time_");
+
+    if (!load) {
+        writeToDisk();
+    }
+
+    LOGI("System settings loaded, serial#: %s", serial_.c_str());
 }
 
 
@@ -81,6 +109,14 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
     // ULP I2C
     // Sleep; TODO wait till driver is in sleep
     // ESP.deepSleep(system_sleep_time_);
+}
+
+
+void SystemTask::systemReset() {
+    LOGI("System factory reset\n");
+    factory_reset_ = true;
+    LITTLEFS.format();
+    ESP.restart();
 }
 
 
