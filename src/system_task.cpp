@@ -77,15 +77,22 @@ inline void SystemTask::checkButtonPress() {
         button_press_start_ = esp_timer_get_time();
     } else if (digitalRead(BUTTON_PIN) == HIGH && button_pressed_) {
         button_pressed_ = false;
-        button_press_duration_ = (esp_timer_get_time() - button_press_start_) / 1000;
-        if (button_press_duration_ > 5000 && button_press_duration_ < 15000) {
+        button_press_duration_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
+        if (button_press_duration_ > SETUP_MODE_TIMER && button_press_duration_ < FACTORY_RESET_TIMER) {
             LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
             sendTo(wireless_task_, Message(WIRELESS_SETUP, 1), 10);
-        } else if (button_press_duration_ > 15000) {
+        } else if (button_press_duration_ > FACTORY_RESET_TIMER) {
             LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
             systemReset();
         }
         LOGI("No action, button pressed for %dms", button_press_duration_);
+    } else if (digitalRead(BUTTON_PIN) == LOW && button_pressed_) {
+        int button_press_elapsed_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
+        if (button_press_elapsed_ > SETUP_MODE_TIMER && button_press_elapsed_ < FACTORY_RESET_TIMER) {
+            digitalWrite(LED_PIN, HIGH);
+        } else if (button_press_elapsed_ > FACTORY_RESET_TIMER) {
+            digitalWrite(LED_PIN, LOW);
+        }
     }
 }
 

@@ -1,6 +1,11 @@
 #pragma once
 #include "task.h"
 
+#define SYSTEM_WAKE_DURATION 5000   // ms
+#define SYSTEM_SLEEP_DURTION 5000   // ms
+#define SETUP_MODE_TIMER     5000   // ms
+#define FACTORY_RESET_TIMER  15000  // ms
+
 
 class SystemTask: public Task {
 public:
@@ -15,12 +20,12 @@ protected:
 
 private:
     String serial_ = "";
-    int system_wake_time_ = 5000;      // mSec
-    int system_sleep_time_ = 5000000;  // uSec
+    int system_wake_time_  = SYSTEM_WAKE_DURATION;          // ms
+    int system_sleep_time_ = SYSTEM_SLEEP_DURTION * 1000;  // us
 
-    int button_press_start_ = 0;
-    int button_press_duration_ = 0;
-    bool button_pressed_ = false;
+    bool button_pressed_        = false;
+    int  button_press_start_    = 0;
+    int  button_press_duration_ = 0;
 
     Task *motor_task_;
     Task *wireless_task_;
