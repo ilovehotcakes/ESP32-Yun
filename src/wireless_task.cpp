@@ -92,8 +92,10 @@ void WirelessTask::connectWifi() {
         initialized_ = false;
     }
 
-    // Websocket server
-    webserver.begin();
+    if (!MDNS.begin(ap_ssid_.c_str())) {
+        LOGE("Failed to set mDNS responder");
+    }
+    MDNS.addService("_osc", "_tcp", 80);
 
     websocket.onEvent(std::bind(&WirelessTask::wsEventHandler, this, std::placeholders::_1,
                       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
@@ -103,8 +105,11 @@ void WirelessTask::connectWifi() {
 
     routing();
 
+    webserver.begin();
+
     #if COMPILEOTA
-        ArduinoOTA.begin();  // TODO: check if OTA needs to be restarted after reconnection
+        ArduinoOTA.setHostname(ap_ssid_.c_str());
+        ArduinoOTA.begin();
     #endif
 
     setAndSave(attempts_, 1, "attempts_");

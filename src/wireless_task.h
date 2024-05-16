@@ -9,6 +9,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
 #include <FunctionalInterrupt.h>  // std:bind()
 #include <esp_task_wdt.h>
 #include "task.h"
@@ -18,8 +19,8 @@
     #include <ArduinoOTA.h>
 #endif
 
-#define MAX_ATTEMPTS 4
-#define WDT_DURATION 8  // Sec
+#define MAX_ATTEMPTS 5
+#define WDT_DURATION 9  // Sec
 
 
 class WirelessTask : public Task {
