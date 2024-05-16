@@ -10,19 +10,22 @@ def process_html():
                 assembled_html += "\t<style>\n"
                 with open(file_path, 'r') as css_file:
                     for line in css_file:
+                        if "%" in line:
+                            i = line.index("%")
+                            t = line[:i] + "%" + line[i:]
                         assembled_html += line
                 assembled_html += "\t</style>\n"
             elif "index.js" in html_line:
                 file_path = current_directory + html_line[18:27]
                 assembled_html += "\t<script>\n"
-                with open(file_path, 'r') as css_file:
-                    for line in css_file:
+                with open(file_path, 'r') as js_file:
+                    for line in js_file:
                         assembled_html += line
                 assembled_html += "\t</script>\n"
             elif ".png" in html_line:
                 file_path = current_directory + html_line[html_line.index("href=")+7:-5]
-                with open(file_path, 'rb') as img:
-                    b64_string = base64.b64encode(img.read()).decode("utf-8")
+                with open(file_path, 'rb') as img_file:
+                    b64_string = base64.b64encode(img_file.read()).decode("utf-8")
                     href_tag = html_line[:html_line.index("href=") + 6] + "data:image/png;base64," + b64_string + "\" />\n"
                     assembled_html += href_tag
             else:

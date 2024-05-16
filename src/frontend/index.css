@@ -61,3 +61,16 @@ p {
     background: #04AA6D; /* Green background */
     cursor: pointer;
 }
+.container {
+    width: 500px;
+    height: 300px;
+    margin: 200px auto;
+}
+.glass{
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border:1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
