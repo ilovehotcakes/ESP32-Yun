@@ -12,7 +12,7 @@ def process_html():
                     for line in css_file:
                         if "%" in line:
                             i = line.index("%")
-                            t = line[:i] + "%" + line[i:]
+                            line = line[:i] + "%" + line[i:]
                         assembled_html += line
                 assembled_html += "\t</style>\n"
             elif "index.js" in html_line:
