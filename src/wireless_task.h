@@ -19,7 +19,7 @@
     #include <ArduinoOTA.h>
 #endif
 
-#define MAX_ATTEMPTS 5
+#define MAX_ATTEMPTS 9
 #define WDT_DURATION 9  // Sec
 
 
