@@ -7,44 +7,261 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
     <title>ESP32 Yun</title>
 	<style>
 html {
-    font-family: Helvetica;
-    display: inline-block;
-    margin: 0px auto;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     text-align: center;
+    color: rgb(255, 255, 255);
 }
 body {
-    margin-top: 50px;
+    user-select: none;
     -webkit-user-select: none;
-    touch-action: pan-x pan-y;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 625px; */
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-image: url(https://wallpapers.com/images/featured/iphone-wltnz5o1xymafqmo.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 400px 1200px;
+    overflow: hidden;
 }
-h1 {
-    color: #444444;
-    margin: 50px auto;
+h2 {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 0;
 }
-p {
-    font-size: 19px;
-    color: #888;
+h3 {
+    font-size: 1.2em;
+    font-weight: 500;
+    margin: 0;
+    color: rgb(219, 219, 219);
+}
+.page {
+    position: absolute;
+    width: 375px;
+    height: 625px;
+    border: 1px solid black;
+}
+.container {
+    position: absolute;
+    top: 36%%;
+    left: 4.5%%;
+    width: 91%%;
+    height: 28%%;
+    border-radius: 1em;
+    border: none;
+}
+.glass{
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.6), rgba(94, 94, 94, 0.75));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
+    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
+}
+.navbar {
+    position: absolute;
+    top: 85%%;
+    width: 91%%;
+    height: 10.5%%;
+}
+.title {
+    position: absolute;
+    top: 7%%;
+    left: 0%%;
+    margin: -1px 0 0 -1px;
+    width: 100%%;
+    height: 30%%;
+    border: inherit;
+}
+.slider {
+    position: absolute;
+    top: 35%%;
+    left: 0%%;
+    margin: 0 0 0 -1px;
+    padding-top: 5%%;
+    width: 100%%;
+    height: 30%%;
+    border: inherit;
+}
+.controls {
+    position: absolute;
+    top: 62.5%%;
+    left: 0%%;
+    margin: 1px 0 0 -1px;
+    width: 100%%;
+    height: 39%%;
+    border: inherit;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    top: 25%%;
+    left: 8%%;
+    width: 84%%;
+    height: 12%%;
+    border-radius: 0.75em;
+    outline: none;
+    overflow: hidden;
+    transition: 0.25s ease;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    cursor: pointer;
+    box-shadow: -20rem 0 0 20rem rgba(255, 255, 255, 0.700);
+}
+input[type="range"]:hover {
+    top: 10%%;
+    left: 4.5%%;
+    width: 91%%;
+    height: 44%%;
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+    box-shadow: -20rem 0 0 20rem rgba(255, 255, 255, 0.950);
+}
+.tick {
+    position: absolute;
+    top: 40%%;
+    width: 1px;
+    height: 7px;
+    background-color: rgba(148, 148, 148, 0.75);
+    transition: 50ms ease;
+}
+input[type="range"]:hover ~ .tick {
+    width: 0px;
+}
+.one {
+    left: 8.75%%;
+}
+.two {
+    left: 30%%;
+}
+.three {
+    left: 50%%;
+}
+.four {
+    left: 72%%;
+}
+.five {
+    left: 92.5%%;
+}
+.marker {
+    position: absolute;
+    top: 50%%;
+    font-size: 0.8em;
+    color: rgba(172, 172, 172, 0.75);
+    transition: 0.25s ease;
+}
+.zero {
+    left: 7.75%%;
+}
+input[type="range"]:hover ~ .zero {
+    top: 61%%;
+    left: 4.5%%;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.950);
+}
+.hundred {
+    left: 87.5%%;
+}
+input[type="range"]:hover ~ .hundred {
+    top: 61%%;
+    left: 89.5%%;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.950);
 }
 .button {
-    display: inline-block;
-    width: 100px;
-    margin: 0px 5px;
-    padding: 10px;
-    font-size: 20px;
-    text-align: center;
+    position: absolute;
+    top: 5%%;
+    width: 14.3%%;
+    height: 74.6%%;
+    color: rgba(0, 0, 0, 0);
+    background-size: 2.7rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0);
+    border: inherit;
+    border-radius: 3em;
     cursor: pointer;
     outline: none;
-    color: #fff;
-    background-color: #04AA6D;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 9px #999;
+    transition: 250ms ease;
+}
+.side {
+    background-size: 2.5rem;
 }
 .button:active {
-    background-color: #3e8e41;
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-    transform: translateY(4px);
+    background-size: 2.3rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgb(189, 189, 189);
+}
+.open {
+    left: 15%%;
+    background-image: url(./img/icon_open_100x100.png);
+}
+.stop {
+    left: 43%%;
+    background-image: url(./img/icon_stop_100x100.png);
+}
+.close {
+    left: 70.7%%;
+    background-image: url(./img/icon_close_100x100.png);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* .container {
+    display: grid;
+    width: 95vw;
+    max-width: 500px;
+    height: 100vh;
+    max-height: 800px;
+    margin: auto;
+    border-radius: 20px;
+    border-color: #333333;
+    border: 1px;
+}
+.column {
+    display: inline-block;
+    width: 100%%;
+    margin: 0px;
+}
+.card {
+    display: grid;
+    width: 95%%;
+    aspect-ratio: 1 / 1;
+    margin: 10px;
+    background-color: #ffe7a3;
+    border-radius: 35px;
+}
+.short {
+    aspect-ratio: 2 / 1;
+}
+.setting-key {
+    height: 100%%;
+    margin: 5%% auto -8%;
+}
+.setting-value {
+    font-size: 60px;
+    font-weight: normal;
+    padding: 0px;
+    margin: 0px;
+}
+.setting-unit {
+    margin: 1%% auto 1%;
 }
 .desktop-only-elements {
     display: none;
@@ -52,40 +269,64 @@ p {
 .mobile-only-elements {
     display: inline-block;
 }
-.slider {
-    -webkit-appearance: none;
+input[type="number" i] {
     appearance: none;
-    width: 300px;
-    margin: 50px 0px;
-    height: 50px;
-    background: #d3d3d3;
-    outline: none;
+    -webkit-appearance: none;
+    width: 80%%;
+    height: 90%%;
+    padding: 0px;
+    margin: 0px auto -35px;
+    font-size: 60px;
+    font-weight: 600;
+    color: #333333;
+    text-align: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    border-width: 0px;
+    background-color: #ffffff00;
 }
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
+textarea:focus, input[type="number" i]:focus {
+    outline: none;
+    background-color: hsla(24, 100%%, 73%, 0.459);
+    border-radius: 20px;
+}
+input[type=checkbox i] {
+    margin: -16px auto;
+    height: 100%%;
+    width: 100%%;
+    background-color: #002B4E;
+}
+.toggle {
+    margin: -16px auto;
+    border: 0.2rem solid rgb(0, 0, 0);
+    border-radius: calc( 2.5rem / 2 );
+    width: 4.5rem;
+    height: 2.5rem;
     appearance: none;
-    width: 15px; /* Set a specific slider handle width */
-    height: 35px; /* Slider handle height */
-    background: #04AA6D; /* Green background */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: transform 0.07s;
     cursor: pointer;
 }
-.container {
-    width: 500px;
-    height: 300px;
-    margin: 200px auto;
+
+
+.toggle::after {
+    content: "";
+    display: inline-block;
+    margin: 0.2rem;
+    border-radius: 50%%;
+    width: 1.7rem;
+    height: 1.7rem;
+    background: black;
+    transition: transform 0.07s linear;
 }
-.glass{
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border:1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}	</style>
+
+.toggle:checked::after {
+    transform: translateX(2rem);
+} */
+
+	</style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
-const percentage_slider_ = document.getElementById('percentage-slider');
-
 window.addEventListener('load', () => {
     isMobileDevice();
     try {
@@ -110,7 +351,7 @@ window.addEventListener('load', () => {
             const data = event.data;
             console.log(data);
             if (data > -1) {
-                percentage_slider_.value = data;
+                document.getElementById("percent-slider").value = data;
             }
         };
     } catch (error) {
@@ -121,12 +362,10 @@ window.addEventListener('load', () => {
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
     // Is mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
         return true;
     }
-
     // Is desktop device
     $('.mobile-only-elements').hide();
     $('.desktop-only-elements').show();
@@ -135,11 +374,7 @@ function isMobileDevice() {
 
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
-    if (element == '0' || element == '100') {
-        xhr.open('GET', '/motor?percent=' + element, true);
-    } else {
-        xhr.open('GET', '/motor?percent=' + percentage_slider_.value, true);
-    }
+    xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();
 }
 
@@ -171,34 +406,99 @@ function motorSetMax() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?set-max=1', true);
     xhr.send();
-}
-
-
-// wifi name
-// wifi password
-// step
-// openclose
-// velocity
-// current
-// acceleration
-// sg
-// tcoolsthresh
-// sg thresh
-// fastmode
-// fastmode thresh
-// direction
-// microstep
-	</script>
+}	</script>
 </head>
 <body>
-    <h1>ESP32 Yun</h1>
-    <div>
-        <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
-        <button id="stop-button" class="button" onclick="motorStop()">STOP</button>
-        <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
+    <!-- <div class="container">
+        <div id="left-column" class="column">
+            <div class="card">
+                <h2 class="setting-key">current</h2>
+                <input id="closing-current" type="number" value=200 step="1">
+                <input id="opening-current" type="number" value=75  step="1">
+                <h2 class="setting-unit">ma</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">acceleration</h2>
+                <input id="closing-acceleration" type="number" value=0.5 step="0.1">
+                <input id="opening-acceleration" type="number" value=0.5 step="0.1">
+                <h2 class="setting-unit">hz/s</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">full steps</h2>
+                <input id="full-steps" type="number" value=200>
+                <h2 class="setting-unit">/rev</h2>
+            </div>
+            <div class="card short">
+                <h2 class="setting-key">fastmode</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">fastmode threshold</h2>
+                <h2 class="setting-value">300</h2>
+                <h2 class="setting-unit">-</h2>
+            </div>
+        </div>
+
+        <div id="right-column" class="column">
+            <div id="sync-settings-card" class="card short">
+                <h2 class="setting-key">sync settings</h2>
+                <span>unified
+                <input class="toggle" type="checkbox">
+                dual
+                </span>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">speed</h2>
+                <h2 class="setting-value">3.0</h2>
+                <h2 class="setting-unit">hz</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">microsteps</h2>
+                <h2 class="setting-value">2</h2>
+                <h2 class="setting-unit">/full steps</h2>
+            </div>
+            <div class="card short">
+                <h2 class="setting-key">direction</h2>
+            </div>
+            <div id="stallguard-card" class="card short">
+                <h2 class="setting-key">stallguard</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">stallguard threshold</h2>
+                <h2 class="setting-value">10</h2>
+                <h2 class="setting-unit">-</h2>
+            </div>
+        </div>
+    </div> -->
+    <div id="home-page" class="page">
+        <div class="glass container">
+            <div class="title">
+                <h2>North Window</h2>
+                <h3>e5c258</h3>
+            </div>
+
+            <div class="slider">
+                <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
+                <span class="tick one"></span>
+                <span class="tick two"></span>
+                <span class="tick three"></span>
+                <span class="tick four"></span>
+                <span class="tick five"></span>
+                <span class="zero marker">0</span>
+                <span class="hundred marker">100</span>
+            </div>
+
+            <div class="controls">
+                <button type="button" class="open side button" onclick="motorMove(this)">OPEN</button>
+                <button type="button" class="stop button" onclick="motorStop()">STOP</button>
+                <button type="button" class="close side button" onclick="motorMove(this)">CLOSE</button>
+            </div>
+        </div>
+
+        <div class="navbar glass container"></div>
     </div>
 
-    <div class="desktop-only-elements">
+
+    <!-- <div class="desktop-only-elements">
         <button id="forward-button" class="button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
         <button id="backward-button" class="button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
     </div>
@@ -211,10 +511,6 @@ function motorSetMax() {
     <div>
         <button id="set-min-button" class="button" onmousedown="motorSetMin()" onmouseup="motorStop()">SET MIN</button>
         <button id="set-max-button" class="button" onmousedown="motorSetMax()" onmouseup="motorStop()">SET MAX</button>
-    </div>
-
-    <div>
-        <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
-    </div>
+    </div> -->
 </body>
 </html>)rawliteral";

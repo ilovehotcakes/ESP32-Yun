@@ -10,14 +10,97 @@
     <script src="./index.js"></script>
 </head>
 <body>
-    <h1>ESP32 Yun</h1>
-    <div>
-        <button id="open-button" class="button" onclick="motorMove(0)">OPEN</button>
-        <button id="stop-button" class="button" onclick="motorStop()">STOP</button>
-        <button id="close-button" class="button" onclick="motorMove(100)">CLOSE</button>
+    <!-- <div class="container">
+        <div id="left-column" class="column">
+            <div class="card">
+                <h2 class="setting-key">current</h2>
+                <input id="closing-current" type="number" value=200 step="1">
+                <input id="opening-current" type="number" value=75  step="1">
+                <h2 class="setting-unit">ma</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">acceleration</h2>
+                <input id="closing-acceleration" type="number" value=0.5 step="0.1">
+                <input id="opening-acceleration" type="number" value=0.5 step="0.1">
+                <h2 class="setting-unit">hz/s</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">full steps</h2>
+                <input id="full-steps" type="number" value=200>
+                <h2 class="setting-unit">/rev</h2>
+            </div>
+            <div class="card short">
+                <h2 class="setting-key">fastmode</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">fastmode threshold</h2>
+                <h2 class="setting-value">300</h2>
+                <h2 class="setting-unit">-</h2>
+            </div>
+        </div>
+
+        <div id="right-column" class="column">
+            <div id="sync-settings-card" class="card short">
+                <h2 class="setting-key">sync settings</h2>
+                <span>unified
+                <input class="toggle" type="checkbox">
+                dual
+                </span>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">speed</h2>
+                <h2 class="setting-value">3.0</h2>
+                <h2 class="setting-unit">hz</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">microsteps</h2>
+                <h2 class="setting-value">2</h2>
+                <h2 class="setting-unit">/full steps</h2>
+            </div>
+            <div class="card short">
+                <h2 class="setting-key">direction</h2>
+            </div>
+            <div id="stallguard-card" class="card short">
+                <h2 class="setting-key">stallguard</h2>
+            </div>
+            <div class="card">
+                <h2 class="setting-key">stallguard threshold</h2>
+                <h2 class="setting-value">10</h2>
+                <h2 class="setting-unit">-</h2>
+            </div>
+        </div>
+    </div> -->
+    <div id="home-page" class="page">
+        <div class="glass container">
+            <div class="title">
+                <h2 class="name">Living Room Window</h2>
+                <h3 class="serial">yun-e5c258</h3>
+                <button type="button" class="dropdown glass button" onclick="motorMove(this)">DROPDOWN</button>
+            </div>
+
+            <div class="slider">
+                <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
+                <span class="tick one"></span>
+                <span class="tick two"></span>
+                <span class="tick three"></span>
+                <span class="tick four"></span>
+                <span class="tick five"></span>
+                <span class="zero marker">0</span>
+                <span class="hundred marker">100</span>
+            </div>
+
+            <div class="controls">
+                <button type="button" class="open side button" onclick="motorMove(this)">OPEN</button>
+                <button type="button" class="stop button" onclick="motorStop()">STOP</button>
+                <button type="button" class="close side button" onclick="motorMove(this)">CLOSE</button>
+            </div>
+        </div>
+
+        <div class="navbar glass container"></div>
     </div>
 
-    <div class="desktop-only-elements">
+
+    <!-- <div class="desktop-only-elements">
         <button id="forward-button" class="button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
         <button id="backward-button" class="button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
     </div>
@@ -30,10 +113,6 @@
     <div>
         <button id="set-min-button" class="button" onmousedown="motorSetMin()" onmouseup="motorStop()">SET MIN</button>
         <button id="set-max-button" class="button" onmousedown="motorSetMax()" onmouseup="motorStop()">SET MAX</button>
-    </div>
-
-    <div>
-        <input id="percentage-slider" class="slider" onchange="motorMove(this)" type="range" value="%SLIDER%" min="0" max="100" step="1">
-    </div>
+    </div> -->
 </body>
 </html>

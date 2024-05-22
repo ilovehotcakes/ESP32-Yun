@@ -1,5 +1,3 @@
-const percentage_slider_ = document.getElementById('percentage-slider');
-
 window.addEventListener('load', () => {
     isMobileDevice();
     try {
@@ -24,7 +22,7 @@ window.addEventListener('load', () => {
             const data = event.data;
             console.log(data);
             if (data > -1) {
-                percentage_slider_.value = data;
+                document.getElementById("percent-slider").value = data;
             }
         };
     } catch (error) {
@@ -35,12 +33,10 @@ window.addEventListener('load', () => {
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
     // Is mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
         return true;
     }
-
     // Is desktop device
     $('.mobile-only-elements').hide();
     $('.desktop-only-elements').show();
@@ -49,11 +45,7 @@ function isMobileDevice() {
 
 function motorMove(element) {
     const xhr = new XMLHttpRequest();
-    if (element == '0' || element == '100') {
-        xhr.open('GET', '/motor?percent=' + element, true);
-    } else {
-        xhr.open('GET', '/motor?percent=' + percentage_slider_.value, true);
-    }
+    xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();
 }
 
@@ -86,19 +78,3 @@ function motorSetMax() {
     xhr.open('GET', '/motor?set-max=1', true);
     xhr.send();
 }
-
-
-// wifi name
-// wifi password
-// step
-// openclose
-// velocity
-// current
-// acceleration
-// sg
-// tcoolsthresh
-// sg thresh
-// fastmode
-// fastmode thresh
-// direction
-// microstep
