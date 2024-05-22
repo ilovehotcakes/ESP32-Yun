@@ -74,50 +74,53 @@
     <div id="home-page" class="page">
         <div class="glass container">
             <div class="title">
-                <h2 class="name">Living Room Window</h2>
-                <h3 class="serial">yun-e5c258</h3>
-                <button type="button" class="dropdown glass button" onclick="dropdown(this)">DROPDOWN</button>
+                <h2 class="name-txt">Living Room Window</h2>
+                <h3 class="serial-txt">yun-e5c258</h3>
+                <div class="dropdown">
+                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()">
+                    <label for="dropdown_checkbox" class="dropdown-cbx"></label>
+                </div>
             </div>
 
-            <div class="controls">
+            <div id="controls" class="controls">
                 <div class="slider">
                     <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                    <span class="tick one"></span>
-                    <span class="tick two"></span>
-                    <span class="tick three"></span>
-                    <span class="tick four"></span>
-                    <span class="tick five"></span>
-                    <span class="zero marker">0</span>
-                    <span class="hundred marker">100</span>
+                    <span class="tick one-tck"></span>
+                    <span class="tick two-tck"></span>
+                    <span class="tick three-tck"></span>
+                    <span class="tick four-tck"></span>
+                    <span class="tick five-tck"></span>
+                    <span class="marker zero-mkr">0</span>
+                    <span class="marker hundred-mkr">100</span>
                 </div>
 
                 <div class="open-stop-close">
-                    <button type="button" class="open side button" onclick="motorMove(this)">OPEN</button>
-                    <button type="button" class="stop button" onclick="motorStop()">STOP</button>
-                    <button type="button" class="close side button" onclick="motorMove(this)">CLOSE</button>
+                    <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">OPEN</button>
+                    <button type="button" class="stop-btn button1" onclick="motorStop()">STOP</button>
+                    <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">CLOSE</button>
                 </div>
             </div>
 
-            <div class="controls hide">
+            <div id="advanced_controls" class="controls hide-hlp">
                 <div class="forward-backward">
-                    <div class="desktop-only-elements">
-                        <button type="button" class="backward button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
-                        <button type="button" class="forward button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
+                    <div class="desktop-only">
+                        <button type="button" class="backward-btn button1" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
+                        <button type="button" class="forward-btn button1" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
                     </div>
-                    <div class="mobile-only-elements">
-                        <button type="button" class="backward button" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
-                        <button type="button" class="forward button" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
+                    <div class="mobile-only">
+                        <button type="button" class="backward-btn button1" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
+                        <button type="button" class="forward-btn button1" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
                     </div>
                 </div>
 
                 <div class="horizontal-separator"></div>
 
                 <div class="min-zero-max">
-                    <button type="button" class="set-min btn" onclick="motorSetMin()">Set Min</button>
-                    <span class="left vertical-separator"></span>
-                    <button type="button" class="zeroing btn">Zero</button>
-                    <span class="right vertical-separator"></span>
-                    <button type="button" class="set-max btn" onclick="motorSetMax()">Set Max</button>
+                    <button type="button" class="set-min-btn button2" onclick="motorSetMin()">Set Min</button>
+                    <span class="left-spr vertical-separator"></span>
+                    <button type="button" class="zeroing-btn button2">Zero</button>
+                    <span class="right-spr vertical-separator"></span>
+                    <button type="button" class="set-max-btn button2" onclick="motorSetMax()">Set Max</button>
                 </div>
             </div>
         </div>

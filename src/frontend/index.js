@@ -38,12 +38,18 @@ function isMobileDevice() {
         return true;
     }
     // Is desktop device
-    $('.mobile-only-elements').hide();
-    $('.desktop-only-elements').show();
+    $('.mobile-only').hide();
+    $('.desktop-only').show();
     return false;
 }
 
+function dropdown () {
+    document.getElementById("controls").classList.toggle('hide-hlp');
+    document.getElementById("advanced_controls").classList.toggle('hide-hlp');
+}
+
 function motorMove(element) {
+    console.log(element);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();

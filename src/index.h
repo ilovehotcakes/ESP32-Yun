@@ -14,6 +14,7 @@ html {
 body {
     user-select: none;
     -webkit-user-select: none;
+    -moz-user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,10 +52,19 @@ h3 {
     width: 91%%;
     height: 28%%;
     border-radius: 1em;
+    /* border: 1px solid black; */
     border: none;
 }
+.controls {
+    position: absolute;
+    top: 36.7%%;
+    left: 0;
+    width: 100%%;
+    height: 63%%;
+    border: inherit;
+}
 .glass{
-    background: linear-gradient(135deg, rgba(145, 145, 145, 0.6), rgba(94, 94, 94, 0.75));
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     /* border: 1px solid rgba(255, 255, 255, 0.3); */
@@ -75,28 +85,103 @@ h3 {
     height: 30%%;
     border: inherit;
 }
+.name-txt {
+    position: absolute;
+    top: 3%%;
+    left: 8.7%%;
+}
+.serial-txt {
+    position: absolute;
+    top: 50%%;
+    left: 9%%;
+}
 .slider {
     position: absolute;
-    top: 35%%;
-    left: 0%%;
+    top: 0;
+    left: 0;
     margin: 0 0 0 -1px;
     padding-top: 5%%;
     width: 100%%;
-    height: 30%%;
+    height: 47.6%%;
     border: inherit;
 }
-.controls {
+.open-stop-close {
     position: absolute;
-    top: 62.5%%;
-    left: 0%%;
-    margin: 1px 0 0 -1px;
+    top: 47.6%%;
+    left: 0;
+    margin: 0 0 0 -1px;
     width: 100%%;
-    height: 39%%;
+    height: 52.4%%;
     border: inherit;
+}
+.forward-backward {
+    position: absolute;
+    top: 0;
+    left: 0%%;
+    margin: 0 0 0 -1px;
+    width: 100%%;
+    height: 52.4%%;
+    border: inherit;
+}
+.horizontal-separator {
+    position: absolute;
+    top: 52.4%%;
+    width: 100%%;
+    height: 1px;
+    background-color: rgba(209, 209, 209, 0.527);
+}
+.min-zero-max {
+    position: absolute;
+    top: 52.4%%;
+    left: 0%%;
+    margin: 0 0 0 -1px;
+    width: 100%%;
+    height: 47%%;
+    border: inherit;
+}
+.vertical-separator {
+    position: absolute;
+    top: 1px;
+    width: 1px;
+    height: 100%%;
+    background-color: rgba(209, 209, 209, 0.527);
+}
+.left-spr {
+    left: 35%%;
+}
+.right-spr {
+    left: 65%%;
+}
+.button2 {
+    position: absolute;
+    top: 1px;
+    padding: 0;
+    width: 35%%;
+    height: 100%%;
+    font-size: medium;
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    transition: 0.1s ease;
+}
+.button2:active {
+    background-color: rgba(194, 194, 194, 0.507);
+}
+.set-min-btn {
+    left: 0;
+    border-radius: 0 0 0 1em;
+}
+.zeroing-btn {
+    left: 35%%;
+    width: 30%%;
+}
+.set-max-btn {
+    margin-left: 1px;
+    left: 65%%;
+    border-radius: 0 0 1em 0;
 }
 input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
     position: absolute;
     top: 25%%;
     left: 8%%;
@@ -116,8 +201,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]:hover {
     top: 10%%;
-    left: 4.5%%;
-    width: 91%%;
+    left: 5%%;
+    width: 90%%;
     height: 44%%;
 }
 input[type="range"]:hover::-webkit-slider-thumb {
@@ -134,19 +219,19 @@ input[type="range"]:hover::-webkit-slider-thumb {
 input[type="range"]:hover ~ .tick {
     width: 0px;
 }
-.one {
+.one-tck {
     left: 8.75%%;
 }
-.two {
+.two-tck {
     left: 30%%;
 }
-.three {
-    left: 50%%;
+.three-tck {
+    left: 50.5%%;
 }
-.four {
+.four-tck {
     left: 72%%;
 }
-.five {
+.five-tck {
     left: 92.5%%;
 }
 .marker {
@@ -156,31 +241,32 @@ input[type="range"]:hover ~ .tick {
     color: rgba(172, 172, 172, 0.75);
     transition: 0.25s ease;
 }
-.zero {
+.zero-mkr {
     left: 7.75%%;
 }
-input[type="range"]:hover ~ .zero {
+input[type="range"]:hover ~ .zero-mkr {
     top: 61%%;
-    left: 4.5%%;
+    left: 5%%;
     font-size: 0.85em;
     color: rgba(255, 255, 255, 0.950);
 }
-.hundred {
+.hundred-mkr {
     left: 87.5%%;
 }
-input[type="range"]:hover ~ .hundred {
+input[type="range"]:hover ~ .hundred-mkr {
     top: 61%%;
-    left: 89.5%%;
+    left: 89%%;
     font-size: 0.85em;
     color: rgba(255, 255, 255, 0.950);
 }
-.button {
+.button1 {
     position: absolute;
     top: 5%%;
     width: 14.3%%;
-    height: 74.6%%;
+    height: 84.5%%;
+    padding: 0;
     color: rgba(0, 0, 0, 0);
-    background-size: 2.7rem;
+    background-size: 2.5rem;
     background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(0, 0, 0, 0);
@@ -188,29 +274,76 @@ input[type="range"]:hover ~ .hundred {
     border-radius: 3em;
     cursor: pointer;
     outline: none;
-    transition: 250ms ease;
+    transition: 100ms ease;
 }
-.side {
-    background-size: 2.5rem;
-}
-.button:active {
-    background-size: 2.3rem;
+.button1:active {
+    background-size: 2.2rem;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: rgb(189, 189, 189);
+    background-color: rgba(189, 189, 189, 0.747);
 }
-.open {
+.side-hlp {
+    background-size: 2.4rem;
+}
+.open-btn {
     left: 15%%;
     background-image: url(./img/icon_open_100x100.png);
 }
-.stop {
-    left: 43%%;
+.stop-btn {
+    left: 42.85%%;
     background-image: url(./img/icon_stop_100x100.png);
 }
-.close {
+.close-btn {
     left: 70.7%%;
     background-image: url(./img/icon_close_100x100.png);
 }
+.forward-btn {
+    left: 61.5%%;
+    background-image: url(./img/icon_forward_100x100.png);
+}
+.backward-btn {
+    left: 24.5%%;
+    background-image: url(./img/icon_backward_100x100.png);
+}
+.dropdown {
+    position: absolute;
+    top: 6%%;
+    left: 87%%;
+    margin: 0;
+    width: 8%%;
+    height: 52.1%%;
+}
+.dropdown-cbx::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    background-color: gray;
+    width: 100%%;
+    height: 100%%;
+    border-radius: 3em;
+    background-size: 1.7em;
+    background-image: url(./img/icon_dropdown_100x100.png);
+    background-color: rgba(172, 172, 172, 0.548);
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: rotate(180deg);
+    transition: 0.2s;
+}
+input:checked + .dropdown-cbx::before {
+    background-color: rgba(122, 122, 122, 0.582);
+    transform: rotate(0deg);
+}
+input[type="checkbox"], input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+.hide-hlp {
+    display: none;
+}
+
+
 
 
 
@@ -367,12 +500,18 @@ function isMobileDevice() {
         return true;
     }
     // Is desktop device
-    $('.mobile-only-elements').hide();
-    $('.desktop-only-elements').show();
+    $('.mobile-only').hide();
+    $('.desktop-only').show();
     return false;
 }
 
+function dropdown () {
+    document.getElementById("controls").classList.toggle('hide-hlp');
+    document.getElementById("advanced_controls").classList.toggle('hide-hlp');
+}
+
 function motorMove(element) {
+    console.log(element);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();
@@ -469,48 +608,62 @@ function motorSetMax() {
             </div>
         </div>
     </div> -->
+
     <div id="home-page" class="page">
         <div class="glass container">
             <div class="title">
-                <h2>North Window</h2>
-                <h3>e5c258</h3>
+                <h2 class="name-txt">Living Room Window</h2>
+                <h3 class="serial-txt">yun-e5c258</h3>
+                <div class="dropdown">
+                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()">
+                    <label for="dropdown_checkbox" class="dropdown-cbx"></label>
+                </div>
             </div>
 
-            <div class="slider">
-                <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                <span class="tick one"></span>
-                <span class="tick two"></span>
-                <span class="tick three"></span>
-                <span class="tick four"></span>
-                <span class="tick five"></span>
-                <span class="zero marker">0</span>
-                <span class="hundred marker">100</span>
+            <div id="controls" class="controls">
+                <div class="slider">
+                    <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
+                    <span class="tick one-tck"></span>
+                    <span class="tick two-tck"></span>
+                    <span class="tick three-tck"></span>
+                    <span class="tick four-tck"></span>
+                    <span class="tick five-tck"></span>
+                    <span class="marker zero-mkr">0</span>
+                    <span class="marker hundred-mkr">100</span>
+                </div>
+
+                <div class="open-stop-close">
+                    <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">OPEN</button>
+                    <button type="button" class="stop-btn button1" onclick="motorStop()">STOP</button>
+                    <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">CLOSE</button>
+                </div>
             </div>
 
-            <div class="controls">
-                <button type="button" class="open side button" onclick="motorMove(this)">OPEN</button>
-                <button type="button" class="stop button" onclick="motorStop()">STOP</button>
-                <button type="button" class="close side button" onclick="motorMove(this)">CLOSE</button>
+            <div id="advanced_controls" class="controls hide-hlp">
+                <div class="forward-backward">
+                    <div class="desktop-only">
+                        <button type="button" class="backward-btn button1" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
+                        <button type="button" class="forward-btn button1" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
+                    </div>
+                    <div class="mobile-only">
+                        <button type="button" class="backward-btn button1" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
+                        <button type="button" class="forward-btn button1" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
+                    </div>
+                </div>
+
+                <div class="horizontal-separator"></div>
+
+                <div class="min-zero-max">
+                    <button type="button" class="set-min-btn button2" onclick="motorSetMin()">Set Min</button>
+                    <span class="left-spr vertical-separator"></span>
+                    <button type="button" class="zeroing-btn button2">Zero</button>
+                    <span class="right-spr vertical-separator"></span>
+                    <button type="button" class="set-max-btn button2" onclick="motorSetMax()">Set Max</button>
+                </div>
             </div>
         </div>
 
-        <div class="navbar glass container"></div>
+        <!-- <div class="navbar glass container"></div> -->
     </div>
-
-
-    <!-- <div class="desktop-only-elements">
-        <button id="forward-button" class="button" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
-        <button id="backward-button" class="button" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
-    </div>
-    
-    <div class="mobile-only-elements">
-        <button id="forward-button" class="button" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
-        <button id="backward-button" class="button" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
-    </div>
-
-    <div>
-        <button id="set-min-button" class="button" onmousedown="motorSetMin()" onmouseup="motorStop()">SET MIN</button>
-        <button id="set-max-button" class="button" onmousedown="motorSetMax()" onmouseup="motorStop()">SET MAX</button>
-    </div> -->
 </body>
 </html>)rawliteral";
