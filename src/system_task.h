@@ -19,6 +19,7 @@ protected:
     void run();
 
 private:
+    String name_   = "";
     String serial_ = "";
     // String manufacturer_ = "";
     // String model_ = "";
