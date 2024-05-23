@@ -8,8 +8,7 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
 	<style>
 html {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    text-align: center;
-    color: rgb(255, 255, 255);
+    color: rgba(255, 255, 255, 1);
 }
 body {
     user-select: none;
@@ -37,7 +36,7 @@ h3 {
     font-size: 1.2em;
     font-weight: 500;
     margin: 0;
-    color: rgb(219, 219, 219);
+    color: rgba(210, 210, 210, 0.85);
 }
 .page {
     position: absolute;
@@ -62,6 +61,7 @@ h3 {
     width: 100%%;
     height: 63%%;
     border: inherit;
+    transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
 }
 .glass{
     background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
@@ -107,7 +107,7 @@ h3 {
 }
 .open-stop-close {
     position: absolute;
-    top: 47.6%%;
+    top: 46%%;
     left: 0;
     margin: 0 0 0 -1px;
     width: 100%%;
@@ -322,7 +322,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     width: 100%%;
     height: 100%%;
     border-radius: 3em;
-    background-size: 1.7em;
+    background-size: 1.3em;
     background-image: url(./img/icon_dropdown_100x100.png);
     background-color: rgba(172, 172, 172, 0.548);
     background-repeat: no-repeat;
@@ -340,7 +340,8 @@ input[type="checkbox"], input[type="range"] {
     -moz-appearance: none;
 }
 .hide-hlp {
-    display: none;
+    opacity: 0;
+    height: 0;
 }
 
 
@@ -615,7 +616,7 @@ function motorSetMax() {
                 <h2 class="name-txt">Living Room Window</h2>
                 <h3 class="serial-txt">yun-e5c258</h3>
                 <div class="dropdown">
-                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()">
+                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()" unchecked>
                     <label for="dropdown_checkbox" class="dropdown-cbx"></label>
                 </div>
             </div>
@@ -633,21 +634,21 @@ function motorSetMax() {
                 </div>
 
                 <div class="open-stop-close">
-                    <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">OPEN</button>
+                    <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">Open</button>
                     <button type="button" class="stop-btn button1" onclick="motorStop()">STOP</button>
-                    <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">CLOSE</button>
+                    <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">Close</button>
                 </div>
             </div>
 
             <div id="advanced_controls" class="controls hide-hlp">
                 <div class="forward-backward">
                     <div class="desktop-only">
-                        <button type="button" class="backward-btn button1" onmousedown="motorBackward()" onmouseup="motorStop()">BACKWARD</button>
-                        <button type="button" class="forward-btn button1" onmousedown="motorForward()" onmouseup="motorStop()">FORWARD</button>
+                        <button type="button" class="backward-btn button1" onmousedown="motorBackward()" onmouseup="motorStop()">Backward</button>
+                        <button type="button" class="forward-btn button1" onmousedown="motorForward()" onmouseup="motorStop()">Forward</button>
                     </div>
                     <div class="mobile-only">
-                        <button type="button" class="backward-btn button1" ontouchstart="motorBackward()" ontouchend="motorStop()">BACKWARD</button>
-                        <button type="button" class="forward-btn button1" ontouchstart="motorForward()" ontouchend="motorStop()">FORWARD</button>
+                        <button type="button" class="backward-btn button1" ontouchstart="motorBackward()" ontouchend="motorStop()">Backward</button>
+                        <button type="button" class="forward-btn button1" ontouchstart="motorForward()" ontouchend="motorStop()">Forward</button>
                     </div>
                 </div>
 
@@ -663,7 +664,7 @@ function motorSetMax() {
             </div>
         </div>
 
-        <!-- <div class="navbar glass container"></div> -->
+        <div class="navbar glass container"></div>
     </div>
 </body>
 </html>)rawliteral";

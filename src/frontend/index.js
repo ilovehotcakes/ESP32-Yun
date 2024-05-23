@@ -22,7 +22,7 @@ window.addEventListener('load', () => {
             const data = event.data;
             console.log(data);
             if (data > -1) {
-                document.getElementById("percent-slider").value = data;
+                document.getElementById("percent_slider").value = data;
             }
         };
     } catch (error) {
@@ -46,6 +46,10 @@ function isMobileDevice() {
 function dropdown () {
     document.getElementById("controls").classList.toggle('hide-hlp');
     document.getElementById("advanced_controls").classList.toggle('hide-hlp');
+}
+
+function jm () {
+    document.getElementById("wireless").classList.toggle('wireless');
 }
 
 function motorMove(element) {
@@ -83,4 +87,8 @@ function motorSetMax() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?set-max=1', true);
     xhr.send();
+}
+
+function print(element) {
+    console.log(element);
 }
