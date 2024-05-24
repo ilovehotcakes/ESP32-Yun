@@ -2,8 +2,6 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" type="image/x-icon" href="./img/favicon_60x60.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./img/touch_icon_180x180.png" />
     <title>ESP32 Yun</title>
     <link rel="stylesheet" type="text/css" href="./index.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -13,7 +11,7 @@
     <div class="page">
         <div id="home_page" class="glass container hide-hlp">
             <div class="title">
-                <h3 class="name-txt">Living Room Window</h3>
+                <h3 class="name-txt white-color">Living Room Window</h3>
                 <h3 class="serial-txt">yun-e5c258</h3>
                 <div class="dropdown">
                     <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()" unchecked>
@@ -35,7 +33,7 @@
 
                 <div class="open-stop-close">
                     <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">Open</button>
-                    <button type="button" class="stop-btn button1" onclick="motorStop()">STOP</button>
+                    <button type="button" class="stop-btn button1" onclick="motorStop()">Stop</button>
                     <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">Close</button>
                 </div>
             </div>
@@ -65,7 +63,8 @@
         </div>
 
 
-        <!-- To display and change motor settings -->
+
+        <!-- To display and change some motor settings -->
         <div class="unified-settings glass container">
             <div class="zero-pos four-settings">
                 <h3 class="setting-name-txt">Sync Settings</h3>
@@ -77,7 +76,7 @@
 
             <div class="one-forth-pos horizontal-separator"></div>
 
-            <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current')">
+            <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current', 1)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
                 <h4 id="current_open_setting" class="opening-setting-txt">75</h4>
                 <h4 id="current_close_setting" class="closing-setting-txt">200</h4>
@@ -85,7 +84,7 @@
 
             <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half-pos four-settings pointer-hlp" onclick="openSettingDialog('Velocity')">
+            <div class="one-half-pos four-settings pointer-hlp" onclick="openSettingDialog('Velocity', 0.1)">
                 <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
                 <h4 id="velocity_open_setting" class="opening-setting-txt">3.0</h4>
                 <h4 id="velocity_close_setting" class="closing-setting-txt">3.0</h4>
@@ -159,7 +158,9 @@
         </div>
 
 
-        <form id="setting_dialog" class="setting-dlg glass container">
+
+        <!-- Dialog box for submitting new values for motor settings -->
+        <form id="setting_dialog" class="setting-dlg glass container" method="GET">
             <div class="dialog-prompt">
                 <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>
             </div>
@@ -173,14 +174,14 @@
             <div class="form-input advanced-settings glass container">
                 <div class="zero-pos two-settings">
                     <h4 class="white-color form-input-txt">Opening</h4>
-                    <input type="number" id="opening_setting_input" name="opening_setting_input">
+                    <input type="number" id="opening_setting_input">
                 </div>
 
                 <div class="one-half-pos horizontal-separator"></div>
 
                 <div class="one-half-pos two-settings">
                     <h4 class="white-color form-input-txt">Closing</h4>
-                    <input type="number" id="closing_setting_input" name="closing_setting_input">
+                    <input type="number" id="closing_setting_input">
                 </div>
             </div>
 

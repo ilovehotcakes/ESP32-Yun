@@ -63,8 +63,13 @@ function hideOpenSettings() {
     document.getElementById("acceleration_open_setting").classList.toggle('opening-setting-txt-hide');
 }
 
-function openSettingDialog(setting_name) {
-    var lowercase_name = setting_name.toLowerCase() + "";
+function openSettingDialog(setting_name, input_step) {
+    const lowercase_name = setting_name.toLowerCase() + "";
+    document.getElementById("setting_dialog").action = '/motor?';
+    document.getElementById("opening_setting_input").step = input_step;
+    document.getElementById("opening_setting_input").name = 'opening-' + lowercase_name;
+    document.getElementById("closing_setting_input").step = input_step;
+    document.getElementById("closing_setting_input").name = 'closing-' + lowercase_name;
     document.getElementById("dialog_setting_prompt").innerText = 'Enter new value for "' 
                                                             + document.getElementById(lowercase_name + "_setting_name").innerText + '"';
     document.getElementById("dialog_setting_name").innerText = 'Enter ' + setting_name;
