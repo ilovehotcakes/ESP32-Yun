@@ -58,6 +58,7 @@ void SystemTask::loadSettings() {
     serial_ = getOrDefault("serial_", serial_);
     if (serial_ == "") {  // Factory reset
         serial_ = getSerialNumber();
+        settings_["serial_"] = serial_;
     }
     system_wake_time_ = getOrDefault("system_wake_time_", system_wake_time_);
     system_sleep_time_ = getOrDefault("system_sleep_time_", system_sleep_time_);
@@ -84,8 +85,9 @@ inline void SystemTask::checkButtonPress() {
         } else if (button_press_duration_ > FACTORY_RESET_TIMER) {
             LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
             systemReset();
+        } else {
+            LOGI("No action, button pressed for %dms", button_press_duration_);
         }
-        LOGI("No action, button pressed for %dms", button_press_duration_);
     } else if (digitalRead(BUTTON_PIN) == LOW && button_pressed_) {
         int button_press_elapsed_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
         if (button_press_elapsed_ > SETUP_MODE_TIMER && button_press_elapsed_ < FACTORY_RESET_TIMER) {
@@ -112,6 +114,7 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
 void SystemTask::systemReset() {
     LOGI("System factory reset\n");
     LITTLEFS.format();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     ESP.restart();
 }
 

@@ -50,6 +50,7 @@ void WirelessTask::loadSettings() {
     ap_ssid_ = getOrDefault("ap_ssid_",ap_ssid_);
     if (ap_ssid_ == "") {  // Factory reset
         ap_ssid_ = "yun-" + getSerialNumber().substring(6, 12);
+        settings_["ap_ssid_"] = ap_ssid_;
     }
     sta_ssid_ = getOrDefault("sta_ssid_", sta_ssid_);
     sta_password_ = getOrDefault("sta_password_", sta_password_);
