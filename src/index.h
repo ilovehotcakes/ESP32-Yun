@@ -38,6 +38,12 @@ h3 {
     margin: 0;
     color: rgba(210, 210, 210, 0.85);
 }
+h4 {
+    font-size: 1.1em;
+    font-weight: 500;
+    margin: 0;
+    color: rgba(210, 210, 210, 0.85);
+}
 .page {
     position: absolute;
     width: 375px;
@@ -69,12 +75,15 @@ h3 {
     -webkit-backdrop-filter: blur(10px);
     /* border: 1px solid rgba(255, 255, 255, 0.3); */
     /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
+    transition: 0.4s ease-in-out;
 }
 .navbar {
     position: absolute;
-    top: 85%%;
-    width: 91%%;
-    height: 10.5%%;
+    top: 86%%;
+    left: 13%%;
+    width: 74%%;
+    height: 9%%;
+    border-radius: 3em;
 }
 .title {
     position: absolute;
@@ -242,21 +251,19 @@ input[type="range"]:hover ~ .tick {
     transition: 0.25s ease;
 }
 .zero-mkr {
-    left: 7.75%%;
+    left: 7.85%%;
 }
 input[type="range"]:hover ~ .zero-mkr {
-    top: 61%%;
+    top: 60%%;
     left: 5%%;
-    font-size: 0.85em;
     color: rgba(255, 255, 255, 0.950);
 }
 .hundred-mkr {
     left: 87.5%%;
 }
 input[type="range"]:hover ~ .hundred-mkr {
-    top: 61%%;
+    top: 60%%;
     left: 89%%;
-    font-size: 0.85em;
     color: rgba(255, 255, 255, 0.950);
 }
 .button1 {
@@ -318,7 +325,6 @@ input[type="range"]:hover ~ .hundred-mkr {
     top: 0;
     left: 0;
     content: '';
-    background-color: gray;
     width: 100%%;
     height: 100%%;
     border-radius: 3em;
@@ -334,7 +340,7 @@ input:checked + .dropdown-cbx::before {
     background-color: rgba(122, 122, 122, 0.582);
     transform: rotate(0deg);
 }
-input[type="checkbox"], input[type="range"] {
+input[type="checkbox"], input[type="range"], input[type="radio"] {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -346,28 +352,160 @@ input[type="checkbox"], input[type="range"] {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/* .container {
-    display: grid;
-    width: 95vw;
-    max-width: 500px;
-    height: 100vh;
-    max-height: 800px;
-    margin: auto;
-    border-radius: 20px;
-    border-color: #333333;
-    border: 1px;
+.radio {
+    position: absolute;
+    top: 12%%;
+    margin: 0;
+    content: '';
+    width: 22%%;
+    height: 76%%;
+    background-size: 2em;
+    background-color: rgba(172, 172, 172, 0);
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 3em;
+    transition: 0.2s;
 }
+.radio:active {
+    background-color: rgba(172, 172, 172, 0.548);
+}
+.wireless-rad {
+    left: 9%%;
+    background-image: url(./img/icon_wifi_100x100.png);
+}
+.home-rad {
+    left: 39%%;
+    background-image: url(./img/icon_home_100x100.png);
+}
+.motor-rad {
+    left: 69%%;
+    background-image: url(./img/icon_motor_100x100.png);
+}
+.wifi-page-initial {
+    left: -96%%;
+    transition: 0.4s ease-in-out;
+}
+
+
+
+
+.unified-settings {
+    top: 7%%;
+    height: 28%%;
+    border-radius: 0.5em;
+}
+.motor-settings {
+    top: 38%%;
+    height: 21%%;
+    border-radius: 0.5em;
+}
+.advanced-settings {
+    top: 62%%;
+    height: 14%%;
+    border-radius: 0.5em;
+}
+.setting {
+    position: absolute;
+    left: 0;
+    width: 100%%;
+    height: 25%%;
+}
+.setting-three {
+    position: absolute;
+    left: 0;
+    width: 100%%;
+    height: 33%%;
+}
+.setting-two {
+    position: absolute;
+    left: 0;
+    width: 100%%;
+    height: 50%%;
+}
+.unify, .fullsteps {
+    top: 0;
+}
+.one-forth, .current {
+    top: 25%%;
+}
+.one-half, .velocity {
+    top: 50%%;
+}
+.three-forths, .acceleration {
+    top: 75%%;
+}
+.one-third, .fullsteps {
+    top: 33%%;
+}
+.two-thirds, .microsteps {
+    top: 66.7%%;
+}
+.setting-name-txt {
+    position: absolute;
+    top: 16%%;
+    left: 4%%;
+    color: rgb(255, 255, 255);
+}
+.opening-setting-txt {
+    position: absolute;
+    top: 21%%;
+    left: 61%%;
+    width: 15%%;
+    height: 57%%;
+    text-align: right;
+}
+.closing-setting-txt {
+    position: absolute;
+    top: 21%%;
+    left: 79%%;
+    width: 15%%;
+    height: 57%%;
+    text-align: right;
+}
+.toggle {
+    position: absolute;
+    top: 15%%;
+    left: 81%%;
+    width: 14.8%%;
+    height: 70%%;
+}
+.toggle-cbx {
+    position: absolute;
+    width: 100%%;
+    height: 100%%;
+    top: 0;
+    left: 0;
+    border-radius: 3em;
+    background-color: rgba(199, 199, 199, 0.603);
+    transition: 0.2s;
+    cursor: pointer;
+    overflow: hidden;
+}
+.toggle-cbx::before {
+    position: absolute;
+    top: 7%%;
+    left: 4%%;
+    content: '';
+    width: 52%%;
+    height: 86%%;
+    border-radius: 3em;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    transition: 0.2s ease-in-out;
+}
+input:checked + .toggle-cbx {
+    background-color: rgb(45, 226, 100);
+    transition: 0.2s ease-in-out;
+}
+input:checked + .toggle-cbx::before {
+    transform: translateX(77%%);
+    transition: 0.2s ease-in-out;
+}
+
+
+
+
+/* 
 .column {
     display: inline-block;
     width: 100%%;
@@ -485,7 +623,7 @@ window.addEventListener('load', () => {
             const data = event.data;
             console.log(data);
             if (data > -1) {
-                document.getElementById("percent-slider").value = data;
+                document.getElementById("percent_slider").value = data;
             }
         };
     } catch (error) {
@@ -509,6 +647,15 @@ function isMobileDevice() {
 function dropdown () {
     document.getElementById("controls").classList.toggle('hide-hlp');
     document.getElementById("advanced_controls").classList.toggle('hide-hlp');
+}
+
+function gotoWifiPage () {
+    document.getElementById("wifi_page").classList.remove('wifi-page-initial');
+    console.log(document.getElementById("wireless_radio").checked);
+}
+
+function gotoHomePage () {
+    document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
 function motorMove(element) {
@@ -546,74 +693,17 @@ function motorSetMax() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?set-max=1', true);
     xhr.send();
+}
+
+function print(element) {
+    console.log(element);
 }	</script>
 </head>
 <body>
-    <!-- <div class="container">
-        <div id="left-column" class="column">
-            <div class="card">
-                <h2 class="setting-key">current</h2>
-                <input id="closing-current" type="number" value=200 step="1">
-                <input id="opening-current" type="number" value=75  step="1">
-                <h2 class="setting-unit">ma</h2>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">acceleration</h2>
-                <input id="closing-acceleration" type="number" value=0.5 step="0.1">
-                <input id="opening-acceleration" type="number" value=0.5 step="0.1">
-                <h2 class="setting-unit">hz/s</h2>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">full steps</h2>
-                <input id="full-steps" type="number" value=200>
-                <h2 class="setting-unit">/rev</h2>
-            </div>
-            <div class="card short">
-                <h2 class="setting-key">fastmode</h2>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">fastmode threshold</h2>
-                <h2 class="setting-value">300</h2>
-                <h2 class="setting-unit">-</h2>
-            </div>
-        </div>
-
-        <div id="right-column" class="column">
-            <div id="sync-settings-card" class="card short">
-                <h2 class="setting-key">sync settings</h2>
-                <span>unified
-                <input class="toggle" type="checkbox">
-                dual
-                </span>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">speed</h2>
-                <h2 class="setting-value">3.0</h2>
-                <h2 class="setting-unit">hz</h2>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">microsteps</h2>
-                <h2 class="setting-value">2</h2>
-                <h2 class="setting-unit">/full steps</h2>
-            </div>
-            <div class="card short">
-                <h2 class="setting-key">direction</h2>
-            </div>
-            <div id="stallguard-card" class="card short">
-                <h2 class="setting-key">stallguard</h2>
-            </div>
-            <div class="card">
-                <h2 class="setting-key">stallguard threshold</h2>
-                <h2 class="setting-value">10</h2>
-                <h2 class="setting-unit">-</h2>
-            </div>
-        </div>
-    </div> -->
-
-    <div id="home-page" class="page">
-        <div class="glass container">
+    <div class="page">
+        <div id="home_page" class="glass container hide-hlp">
             <div class="title">
-                <h2 class="name-txt">Living Room Window</h2>
+                <h3 class="name-txt">Living Room Window</h3>
                 <h3 class="serial-txt">yun-e5c258</h3>
                 <div class="dropdown">
                     <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()" unchecked>
@@ -623,7 +713,7 @@ function motorSetMax() {
 
             <div id="controls" class="controls">
                 <div class="slider">
-                    <input type="range" id="percent-slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
+                    <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
                     <span class="tick one-tck"></span>
                     <span class="tick two-tck"></span>
                     <span class="tick three-tck"></span>
@@ -664,7 +754,97 @@ function motorSetMax() {
             </div>
         </div>
 
-        <div class="navbar glass container"></div>
+        <div class="unified-settings glass container">
+            <div class="unify setting">
+                <h3 class="setting-name-txt">Unify Settings</h3>
+                <label class="toggle">
+                    <input type="checkbox" onclick="print(this)">
+                    <span class="toggle-cbx">
+                </label>
+            </div>
+
+            <div class="one-forth horizontal-separator"></div>
+
+            <div class="current setting">
+                <h3 class="setting-name-txt">Current (mA)</h3>
+                <h4 class="opening-setting-txt">75</h4>
+                <h4 class="closing-setting-txt">200</h4>
+            </div>
+
+            <div class="one-half horizontal-separator"></div>
+
+            <div class="velocity setting">
+                <h3 class="setting-name-txt">Velocity (Hz)</h3>
+                <h4 class="opening-setting-txt">3.0</h4>
+                <h4 class="closing-setting-txt">3.0</h4>
+            </div>
+
+            <div class="three-forths horizontal-separator"></div>
+
+            <div class="acceleration setting">
+                <h3 class="setting-name-txt">Acceleration (Hz/s)</h3>
+                <h4 class="opening-setting-txt">3.0</h4>
+                <h4 class="closing-setting-txt">3.0</h4>
+            </div>
+        </div>
+
+        <div class="motor-settings glass container">
+            <div class="direction setting-three">
+                <h3 class="setting-name-txt">Direction</h3>
+                <label class="toggle">
+                    <input type="checkbox" onclick="print(this)">
+                    <span class="toggle-cbx">
+                </label>
+            </div>
+
+            <div class="one-third horizontal-separator"></div>
+
+            <div class="fullsteps setting-three">
+                <h3 class="setting-name-txt">Full Steps (per turn)</h3>
+                <h4 class="closing-setting-txt">200</h4>
+            </div>
+
+            <div class="two-thirds horizontal-separator"></div>
+
+            <div class="microsteps setting-three">
+                <h3 class="setting-name-txt">Microsteps (per step)</h3>
+                <h4 class="closing-setting-txt">2</h4>
+            </div>
+        </div>
+
+        <div class="advanced-settings glass container">
+            <div class="direction setting-two">
+                <h3 class="setting-name-txt">Fastmode</h3>
+                <label class="toggle">
+                    <input type="checkbox" onclick="print(this)">
+                    <span class="toggle-cbx">
+                </label>
+            </div>
+
+            <div class="one-half horizontal-separator"></div>
+
+            <div class="one-half setting-two">
+                <h3 class="setting-name-txt">Threshold</h3>
+                <h4 class="closing-setting-txt">200</h4>
+            </div>
+        </div>
+        
+            <!-- <h3 class="setting-key">Stallguard</h3>
+        
+            <h3 class="setting-key">Threshold</h3>
+            <h4 class="closing-setting-txt">10</h4> -->
+
+        <!-- <div id="wifi_page" class="wifi-page-initial glass container2">
+        </div>
+
+        <div class="navbar glass container">
+            <input type="radio" id="wireless_radio" name="navbar" onclick="gotoWifiPage()">
+            <label for="wireless_radio" class="wireless-rad radio"></label>
+            <input type="radio" id="home_radio" name="navbar" onclick="gotoHomePage()" checked>
+            <label for="home_radio" class="home-rad radio"></label>
+            <input type="radio" id="motor_radio" name="navbar" onclick="gotoMotorPage(this)">
+            <label for="motor_radio" class="motor-rad radio"></label>
+        </div> -->
     </div>
 </body>
 </html>)rawliteral";

@@ -48,8 +48,13 @@ function dropdown () {
     document.getElementById("advanced_controls").classList.toggle('hide-hlp');
 }
 
-function jm () {
-    document.getElementById("wireless").classList.toggle('wireless');
+function gotoWifiPage () {
+    document.getElementById("wifi_page").classList.remove('wifi-page-initial');
+    console.log(document.getElementById("wireless_radio").checked);
+}
+
+function gotoHomePage () {
+    document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
 function motorMove(element) {
