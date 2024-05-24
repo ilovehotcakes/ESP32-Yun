@@ -57,6 +57,27 @@ function gotoHomePage () {
     document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
+function hideOpenSettings() {
+    document.getElementById("current_open_setting").classList.toggle('opening-setting-txt-hide');
+    document.getElementById("velocity_open_setting").classList.toggle('opening-setting-txt-hide');
+    document.getElementById("acceleration_open_setting").classList.toggle('opening-setting-txt-hide');
+}
+
+function openSettingDialog(setting_name) {
+    var lowercase_name = setting_name.toLowerCase() + "";
+    document.getElementById("dialog_setting_prompt").innerText = 'Enter new value for "' 
+                                                            + document.getElementById(lowercase_name + "_setting_name").innerText + '"';
+    document.getElementById("dialog_setting_name").innerText = 'Enter ' + setting_name;
+    document.getElementById("opening_setting_input").placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
+    document.getElementById("closing_setting_input").placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
+    document.getElementById("setting_dialog").classList.add('setting-dlg-show');
+    document.getElementById("opening_setting_input").select();
+}
+
+function cancel() {
+    document.getElementById("setting_dialog").classList.remove('setting-dlg-show');
+}
+
 function motorMove(element) {
     console.log(element);
     const xhr = new XMLHttpRequest();

@@ -65,43 +65,43 @@
         </div>
 
 
-
+        <!-- To display and change motor settings -->
         <div class="unified-settings glass container">
-            <div class="unify setting">
-                <h3 class="setting-name-txt">Unify Settings</h3>
+            <div class="zero-pos four-settings">
+                <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
-                    <input type="checkbox" onclick="print(this)">
+                    <input type="checkbox" onclick="hideOpenSettings()" checked>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
-            <div class="one-forth horizontal-separator"></div>
+            <div class="one-forth-pos horizontal-separator"></div>
 
-            <div class="current setting">
-                <h3 class="setting-name-txt">Current (mA)</h3>
-                <h4 class="opening-setting-txt">75</h4>
-                <h4 class="closing-setting-txt">200</h4>
+            <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current')">
+                <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
+                <h4 id="current_open_setting" class="opening-setting-txt">75</h4>
+                <h4 id="current_close_setting" class="closing-setting-txt">200</h4>
             </div>
 
-            <div class="one-half horizontal-separator"></div>
+            <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="velocity setting">
-                <h3 class="setting-name-txt">Velocity (Hz)</h3>
-                <h4 class="opening-setting-txt">3.0</h4>
-                <h4 class="closing-setting-txt">3.0</h4>
+            <div class="one-half-pos four-settings pointer-hlp" onclick="openSettingDialog('Velocity')">
+                <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
+                <h4 id="velocity_open_setting" class="opening-setting-txt">3.0</h4>
+                <h4 id="velocity_close_setting" class="closing-setting-txt">3.0</h4>
             </div>
 
-            <div class="three-forths horizontal-separator"></div>
+            <div class="three-forths-pos horizontal-separator"></div>
 
-            <div class="acceleration setting">
+            <div class="three-forths-pos four-settings pointer-hlp" onclick="print(this)">
                 <h3 class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h4 class="opening-setting-txt">3.0</h4>
+                <h4 id="acceleration_open_setting" class="opening-setting-txt">3.0</h4>
                 <h4 class="closing-setting-txt">3.0</h4>
             </div>
         </div>
 
         <div class="motor-settings glass container">
-            <div class="direction setting-three">
+            <div class="zero-pos three-settings">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
                     <input type="checkbox" onclick="print(this)">
@@ -109,23 +109,23 @@
                 </label>
             </div>
 
-            <div class="one-third horizontal-separator"></div>
+            <div class="one-third-pos horizontal-separator"></div>
 
-            <div class="fullsteps setting-three">
+            <div class="one-third-pos three-settings">
                 <h3 class="setting-name-txt">Full Steps (per turn)</h3>
                 <h4 class="closing-setting-txt">200</h4>
             </div>
 
-            <div class="two-thirds horizontal-separator"></div>
+            <div class="two-thirds-pos horizontal-separator"></div>
 
-            <div class="microsteps setting-three">
+            <div class="two-thirds-pos three-settings">
                 <h3 class="setting-name-txt">Microsteps (per step)</h3>
                 <h4 class="closing-setting-txt">2</h4>
             </div>
         </div>
 
         <div class="fastmode advanced-settings glass container">
-            <div class="direction setting-two">
+            <div class="zero-pos two-settings">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
                     <input type="checkbox" onclick="print(this)">
@@ -133,30 +133,61 @@
                 </label>
             </div>
 
-            <div class="one-half horizontal-separator"></div>
+            <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half setting-two">
+            <div class="one-half-pos two-settings">
                 <h3 class="setting-name-txt">Threshold</h3>
                 <h4 class="closing-setting-txt">200</h4>
             </div>
         </div>
 
         <div class="stallguard advanced-settings glass container">
-            <div class="setting-two">
+            <div class="zero-pos two-settings">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
-                    <input type="checkbox" onclick="print(this)">
+                    <input type="checkbox" onclick="stallguard(this)">
                     <span class="toggle-cbx">
                 </label>
             </div>
 
-            <div class="one-half horizontal-separator"></div>
+            <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half setting-two">
+            <div class="one-half-pos two-settings">
                 <h3 class="setting-name-txt">Threshold</h3>
                 <h4 class="closing-setting-txt">10</h4>
             </div>
         </div>
+
+
+        <form id="setting_dialog" class="setting-dlg glass container">
+            <div class="dialog-prompt">
+                <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>
+            </div>
+
+            <div class="dialog-title">
+                <button type="reset" class="form-button" onclick="cancel()">Cancel</button>
+                <h3 id="dialog_setting_name" class="dialog-title-txt">SETTINGNAME</h3>
+                <button type="submit" class="form-button"onclick="print(this)">Submit</button>
+            </div>
+
+            <div class="form-input advanced-settings glass container">
+                <div class="zero-pos two-settings">
+                    <h4 class="white-color form-input-txt">Opening</h4>
+                    <input type="number" id="opening_setting_input" name="opening_setting_input">
+                </div>
+
+                <div class="one-half-pos horizontal-separator"></div>
+
+                <div class="one-half-pos two-settings">
+                    <h4 class="white-color form-input-txt">Closing</h4>
+                    <input type="number" id="closing_setting_input" name="closing_setting_input">
+                </div>
+            </div>
+
+            <div class="dialog-explanation">
+                <h5 class="grey-color">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, debitis dolore cumque laboriosam ad nesciunt autem obcaecati, nihil est error, expedita libero totam accusamus quo rem porro enim consequuntur facere.</h5>
+            </div>
+        </form>
 
         <!-- <div id="wifi_page" class="wifi-page-initial glass container2">
         </div>
