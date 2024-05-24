@@ -66,52 +66,52 @@ void MotorTask::run() {
                 case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case MOTOR_STDBY:
+                case MOTOR_STANDBY:
                     if (inbox_.parameter == 1) driverStandby();
                     else driverStartup();
                     break;
-                case MOTOR_OPEN_CLOSE:
-                    setAndSave(open_close_, inbox_.parameter, "open_close_");
+                case MOTOR_SYNC_STTNG:
+                    setAndSave(sync_settings_, inbox_.parameter, "sync_settings_");
                     break;
-                case MOTOR_SPEED:
+                case MOTOR_VLCTY:
                     setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_OP_SPEED:
-                    if (open_close_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
+                case MOTOR_OP_VLCTY:
+                    if (sync_settings_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
-                case MOTOR_CL_SPEED:
-                    if (open_close_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
+                case MOTOR_CL_VLCTY:
+                    if (sync_settings_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_ACCEL:
                     setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_OP_ACCEL:
-                    if (open_close_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
+                    if (sync_settings_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
                 case MOTOR_CL_ACCEL:
-                    if (open_close_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
+                    if (sync_settings_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
                     setAndSave(open_current_, inbox_.parameter, "open_current_");
                     setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_OP_CURRENT:
-                    if (open_close_) setAndSave(open_current_, inbox_.parameter, "open_current_");
+                    if (sync_settings_) setAndSave(open_current_, inbox_.parameter, "open_current_");
                     break;
                 case MOTOR_CL_CURRENT:
-                    if (open_close_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
+                    if (sync_settings_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
                     setAndSave(direction_, inbox_.parameter, "direction_");
                     break;
-                case MOTOR_MICROSTEPS:
-                    setAndSave(microsteps_, inbox_.parameter, "microsteps_");
-                    calculateTotalSteps();
-                    break;
                 case MOTOR_FULL_STEPS:
                     setAndSave(full_steps_, inbox_.parameter, "full_steps_");
+                    calculateTotalSteps();
+                    break;
+                case MOTOR_MICROSTEPS:
+                    setAndSave(microsteps_, inbox_.parameter, "microsteps_");
                     calculateTotalSteps();
                     break;
                 case MOTOR_STALLGUARD:
@@ -168,7 +168,7 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     bool load = readFromDisk();
 
-    open_close_     = getOrDefault("open_close_", open_close_);
+    sync_settings_     = getOrDefault("sync_settings_", sync_settings_);
     open_velocity_  = getOrDefault("open_velocity_", open_velocity_);
     clos_velocity_  = getOrDefault("clos_velocity_",clos_velocity_);
     open_accel_     = getOrDefault("open_accel_", open_accel_);
@@ -211,7 +211,7 @@ void MotorTask::prepareToMove(bool check, bool direction) {
         vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
-    if (direction && open_close_) {
+    if (direction && sync_settings_) {
         updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     } else {
         updateMotorSettings(open_velocity_, open_accel_, open_current_);

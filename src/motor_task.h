@@ -42,7 +42,7 @@ private:
 
     // User adjustable TMC2209 motor driver settings, updated to driver registers via UART
     int   driver_stdby_  = false;
-    int   open_close_    = true;  // If true, opeining/closing settings should be different
+    int   sync_settings_ = true;  // If true, opeining/closing settings should be different
     float open_velocity_ = 3.0;
     float clos_velocity_ = 3.0;
     float open_accel_    = 0.5;

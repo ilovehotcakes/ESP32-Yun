@@ -179,15 +179,15 @@ void WirelessTask::routing() {
             || httpRequestHandler(request, MOTOR_BACKWARD, [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, MOTOR_SET_MIN, [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, MOTOR_SET_MAX, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_STDBY, [=](int val) -> bool { return val != 0 && val != 1; },
+            || httpRequestHandler(request, MOTOR_STANDBY, [=](int val) -> bool { return val != 0 && val != 1; },
                                   "=0 | 1; 1 to standby motor driver; 0 to start", motor_task_)
-            || httpRequestHandler(request, MOTOR_OPEN_CLOSE, [=](int val) -> bool { return val != 0 && val != 1; },
+            || httpRequestHandler(request, MOTOR_SYNC_STTNG, [=](int val) -> bool { return val != 0 && val != 1; },
                                   "=0 | 1; 0 to keep opening/closing settings the same", motor_task_)
-            || httpRequestHandler(request, MOTOR_SPEED, [=](float val) -> bool { return val <= 0.0; },
+            || httpRequestHandler(request, MOTOR_VLCTY, [=](float val) -> bool { return val <= 0.0; },
                                   ">0.0 (Hz)", motor_task_)  // float
-            || httpRequestHandler(request, MOTOR_OP_SPEED, [=](float val) -> bool { return val <= 0.0; },
+            || httpRequestHandler(request, MOTOR_OP_VLCTY, [=](float val) -> bool { return val <= 0.0; },
                                   ">0.0 (Hz)", motor_task_)  // float
-            || httpRequestHandler(request, MOTOR_CL_SPEED, [=](float val) -> bool { return val <= 0.0; },
+            || httpRequestHandler(request, MOTOR_CL_VLCTY, [=](float val) -> bool { return val <= 0.0; },
                                   ">0.0 (Hz)", motor_task_)  // float
             || httpRequestHandler(request, MOTOR_ACCEL, [=](float val) -> bool { return val <= 0.0; },
                                   ">0.0", motor_task_)   // float
@@ -203,14 +203,14 @@ void WirelessTask::routing() {
                                   "=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
             || httpRequestHandler(request, MOTOR_DIRECTION, [=](int val) -> bool { return val != 0 && val != 1; },
                                   "=0 | 1", motor_task_)
+            || httpRequestHandler(request, MOTOR_FULL_STEPS, [=](int val) -> bool { return val <= 0; },
+                                  ">0", motor_task_)
             || httpRequestHandler(request, MOTOR_MICROSTEPS, [=](int val) -> bool { return val != 0 && val != 2 
                                                                                     && val != 4 && val != 8
                                                                                     && val != 16 && val != 32
                                                                                     && val != 64 && val != 128
                                                                                     && val != 256; },
                                   "=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256", motor_task_)
-            || httpRequestHandler(request, MOTOR_FULL_STEPS, [=](int val) -> bool { return val <= 0; },
-                                  ">0", motor_task_)
             || httpRequestHandler(request, MOTOR_STALLGUARD, [=](int val) -> bool { return val != 0 && val != 1; },
                                   "=0 | 1; 0 to disable; 1 to enable", motor_task_)
             || httpRequestHandler(request, MOTOR_TCOOLTHRS, [=](int val) -> bool { return val < 0 || val > 1048575; },
@@ -238,7 +238,7 @@ void WirelessTask::routing() {
 
     webserver.onNotFound([=](AsyncWebServerRequest *request) {
         if(request->method() == HTTP_GET) {
-            request->send(404, "text/plain", "failed: use /motor or /system or /wireless or /json" );
+            request->send(404, "text/plain", "failed: use /motor? or /system? or /wireless? or /json" );
         }
     });
 }
