@@ -114,7 +114,6 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
 void SystemTask::systemReset() {
     LOGI("System factory reset\n");
     LITTLEFS.format();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
     ESP.restart();
 }
 
