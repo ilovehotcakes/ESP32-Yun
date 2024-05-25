@@ -88,14 +88,14 @@ private:
 
     void stallguardInterrupt();
     void loadSettings();  // Load motor settings from flash
-    void prepareToMove(bool check, bool direction);
+    bool prepareToMove(bool check, bool direction);
     void move(bool direction);
     void moveToStep(int target_step);
     void moveToPercent(int target_percent);
     void stop();
-    void zero();
     bool setMin();
     bool setMax();
+    void zeroEncoder();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
     void calculateTotalSteps();
     inline int getPercent();

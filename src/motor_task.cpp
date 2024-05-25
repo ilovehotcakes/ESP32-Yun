@@ -67,7 +67,7 @@ void MotorTask::run() {
                     setMax();
                     break;
                 case MOTOR_ZERO:
-                    zero();
+                    zeroEncoder();
                     break;
                 case MOTOR_STANDBY:
                     if (inbox_.parameter == 1) driverStandby();
@@ -199,14 +199,14 @@ void MotorTask::loadSettings() {
 }
 
 
-void MotorTask::prepareToMove(bool check, bool direction) {
+bool MotorTask::prepareToMove(bool check, bool direction) {
     if (motor_->isRunning()) {
         stop();
-        return;
+        return false;
     }
 
     if (check) {
-        return;
+        return false;
     }
 
     while (driver_stdby_) {
@@ -219,11 +219,15 @@ void MotorTask::prepareToMove(bool check, bool direction) {
     } else {
         updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     }
+
+    return true;
 }
 
 
 void MotorTask::move(bool direction) {
-    prepareToMove(false, direction);
+    if (!prepareToMove(false, direction)) {
+        return;
+    }
     if (direction) {
         motor_->runBackward();
         LOGI("Motor running backward");
@@ -236,13 +240,17 @@ void MotorTask::move(bool direction) {
 
 void MotorTask::moveToStep(int target_step) {
     int current_step = positionToStep(encod_pos_);
-    prepareToMove(target_step == current_step, target_step < current_step);
+    if (!prepareToMove(target_step == current_step, target_step < current_step)) {
+        return;
+    }
     motor_->moveTo(target_step);
 }
 
 
 void MotorTask::moveToPercent(int target_percent) {
-    prepareToMove(target_percent == getPercent(), target_percent < getPercent());
+    if (!prepareToMove(target_percent == getPercent(), target_percent < getPercent())) {
+        return;
+    }
     int32_t new_position = static_cast<int32_t>(target_percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToStep(new_position));
     LOGI("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
@@ -256,29 +264,29 @@ void MotorTask::stop() {
 }
 
 
-void MotorTask::zero() {
-    encoder_.resetCumulativePosition(0);
-}
-
-
 bool MotorTask::setMin() {
-    if (encod_pos_ >= encod_max_pos_) {
+    if (encod_pos_ >= encod_max_pos_ || motor_->isRunning()) {
         return false;
     }
     setAndSave(encod_max_pos_, encod_max_pos_ - encod_pos_, "encod_max_pos_");
-    encoder_.resetCumulativePosition(0);
+    zeroEncoder();
     LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
     return true;
 }
 
 
 bool MotorTask::setMax() {
-    if (encod_pos_ <= 0) {
+    if (encod_pos_ <= 0 || motor_->isRunning()) {
         return false;
     }
     setAndSave(encod_max_pos_, encod_pos_, "encod_max_pos_");
     LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
     return true;
+}
+
+
+void MotorTask::zeroEncoder() {
+    encoder_.resetCumulativePosition(0);
 }
 
 
