@@ -57,10 +57,20 @@ function gotoHomePage () {
     document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
-function hideOpenSettings() {
-    document.getElementById("current_open_setting").classList.toggle('opening-setting-txt-hide');
-    document.getElementById("velocity_open_setting").classList.toggle('opening-setting-txt-hide');
-    document.getElementById("acceleration_open_setting").classList.toggle('opening-setting-txt-hide');
+function syncSettings() {
+    const xhr = new XMLHttpRequest();
+    if (document.getElementById("sync_settings").checked) {
+        xhr.open('GET', '/motor?sync-settings=1', true);
+        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
+    } else {
+        xhr.open('GET', '/motor?sync-settings=0', true);
+        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
+    }
+    xhr.send();
 }
 
 function openSettingDialog(setting_name, input_step) {
