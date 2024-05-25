@@ -179,6 +179,7 @@ void WirelessTask::routing() {
             || httpRequestHandler(request, MOTOR_BACKWARD, [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, MOTOR_SET_MIN, [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, MOTOR_SET_MAX, [=](int val) -> bool { return false; }, "", motor_task_)
+            || httpRequestHandler(request, MOTOR_ZERO, [=](int val) -> bool { return false; }, "", motor_task_)
             || httpRequestHandler(request, MOTOR_STANDBY, [=](int val) -> bool { return val != 0 && val != 1; },
                                   "=0 | 1; 1 to standby motor driver; 0 to start", motor_task_)
             || httpRequestHandler(request, MOTOR_SYNC_STTNG, [=](int val) -> bool { return val != 0 && val != 1; },

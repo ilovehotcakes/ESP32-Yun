@@ -55,16 +55,19 @@ void MotorTask::run() {
                     moveToStep(inbox_.parameter);
                     break;
                 case MOTOR_FORWARD:
-                    move(true);
+                    move(false);
                     break;
                 case MOTOR_BACKWARD:
-                    move(false);
+                    move(true);
+                    break;
+                case MOTOR_SET_MIN:
+                    setMin();
                     break;
                 case MOTOR_SET_MAX:
                     setMax();
                     break;
-                case MOTOR_SET_MIN:
-                    setMin();
+                case MOTOR_ZERO:
+                    zero();
                     break;
                 case MOTOR_STANDBY:
                     if (inbox_.parameter == 1) driverStandby();
@@ -212,9 +215,9 @@ void MotorTask::prepareToMove(bool check, bool direction) {
     }
 
     if (direction && sync_settings_) {
-        updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
-    } else {
         updateMotorSettings(open_velocity_, open_accel_, open_current_);
+    } else {
+        updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     }
 }
 
@@ -222,24 +225,24 @@ void MotorTask::prepareToMove(bool check, bool direction) {
 void MotorTask::move(bool direction) {
     prepareToMove(false, direction);
     if (direction) {
-        motor_->runForward();
-        LOGI("Motor running forward");
-    } else {
         motor_->runBackward();
         LOGI("Motor running backward");
+    } else {
+        motor_->runForward();
+        LOGI("Motor running forward");
     }
 }
 
 
 void MotorTask::moveToStep(int target_step) {
     int current_step = positionToStep(encod_pos_);
-    prepareToMove(target_step == current_step, target_step > current_step);
+    prepareToMove(target_step == current_step, target_step < current_step);
     motor_->moveTo(target_step);
 }
 
 
 void MotorTask::moveToPercent(int target_percent) {
-    prepareToMove(target_percent == getPercent(), target_percent > getPercent());
+    prepareToMove(target_percent == getPercent(), target_percent < getPercent());
     int32_t new_position = static_cast<int32_t>(target_percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToStep(new_position));
     LOGI("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
@@ -250,6 +253,11 @@ void MotorTask::stop() {
     motor_->forceStop();
     vTaskDelay(2 / portTICK_PERIOD_MS);
     LOGI("Motor stopped(curr/max): %d/%d", encod_pos_, encod_max_pos_);
+}
+
+
+void MotorTask::zero() {
+    encoder_.resetCumulativePosition(0);
 }
 
 

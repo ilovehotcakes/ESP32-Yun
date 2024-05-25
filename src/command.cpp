@@ -12,6 +12,7 @@ Command hash(String command) {
     else if (command == "backward") return MOTOR_BACKWARD;
     else if (command == "set-min") return MOTOR_SET_MIN;
     else if (command == "set-max") return MOTOR_SET_MAX;
+    else if (command == "zero") return MOTOR_ZERO;
     else if (command == "standby") return MOTOR_STANDBY;
     else if (command == "sync-settings") return MOTOR_SYNC_STTNG;
     else if (command == "velocity") return MOTOR_VLCTY;
@@ -55,6 +56,7 @@ String hash(Command command) {
     else if (command == MOTOR_BACKWARD) return "backward";
     else if (command == MOTOR_SET_MIN) return "set-min";
     else if (command == MOTOR_SET_MAX) return "set-max";
+    else if (command == MOTOR_ZERO) return "zero";
     else if (command == MOTOR_STANDBY) return "standby";
     else if (command == MOTOR_SYNC_STTNG) return "sync-settings";
     else if (command == MOTOR_VLCTY) return "velocity";

@@ -50,7 +50,7 @@ private:
     int   open_current_  = 200;
     int   clos_current_  = 75;
     int   direction_     = false;
-    int   microsteps_    = 16;
+    int   microsteps_    = 2;
     int   full_steps_    = DEFAULT_MOTOR_FULLSTEPS;
     int   stallguard_en_ = true;
     int   coolstep_thrs_ = 0;
@@ -93,6 +93,7 @@ private:
     void moveToStep(int target_step);
     void moveToPercent(int target_percent);
     void stop();
+    void zero();
     bool setMin();
     bool setMax();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
