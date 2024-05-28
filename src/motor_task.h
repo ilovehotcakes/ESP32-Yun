@@ -95,7 +95,7 @@ private:
     void stop();
     bool setMin();
     bool setMax();
-    void zeroEncoder();
+    bool zeroEncoder();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
     void calculateTotalSteps();
     inline int getPercent();

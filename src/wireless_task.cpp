@@ -130,20 +130,20 @@ void WirelessTask::routing() {
         });
     });
 
+    // HTTP RESTful API for moving motor and changing motor settings
+    webserver.on("/motor", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (isPrefetch(request)) {
+            return;
+        }
+        httpRequestHandler(request);
+    });
+
     // HTTP RESTful API for managing system
     webserver.on("/system", HTTP_GET, [=](AsyncWebServerRequest *request) {
         if (isPrefetch(request)) {
             return;
         }
-        if (!hasOneParam(request)) {
-            return;
-        }
-        if (httpRequestHandler(request, SYSTEM_SLEEP, [=](int val) -> bool { return false; }, "", system_task_)
-            || httpRequestHandler(request, SYSTEM_RESTART, [=](int val) -> bool { return false; }, "", system_task_)
-            || httpRequestHandler(request, SYSTEM_RESET, [=](int val) -> bool { return false; }, "", system_task_)) {
-            return;
-        }
-        request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listSystemCommands());
+        httpRequestHandler(request);
     });
 
     // HTTP RESTful API for managing wireless settings
@@ -151,80 +151,7 @@ void WirelessTask::routing() {
         if (isPrefetch(request)) {
             return;
         }
-        if (!hasOneParam(request)) {
-            return;
-        }
-        if (httpRequestHandler(request, WIRELESS_SETUP, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1; 1 to enter setup mode", this)
-            || httpRequestHandler(request, WIRELESS_SSID, sta_ssid_, "sta_ssid_")
-            || httpRequestHandler(request, WIRELESS_PASS, sta_password_, "sta_password_")) {
-            return;
-        }
-        request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listWirelessCommands());
-    });
-
-    // HTTP RESTful API for moving motor and changing motor settings
-    webserver.on("/motor", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        if (isPrefetch(request)) {
-            return;
-        }
-        if (!hasOneParam(request)) {
-            return;
-        }
-        if (httpRequestHandler(request, MOTOR_PERECENT, [=](int val) -> bool { return val > 100 || val < 0; },
-                                  "=0~100 (%); 0 to open; 100 to close", motor_task_)
-            || httpRequestHandler(request, MOTOR_STEP, [=](int val) -> bool { return val < 0; }, ">=0", motor_task_)
-            || httpRequestHandler(request, MOTOR_STOP, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_FORWARD, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_BACKWARD, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_SET_MIN, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_SET_MAX, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_ZERO, [=](int val) -> bool { return false; }, "", motor_task_)
-            || httpRequestHandler(request, MOTOR_STANDBY, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1; 1 to standby motor driver; 0 to start", motor_task_)
-            || httpRequestHandler(request, MOTOR_SYNC_STTNG, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1; 0 to keep opening/closing settings the same", motor_task_)
-            || httpRequestHandler(request, MOTOR_VLCTY, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0 (Hz)", motor_task_)  // float
-            || httpRequestHandler(request, MOTOR_OP_VLCTY, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0 (Hz)", motor_task_)  // float
-            || httpRequestHandler(request, MOTOR_CL_VLCTY, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0 (Hz)", motor_task_)  // float
-            || httpRequestHandler(request, MOTOR_ACCEL, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0", motor_task_)   // float
-            || httpRequestHandler(request, MOTOR_OP_ACCEL, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0", motor_task_)   // float
-            || httpRequestHandler(request, MOTOR_CL_ACCEL, [=](float val) -> bool { return val <= 0.0; },
-                                  ">0.0", motor_task_)   // float
-            || httpRequestHandler(request, MOTOR_CURRENT, [=](int val) -> bool { return val < 1 || val > 2000; },
-                                  "=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
-            || httpRequestHandler(request, MOTOR_OP_CURRENT, [=](int val) -> bool { return val < 1 || val > 2000; },
-                                  "=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
-            || httpRequestHandler(request, MOTOR_CL_CURRENT, [=](int val) -> bool { return val < 1 || val > 2000; },
-                                  "=1~2000 (mA); please refer to motor datasheet for max RMS", motor_task_)
-            || httpRequestHandler(request, MOTOR_DIRECTION, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1", motor_task_)
-            || httpRequestHandler(request, MOTOR_FULL_STEPS, [=](int val) -> bool { return val <= 0; },
-                                  ">0", motor_task_)
-            || httpRequestHandler(request, MOTOR_MICROSTEPS, [=](int val) -> bool { return val != 0 && val != 2 
-                                                                                    && val != 4 && val != 8
-                                                                                    && val != 16 && val != 32
-                                                                                    && val != 64 && val != 128
-                                                                                    && val != 256; },
-                                  "=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256", motor_task_)
-            || httpRequestHandler(request, MOTOR_STALLGUARD, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1; 0 to disable; 1 to enable", motor_task_)
-            || httpRequestHandler(request, MOTOR_TCOOLTHRS, [=](int val) -> bool { return val < 0 || val > 1048575; },
-                                  "=0~1048575; lower threshold velocity for switching on stallguard", motor_task_)
-            || httpRequestHandler(request, MOTOR_SGTHRS, [=](int val) -> bool { return val < 0 || val > 255; },
-                                  "=0~255; the greater, the easier to stall", motor_task_)
-            || httpRequestHandler(request, MOTOR_SPREADCYCL, [=](int val) -> bool { return val != 0 && val != 1; },
-                                  "=0 | 1; 0 to disable; 1 to enable", motor_task_)
-            || httpRequestHandler(request, MOTOR_TPWMTHRS, [=](int val) -> bool { return val < 0 || val > 1048575; },
-                                  "=0~1048575; upper threshold to switch to fastmode", motor_task_)) {
-            return;
-        }
-        request->send(400, "text/plain", "failed: param not accepted\nuse of these <param>=" + listMotorCommands());
+        httpRequestHandler(request);
     });
 
     webserver.on("/json", HTTP_GET, [=](AsyncWebServerRequest *request) {
@@ -258,69 +185,90 @@ bool WirelessTask::isPrefetch(AsyncWebServerRequest *request) {
 }
 
 
-bool WirelessTask::hasOneParam(AsyncWebServerRequest *request) {
-    if (request->params() > 1) {
-        request->send(400, "text/plain", "failed: can only perform one request at a time");
-        return false;
-    }
-    return true;
-}
-
-
-bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                                      String &setting, const char *key) {
+void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
     // Prevent the system task from sleeping before finishing processing HTTP requests
     xTimerStart(system_sleep_timer_, portMAX_DELAY);
-    String param = hash(command);
-    if (request->hasParam(param)) {
-        String value = request->getParam(param)->value();
-        LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value);
-        request->send(200, "text/plain", "success");
-        setAndSave(setting, value, key);
-        return true;
+
+    if (request->params() > 10) {
+        request->send(400, "text/plain", "too many parameters");
+        return;
     }
-    return false;
-}
 
-
-bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                                      bool (*eval)(int), String error_message, Task *task) {
-    // Prevent the system task from sleeping before finishing processing HTTP requests
-    xTimerStart(system_sleep_timer_, portMAX_DELAY);
-    String param = hash(command);
-    if (request->hasParam(param)) {
-        String value_str = request->getParam(param)->value();  // To check if param="0" is value=0
-        int value = value_str.toInt();
-        if (eval(value) || (error_message != "" && value == 0 && value_str != "0")) {
-            request->send(400, "text/plain", "failed: " + param + error_message);
-            return true;
+    for (int i = 0; i < request->params(); i++) {
+        String param = request->getParam(i)->name();
+        Command command = hash(param);
+        if (command == ERROR_COMMAND) {
+            String list_of_commands;
+            if (request->url() == "/motor") {
+                list_of_commands =  listMotorCommands();
+            } else if (request->url() == "/system") {
+                list_of_commands =  listSystemCommands();
+            } else {
+                list_of_commands =  listWirelessCommands();
+            }
+            request->send(400, "text/plain", "failed: <param>=" + param 
+                             + " not accepted\nuse of these <param>=" + list_of_commands);
+            return;
         }
-        LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
-        request->send(200, "text/plain", "success");
-        sendTo(task, Message(command, value), 0);
-        return true;
     }
-    return false;
-}
 
+    String response = "";
+    bool success = true;
+    Task *task = motor_task_;
+    if (request->url() == "/system") {
+        task = system_task_;
+    } else if (request->url() == "/wireless") {
+        task = this;
+    }
 
-bool WirelessTask::httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                                      bool (*eval)(float), String error_message, Task *task) {
-    // Prevent the system task from sleeping before finishing processing HTTP requests
-    String param = hash(command);
-    xTimerStart(system_sleep_timer_, portMAX_DELAY);
-    if (request->hasParam(param)) {
-        float value = request->getParam(param)->value().toFloat();
-        if (eval(value)) {
-            request->send(400, "text/plain", "failed: " + param + error_message);
-            return true;
+    for (int i = 0; i < request->params(); i++) {
+        String param = request->getParam(i)->name();
+        String value_str = request->getParam(param)->value();
+        Command command = hash(param);
+        if (command >= MOTOR_VLCTY && command <= MOTOR_CL_ACCEL) {
+            std::pair<std::function<bool(float)>, String> eval = getCommandEvalFuncf(command);
+            float value = value_str.toFloat();
+            if (eval.first(value)) {
+                response += "failed: " + param + eval.second + "\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%.1f", param.c_str(), value);
+            response += "success: " + param + "\n";
+            sendTo(task, Message(command, value), portMAX_DELAY);
+        } else if (command == WIRELESS_SSID) {
+            if (value_str == "") {
+                response += "failed: " + param + " needs to be a non-empty string\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
+            response += "success: " + param + "\n";
+            setAndSave(sta_password_, value_str, "sta_password_");
+        } else if (command == WIRELESS_PASS) {
+            response += "success: " + param + "\n";
+            setAndSave(sta_password_, value_str, "sta_password_");
+        } else {
+            std::pair<std::function<bool(int)>, String> eval = getCommandEvalFunc(command);
+            int value = value_str.toInt();
+            if (eval.first(value) || (eval.second != "" && value == 0 && value_str != "0")) {
+                response += "failed: " + param + eval.second + "\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
+            response += "success: " + param + "\n";
+            sendTo(task, Message(command, value), portMAX_DELAY);
         }
-        LOGI("Parsed HTTP request: param=%s, value=%.1f", param.c_str(), value);
-        request->send(200, "text/plain", "success");
-        sendTo(task, Message(command, value), 0);
-        return true;
     }
-    return false;
+
+    if (success) {
+        request->send(200, "text/plain", response);
+        delay(100 / portTICK_PERIOD_MS);
+        // WS text all;
+    } else {
+        request->send(400, "text/plain", response);
+    }
 }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <FunctionalInterrupt.h>
 
 
 enum Command {
@@ -48,6 +49,8 @@ enum Command {
 
 Command hash (String command);
 String hash (Command command);
+std::pair<std::function<bool(int)>, String> getCommandEvalFunc(Command command);
+std::pair<std::function<bool(float)>, String> getCommandEvalFuncf(Command command);
 String listMotorCommands();
 String listSystemCommands();
 String listWirelessCommands();

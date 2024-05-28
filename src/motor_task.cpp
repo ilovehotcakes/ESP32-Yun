@@ -188,14 +188,14 @@ void MotorTask::loadSettings() {
     spreadcycl_th_  = getOrDefault("spreadcycl_th_", spreadcycl_th_);
 
     encod_max_pos_  = getOrDefault("encod_max_pos_", encod_max_pos_);
-    encoder_.resetCumulativePosition(encod_pos_);
+    zeroEncoder();
     calculateTotalSteps();
 
     if (!load) {
         writeToDisk();
     }
 
-    LOGI("Motor settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
+    LOGI("Motor settings loaded(curr/max): %d/%d", encod_pos_, encod_max_pos_);
 }
 
 
@@ -280,13 +280,19 @@ bool MotorTask::setMax() {
         return false;
     }
     setAndSave(encod_max_pos_, encod_pos_, "encod_max_pos_");
-    LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
+    LOGI("Motor new max(curr/max): %d/%d", encod_pos_, encod_max_pos_);
     return true;
 }
 
 
-void MotorTask::zeroEncoder() {
+bool MotorTask::zeroEncoder() {
+    if (motor_->isRunning()) {
+        LOGI("Encoder can't be zeroed while motor is running");
+        return false;
+    }
     encoder_.resetCumulativePosition(0);
+    LOGI("Encoder zeroed");
+    return true;
 }
 
 

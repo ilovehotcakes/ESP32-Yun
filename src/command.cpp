@@ -89,6 +89,82 @@ String hash(Command command) {
 }
 
 
+std::pair<std::function<bool(int)>, String> getCommandEvalFunc(Command command) {
+    if (command == MOTOR_STOP) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_PERECENT) {
+        return std::make_pair([=](int val) -> bool { return val > 100 || val < 0; }, "=0~100 (%); 0 to open; 100 to close");
+    } else if (command == MOTOR_STEP) {
+        return std::make_pair([=](int val) -> bool { return val < 0; }, ">=0");
+    } else if (command == MOTOR_FORWARD) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_BACKWARD) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_SET_MIN) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_SET_MAX) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_ZERO) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == MOTOR_STANDBY) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1; 1 to standby motor driver; 0 to start");
+    } else if (command == MOTOR_SYNC_STTNG) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1; 0 to keep opening/closing settings the same");
+    } else if (command == MOTOR_CURRENT) {
+        return std::make_pair([=](int val) -> bool { return val < 1 || val > 2000; }, "=1~2000 (mA); please refer to motor datasheet for max RMS");
+    } else if (command == MOTOR_OP_CURRENT) {
+        return std::make_pair([=](int val) -> bool { return val < 1 || val > 2000; }, "=1~2000 (mA); please refer to motor datasheet for max RMS");
+    } else if (command == MOTOR_CL_CURRENT) {
+        return std::make_pair([=](int val) -> bool { return val < 1 || val > 2000; }, "=1~2000 (mA); please refer to motor datasheet for max RMS");
+    } else if (command == MOTOR_DIRECTION) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1");
+    } else if (command == MOTOR_FULL_STEPS) {
+        return std::make_pair([=](int val) -> bool { return val <= 0; }, ">0");
+    } else if (command == MOTOR_MICROSTEPS) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 2 && val != 4 && val != 8 && val != 16 && val != 32 && val != 64
+                                                                && val != 128 && val != 256; }, "=0 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256");
+    } else if (command == MOTOR_STALLGUARD) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1; 0 to disable; 1 to enable");
+    } else if (command == MOTOR_TCOOLTHRS) {
+        return std::make_pair([=](int val) -> bool { return val < 0 || val > 1048575; }, "=0~1048575; lower threshold velocity for switching on stallguard");
+    } else if (command == MOTOR_SGTHRS) {
+        return std::make_pair([=](int val) -> bool { return val < 0 || val > 255; }, "=0~255; the greater, the easier to stall");
+    } else if (command == MOTOR_SPREADCYCL) {
+        return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1; 0 to disable; 1 to enable");
+    } else if (command == MOTOR_TPWMTHRS) {
+        return std::make_pair([=](int val) -> bool { return val < 0 || val > 1048575; }, "=0~1048575; upper threshold to switch to fastmode");
+    }
+
+    else if (command == SYSTEM_SLEEP) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == SYSTEM_RESTART) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    } else if (command == SYSTEM_RESET) {
+        return std::make_pair([=](int val) -> bool { return false; }, "");
+    }
+
+    // else if (command == WIRELESS_SETUP) {
+    return std::make_pair([=](int val) -> bool { return val != 0 && val != 1; }, "=0 | 1; 1 to enter setup mode");
+}
+
+
+std::pair<std::function<bool(float)>, String> getCommandEvalFuncf(Command command) {
+    if (command == MOTOR_VLCTY) {
+        return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0 (Hz)");  // float
+    } else if (command == MOTOR_OP_VLCTY) {
+        return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0 (Hz)");  // float
+    } else if (command == MOTOR_CL_VLCTY) {
+        return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0 (Hz)");  // float
+    } else if (command == MOTOR_ACCEL) {
+        return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0" );  // float
+    } else if (command == MOTOR_OP_ACCEL) {
+        return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0" );  // float
+    } 
+    // else if (command == MOTOR_CL_ACCEL) {
+    return std::make_pair([=](float val) -> bool { return val <= 0.0; }, ">0.0" );  // float
+}
+
+
 String listMotorCommands() {
     String list = "";
     for (int command = MOTOR_STOP; command <= MOTOR_TPWMTHRS; command++) {
