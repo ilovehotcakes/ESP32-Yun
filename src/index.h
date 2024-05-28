@@ -706,6 +706,14 @@ window.addEventListener('load', () => {
         console.log("Failed to connect to websocket")
         console.log(error)
     }
+    document.getElementById('setting_dialog').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Add your form handling logic here
+        
+        // Optionally, you can display a message or perform other actions
+        alert('Form submitted successfully!');
+    });
 });
 
 function print(element) {

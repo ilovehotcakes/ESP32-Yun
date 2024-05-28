@@ -244,8 +244,9 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
             }
             LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
             response += "success: " + param + "\n";
-            setAndSave(sta_password_, value_str, "sta_password_");
+            setAndSave(sta_ssid_, value_str, "sta_ssid_");
         } else if (command == WIRELESS_PASS) {
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
             response += "success: " + param + "\n";
             setAndSave(sta_password_, value_str, "sta_password_");
         } else {
