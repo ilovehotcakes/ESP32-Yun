@@ -31,6 +31,10 @@ window.addEventListener('load', () => {
     }
 });
 
+function print(element) {
+    console.log(element);
+}
+
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     // Is mobile device
@@ -57,22 +61,6 @@ function gotoHomePage () {
     document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
-function syncSettings() {
-    const xhr = new XMLHttpRequest();
-    if (document.getElementById("sync_settings").checked) {
-        xhr.open('GET', '/motor?sync-settings=1', true);
-        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
-    } else {
-        xhr.open('GET', '/motor?sync-settings=0', true);
-        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
-    }
-    xhr.send();
-}
-
 function openSettingDialog(setting_name, input_step) {
     const lowercase_name = setting_name.toLowerCase() + "";
     document.getElementById("setting_dialog").action = '/motor?';
@@ -94,42 +82,29 @@ function cancel() {
 }
 
 function motorMove(element) {
-    console.log(element);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();
 }
 
-function motorStop() {
+function motorAction(action) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?stop=1', true);
+    xhr.open('GET', '/motor?' + action + '=1', true);
     xhr.send();
 }
 
-function motorForward() {
+function syncSettings() {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?forward=1', true);
+    if (document.getElementById("sync_settings").checked) {
+        xhr.open('GET', '/motor?sync-settings=1', true);
+        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
+    } else {
+        xhr.open('GET', '/motor?sync-settings=0', true);
+        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
+    }
     xhr.send();
-}
-
-function motorBackward() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?backward=1', true);
-    xhr.send();
-}
-
-function motorSetMin() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?set-min=1', true);
-    xhr.send();
-}
-
-function motorSetMax() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?set-max=1', true);
-    xhr.send();
-}
-
-function print(element) {
-    console.log(element);
 }

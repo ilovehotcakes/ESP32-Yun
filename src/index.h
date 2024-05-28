@@ -708,6 +708,10 @@ window.addEventListener('load', () => {
     }
 });
 
+function print(element) {
+    console.log(element);
+}
+
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     // Is mobile device
@@ -734,22 +738,6 @@ function gotoHomePage () {
     document.getElementById("wifi_page").classList.add('wifi-page-initial');
 }
 
-function syncSettings() {
-    const xhr = new XMLHttpRequest();
-    if (document.getElementById("sync_settings").checked) {
-        xhr.open('GET', '/motor?sync-settings=1', true);
-        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
-    } else {
-        xhr.open('GET', '/motor?sync-settings=0', true);
-        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
-    }
-    xhr.send();
-}
-
 function openSettingDialog(setting_name, input_step) {
     const lowercase_name = setting_name.toLowerCase() + "";
     document.getElementById("setting_dialog").action = '/motor?';
@@ -771,44 +759,31 @@ function cancel() {
 }
 
 function motorMove(element) {
-    console.log(element);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/motor?percent=' + element.value, true);
     xhr.send();
 }
 
-function motorStop() {
+function motorAction(action) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?stop=1', true);
+    xhr.open('GET', '/motor?' + action + '=1', true);
     xhr.send();
 }
 
-function motorForward() {
+function syncSettings() {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?forward=1', true);
+    if (document.getElementById("sync_settings").checked) {
+        xhr.open('GET', '/motor?sync-settings=1', true);
+        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
+    } else {
+        xhr.open('GET', '/motor?sync-settings=0', true);
+        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
+        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
+    }
     xhr.send();
-}
-
-function motorBackward() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?backward=1', true);
-    xhr.send();
-}
-
-function motorSetMin() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?set-min=1', true);
-    xhr.send();
-}
-
-function motorSetMax() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?set-max=1', true);
-    xhr.send();
-}
-
-function print(element) {
-    console.log(element);
 }	</script>
 </head>
 <body>
@@ -837,7 +812,7 @@ function print(element) {
 
                 <div class="open-stop-close">
                     <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">Open</button>
-                    <button type="button" class="stop-btn button1" onclick="motorStop()">Stop</button>
+                    <button type="button" class="stop-btn button1" onclick="motorAction('stop')">Stop</button>
                     <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">Close</button>
                 </div>
             </div>
@@ -845,23 +820,23 @@ function print(element) {
             <div id="advanced_controls" class="controls hide-hlp">
                 <div class="forward-backward">
                     <div class="desktop-only">
-                        <button type="button" class="backward-btn button1" onmousedown="motorBackward()" onmouseup="motorStop()">Backward</button>
-                        <button type="button" class="forward-btn button1" onmousedown="motorForward()" onmouseup="motorStop()">Forward</button>
+                        <button type="button" class="backward-btn button1" onmousedown="motorAction('backward')" onmouseup="motorAction('stop')">Backward</button>
+                        <button type="button" class="forward-btn button1" onmousedown="motorAction('forward')" onmouseup="motorAction('stop')">Forward</button>
                     </div>
                     <div class="mobile-only">
-                        <button type="button" class="backward-btn button1" ontouchstart="motorBackward()" ontouchend="motorStop()">Backward</button>
-                        <button type="button" class="forward-btn button1" ontouchstart="motorForward()" ontouchend="motorStop()">Forward</button>
+                        <button type="button" class="backward-btn button1" ontouchstart="motorAction('backward')" ontouchend="motorAction('stop')">Backward</button>
+                        <button type="button" class="forward-btn button1" ontouchstart="motorAction('forward')" ontouchend="motorAction('stop')">Forward</button>
                     </div>
                 </div>
 
                 <div class="horizontal-separator"></div>
 
                 <div class="min-zero-max">
-                    <button type="button" class="set-min-btn button2" onclick="motorSetMin()">Set Min</button>
+                    <button type="button" class="set-min-btn button2" onclick="motorAction('set-min')">Set Min</button>
                     <span class="left-spr vertical-separator"></span>
-                    <button type="button" class="zeroing-btn button2">Zero</button>
+                    <button type="button" class="zeroing-btn button2" onclick="motorAction('zero')">Zero</button>
                     <span class="right-spr vertical-separator"></span>
-                    <button type="button" class="set-max-btn button2" onclick="motorSetMax()">Set Max</button>
+                    <button type="button" class="set-max-btn button2" onclick="motorAction('set-max')">Set Max</button>
                 </div>
             </div>
         </div>
@@ -882,8 +857,8 @@ function print(element) {
 
             <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current', 1)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h4 id="current_open_setting" class="opening-setting-txt">75</h4>
-                <h4 id="current_close_setting" class="closing-setting-txt">200</h4>
+                <h4 id="current_open_setting" class="opening-setting-txt">200</h4>
+                <h4 id="current_close_setting" class="closing-setting-txt">75</h4>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
