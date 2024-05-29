@@ -29,12 +29,10 @@ window.addEventListener('load', () => {
         console.log("Failed to connect to websocket")
         console.log(error)
     }
-    document.getElementById('setting_dialog').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        
-        // Optionally, you can display a message or perform other actions
-        alert('Form submitted successfully!');
-    });
+
+    if (document.getElementById("sync_settings").checked) {
+        showOpeningSettings();
+    }
 });
 
 function print(element) {
@@ -58,59 +56,75 @@ function dropdown () {
     document.getElementById("advanced_controls").classList.toggle('hide-hlp');
 }
 
-function gotoWifiPage () {
-    document.getElementById("wifi_page").classList.remove('wifi-page-initial');
-    console.log(document.getElementById("wireless_radio").checked);
-}
-
-function gotoHomePage () {
-    document.getElementById("wifi_page").classList.add('wifi-page-initial');
-}
-
 function openSettingDialog(setting_name, input_step) {
-    const lowercase_name = setting_name.toLowerCase() + "";
+    const lowercase_name = setting_name.toLowerCase();
+    const opening_setting_input = document.getElementById("opening_setting_input");
+    const closing_setting_input = document.getElementById("closing_setting_input");
     document.getElementById("setting_dialog").action = '/motor?';
-    document.getElementById("opening_setting_input").step = input_step;
-    document.getElementById("opening_setting_input").name = 'opening-' + lowercase_name;
-    document.getElementById("closing_setting_input").step = input_step;
-    document.getElementById("closing_setting_input").name = 'closing-' + lowercase_name;
+    opening_setting_input.step = input_step;
+    opening_setting_input.name = 'opening-' + lowercase_name;
+    closing_setting_input.step = input_step;
+    closing_setting_input.name = 'closing-' + lowercase_name;
     document.getElementById("dialog_setting_prompt").innerText = 'Enter new value for "' 
                                                             + document.getElementById(lowercase_name + "_setting_name").innerText + '"';
     document.getElementById("dialog_setting_name").innerText = 'Enter ' + setting_name;
-    document.getElementById("opening_setting_input").placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
-    document.getElementById("closing_setting_input").placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
+    opening_setting_input.placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
+    closing_setting_input.placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
     document.getElementById("setting_dialog").classList.add('setting-dlg-show');
-    document.getElementById("opening_setting_input").select();
+    opening_setting_input.select();
 }
 
-function cancel() {
+function cancelForm() {
     document.getElementById("setting_dialog").classList.remove('setting-dlg-show');
 }
 
-function motorMove(element) {
+function submitForm() {
+    const open_setting = document.getElementById("opening_setting_input");
+    const close_setting = document.getElementById("closing_setting_input");
+    const action = document.getElementById("setting_dialog").action;
+    const request = action + open_setting.name + '=' + open_setting.value + '&' + close_setting.name + '=' + close_setting.value;
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?percent=' + element.value, true);
+    xhr.open('GET', request);
+    xhr.send();
+    cancelForm();
+}
+
+function motorHttpRequest(param, value=1) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?' + param + '=' + value, true);
     xhr.send();
 }
 
-function motorAction(action) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?' + action + '=1', true);
-    xhr.send();
+function motorMove(element) {
+    motorHttpRequest('percent=' + element.value);
+}
+
+function showOpeningSettings() {
+    document.getElementById("current_open_setting").classList.add('opening-setting-txt-show');
+    document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-show');
+    document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-show');
+}
+
+function hideOpeningSettings() {
+    document.getElementById("current_open_setting").classList.remove('opening-setting-txt-show');
+    document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-show');
+    document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-show');
 }
 
 function syncSettings() {
-    const xhr = new XMLHttpRequest();
     if (document.getElementById("sync_settings").checked) {
-        xhr.open('GET', '/motor?sync-settings=1', true);
-        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
+        motorHttpRequest('sync-settings');
+        showOpeningSettings();
     } else {
-        xhr.open('GET', '/motor?sync-settings=0', true);
-        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
+        motorHttpRequest('sync-settings', 0);
+        hideOpeningSettings();
     }
-    xhr.send();
+}
+
+function checkboxHttpRequest(param) {
+    if (document.getElementById(param).checked) {
+        motorHttpRequest(param);
+    } else {
+        motorHttpRequest(param, 0);
+    }
 }

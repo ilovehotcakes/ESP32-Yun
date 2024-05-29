@@ -466,10 +466,11 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     width: 15%;
     height: 57%;
     text-align: right;
+    opacity: 0;
     transition: 0.1s ease-in-out;
 }
-.opening-setting-txt-hide {
-    opacity: 0;
+.opening-setting-txt-show {
+    opacity: 100;
     transform: translateX(25%);
     transition: 0.1s ease-in-out;
 }

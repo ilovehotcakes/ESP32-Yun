@@ -474,10 +474,11 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     width: 15%%;
     height: 57%%;
     text-align: right;
+    opacity: 0;
     transition: 0.1s ease-in-out;
 }
-.opening-setting-txt-hide {
-    opacity: 0;
+.opening-setting-txt-show {
+    opacity: 100;
     transform: translateX(25%%);
     transition: 0.1s ease-in-out;
 }
@@ -706,14 +707,10 @@ window.addEventListener('load', () => {
         console.log("Failed to connect to websocket")
         console.log(error)
     }
-    document.getElementById('setting_dialog').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
 
-        // Add your form handling logic here
-        
-        // Optionally, you can display a message or perform other actions
-        alert('Form submitted successfully!');
-    });
+    if (document.getElementById("sync_settings").checked) {
+        showOpeningSettings();
+    }
 });
 
 function print(element) {
@@ -737,61 +734,77 @@ function dropdown () {
     document.getElementById("advanced_controls").classList.toggle('hide-hlp');
 }
 
-function gotoWifiPage () {
-    document.getElementById("wifi_page").classList.remove('wifi-page-initial');
-    console.log(document.getElementById("wireless_radio").checked);
-}
-
-function gotoHomePage () {
-    document.getElementById("wifi_page").classList.add('wifi-page-initial');
-}
-
 function openSettingDialog(setting_name, input_step) {
-    const lowercase_name = setting_name.toLowerCase() + "";
+    const lowercase_name = setting_name.toLowerCase();
+    const opening_setting_input = document.getElementById("opening_setting_input");
+    const closing_setting_input = document.getElementById("closing_setting_input");
     document.getElementById("setting_dialog").action = '/motor?';
-    document.getElementById("opening_setting_input").step = input_step;
-    document.getElementById("opening_setting_input").name = 'opening-' + lowercase_name;
-    document.getElementById("closing_setting_input").step = input_step;
-    document.getElementById("closing_setting_input").name = 'closing-' + lowercase_name;
+    opening_setting_input.step = input_step;
+    opening_setting_input.name = 'opening-' + lowercase_name;
+    closing_setting_input.step = input_step;
+    closing_setting_input.name = 'closing-' + lowercase_name;
     document.getElementById("dialog_setting_prompt").innerText = 'Enter new value for "' 
                                                             + document.getElementById(lowercase_name + "_setting_name").innerText + '"';
     document.getElementById("dialog_setting_name").innerText = 'Enter ' + setting_name;
-    document.getElementById("opening_setting_input").placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
-    document.getElementById("closing_setting_input").placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
+    opening_setting_input.placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
+    closing_setting_input.placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
     document.getElementById("setting_dialog").classList.add('setting-dlg-show');
-    document.getElementById("opening_setting_input").select();
+    opening_setting_input.select();
 }
 
-function cancel() {
+function cancelForm() {
     document.getElementById("setting_dialog").classList.remove('setting-dlg-show');
 }
 
-function motorMove(element) {
+function submitForm() {
+    const open_setting = document.getElementById("opening_setting_input");
+    const close_setting = document.getElementById("closing_setting_input");
+    const action = document.getElementById("setting_dialog").action;
+    const request = action + open_setting.name + '=' + open_setting.value + '&' + close_setting.name + '=' + close_setting.value;
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?percent=' + element.value, true);
+    xhr.open('GET', request);
+    xhr.send();
+    cancelForm();
+}
+
+function motorHttpRequest(param, value=1) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?' + param + '=' + value, true);
     xhr.send();
 }
 
-function motorAction(action) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?' + action + '=1', true);
-    xhr.send();
+function motorMove(element) {
+    motorHttpRequest('percent=' + element.value);
+}
+
+function showOpeningSettings() {
+    document.getElementById("current_open_setting").classList.add('opening-setting-txt-show');
+    document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-show');
+    document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-show');
+}
+
+function hideOpeningSettings() {
+    document.getElementById("current_open_setting").classList.remove('opening-setting-txt-show');
+    document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-show');
+    document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-show');
 }
 
 function syncSettings() {
-    const xhr = new XMLHttpRequest();
     if (document.getElementById("sync_settings").checked) {
-        xhr.open('GET', '/motor?sync-settings=1', true);
-        document.getElementById("current_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-hide');
+        motorHttpRequest('sync-settings');
+        showOpeningSettings();
     } else {
-        xhr.open('GET', '/motor?sync-settings=0', true);
-        document.getElementById("current_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-hide');
-        document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-hide');
+        motorHttpRequest('sync-settings', 0);
+        hideOpeningSettings();
     }
-    xhr.send();
+}
+
+function checkboxHttpRequest(param) {
+    if (document.getElementById(param).checked) {
+        motorHttpRequest(param);
+    } else {
+        motorHttpRequest(param, 0);
+    }
 }	</script>
 </head>
 <body>
@@ -820,7 +833,7 @@ function syncSettings() {
 
                 <div class="open-stop-close">
                     <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">Open</button>
-                    <button type="button" class="stop-btn button1" onclick="motorAction('stop')">Stop</button>
+                    <button type="button" class="stop-btn button1" onclick="motorHttpRequest('stop')">Stop</button>
                     <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">Close</button>
                 </div>
             </div>
@@ -828,23 +841,23 @@ function syncSettings() {
             <div id="advanced_controls" class="controls hide-hlp">
                 <div class="forward-backward">
                     <div class="desktop-only">
-                        <button type="button" class="backward-btn button1" onmousedown="motorAction('backward')" onmouseup="motorAction('stop')">Backward</button>
-                        <button type="button" class="forward-btn button1" onmousedown="motorAction('forward')" onmouseup="motorAction('stop')">Forward</button>
+                        <button type="button" class="backward-btn button1" onmousedown="motorHttpRequest('backward')" onmouseup="motorHttpRequest('stop')">Backward</button>
+                        <button type="button" class="forward-btn button1" onmousedown="motorHttpRequest('forward')" onmouseup="motorHttpRequest('stop')">Forward</button>
                     </div>
                     <div class="mobile-only">
-                        <button type="button" class="backward-btn button1" ontouchstart="motorAction('backward')" ontouchend="motorAction('stop')">Backward</button>
-                        <button type="button" class="forward-btn button1" ontouchstart="motorAction('forward')" ontouchend="motorAction('stop')">Forward</button>
+                        <button type="button" class="backward-btn button1" ontouchstart="motorHttpRequest('backward')" ontouchend="motorHttpRequest('stop')">Backward</button>
+                        <button type="button" class="forward-btn button1" ontouchstart="motorHttpRequest('forward')" ontouchend="motorHttpRequest('stop')">Forward</button>
                     </div>
                 </div>
 
                 <div class="horizontal-separator"></div>
 
                 <div class="min-zero-max">
-                    <button type="button" class="set-min-btn button2" onclick="motorAction('set-min')">Set Min</button>
+                    <button type="button" class="set-min-btn button2" onclick="motorHttpRequest('set-min')">Set Min</button>
                     <span class="left-spr vertical-separator"></span>
-                    <button type="button" class="zeroing-btn button2" onclick="motorAction('zero')">Zero</button>
+                    <button type="button" class="zeroing-btn button2" onclick="motorHttpRequest('zero')">Zero</button>
                     <span class="right-spr vertical-separator"></span>
-                    <button type="button" class="set-max-btn button2" onclick="motorAction('set-max')">Set Max</button>
+                    <button type="button" class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
                 </div>
             </div>
         </div>
@@ -856,7 +869,7 @@ function syncSettings() {
             <div class="zero-pos four-settings">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
-                    <input id="sync_settings" type="checkbox" onclick="syncSettings()" checked>
+                    <input id="sync_settings" type="checkbox" onclick="syncSettings()"  %SYNC_SETTING%>
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -865,24 +878,24 @@ function syncSettings() {
 
             <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current', 1)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h4 id="current_open_setting" class="opening-setting-txt">200</h4>
-                <h4 id="current_close_setting" class="closing-setting-txt">75</h4>
+                <h4 id="current_open_setting" class="opening-setting-txt">%OP_CURR%</h4>
+                <h4 id="current_close_setting" class="closing-setting-txt">%CL_CURR%</h4>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
 
             <div class="one-half-pos four-settings pointer-hlp" onclick="openSettingDialog('Velocity', 0.1)">
                 <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
-                <h4 id="velocity_open_setting" class="opening-setting-txt">3.0</h4>
-                <h4 id="velocity_close_setting" class="closing-setting-txt">3.0</h4>
+                <h4 id="velocity_open_setting" class="opening-setting-txt">%OP_VELO%</h4>
+                <h4 id="velocity_close_setting" class="closing-setting-txt">%CL_VELO%</h4>
             </div>
 
             <div class="three-forths-pos horizontal-separator"></div>
 
             <div class="three-forths-pos four-settings pointer-hlp" onclick="openSettingDialog('Acceleration', 0.1)">
                 <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h4 id="acceleration_open_setting" class="opening-setting-txt">0.5</h4>
-                <h4 id="acceleration_close_setting" class="closing-setting-txt">0.5</h4>
+                <h4 id="acceleration_open_setting" class="opening-setting-txt">%OP_ACCEL%</h4>
+                <h4 id="acceleration_close_setting" class="closing-setting-txt">%CL_ACCEL%</h4>
             </div>
         </div>
 
@@ -890,7 +903,7 @@ function syncSettings() {
             <div class="zero-pos three-settings">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
-                    <input type="checkbox" onclick="print(this)">
+                    <input id="direction" type="checkbox" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -899,14 +912,14 @@ function syncSettings() {
 
             <div class="one-third-pos three-settings">
                 <h3 class="setting-name-txt">Full Steps (per turn)</h3>
-                <h4 class="closing-setting-txt">200</h4>
+                <h4 class="closing-setting-txt">%FULL_STEPS%</h4>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
 
             <div class="two-thirds-pos three-settings">
                 <h3 class="setting-name-txt">Microsteps (per step)</h3>
-                <h4 class="closing-setting-txt">2</h4>
+                <h4 class="closing-setting-txt">%MICROSTEPS%</h4>
             </div>
         </div>
 
@@ -914,7 +927,7 @@ function syncSettings() {
             <div class="zero-pos two-settings">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
-                    <input type="checkbox" onclick="print(this)">
+                    <input id="fastmode" type="checkbox" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -923,7 +936,7 @@ function syncSettings() {
 
             <div class="one-half-pos two-settings">
                 <h3 class="setting-name-txt">Threshold</h3>
-                <h4 class="closing-setting-txt">200</h4>
+                <h4 class="closing-setting-txt">%FASTMODE_THRESH%</h4>
             </div>
         </div>
 
@@ -931,7 +944,7 @@ function syncSettings() {
             <div class="zero-pos two-settings">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
-                    <input type="checkbox" onclick="stallguard(this)">
+                    <input id="stallguard" type="checkbox" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -940,7 +953,7 @@ function syncSettings() {
 
             <div class="one-half-pos two-settings">
                 <h3 class="setting-name-txt">Threshold</h3>
-                <h4 class="closing-setting-txt">10</h4>
+                <h4 class="closing-setting-txt">%STALLGUARD_THRESH%</h4>
             </div>
         </div>
 
@@ -953,9 +966,9 @@ function syncSettings() {
             </div>
 
             <div class="dialog-title">
-                <button type="reset" class="form-btn" onclick="cancel()">Cancel</button>
+                <button type="reset" class="form-btn" onclick="cancelForm()">Cancel</button>
                 <h3 id="dialog_setting_name" class="dialog-title-txt">SETTINGNAME</h3>
-                <button type="submit" class="form-btn"onclick="print(this)">Submit</button>
+                <button type="reset" class="form-btn" onclick="submitForm(this)">Submit</button>
             </div>
 
             <div class="form-input advanced-settings glass container">
