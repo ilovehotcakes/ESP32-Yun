@@ -41,21 +41,21 @@ private:
     TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
     // User adjustable TMC2209 motor driver settings, updated to driver registers via UART
-    int   driver_stdby_  = false;
-    int   sync_settings_ = true;  // If true, opeining/closing settings should be different
+    bool  driver_stdby_  = false;
+    bool  sync_settings_ = true;  // If true, opeining/closing settings are different values
     float open_velocity_ = 3.0;
     float clos_velocity_ = 3.0;
     float open_accel_    = 0.5;
     float clos_accel_    = 0.5;
     int   open_current_  = 200;
     int   clos_current_  = 75;
-    int   direction_     = false;
+    bool  direction_     = false;
     int   microsteps_    = 2;
     int   full_steps_    = DEFAULT_MOTOR_FULLSTEPS;
-    int   stallguard_en_ = true;
+    bool  stallguard_en_ = true;
     int   coolstep_thrs_ = 0;
     int   stallguard_th_ = 10;
-    int   spreadcycl_en_ = false;
+    bool  spreadcycl_en_ = false;
     int   spreadcycl_th_ = 33;
 
     // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate

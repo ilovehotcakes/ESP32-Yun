@@ -74,7 +74,7 @@ void MotorTask::run() {
                     else driverStartup();
                     break;
                 case MOTOR_SYNC_STTNG:
-                    setAndSave(sync_settings_, inbox_.parameter, "sync_settings_");
+                    setAndSave(sync_settings_, static_cast<bool>(inbox_.parameter), "sync_settings_");
                     break;
                 case MOTOR_VLCTY:
                     setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
@@ -107,7 +107,7 @@ void MotorTask::run() {
                     if (sync_settings_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
-                    setAndSave(direction_, inbox_.parameter, "direction_");
+                    setAndSave(direction_, static_cast<bool>(inbox_.parameter), "direction_");
                     break;
                 case MOTOR_FULL_STEPS:
                     setAndSave(full_steps_, inbox_.parameter, "full_steps_");
@@ -118,7 +118,7 @@ void MotorTask::run() {
                     calculateTotalSteps();
                     break;
                 case MOTOR_STALLGUARD:
-                    setAndSave(stallguard_en_, inbox_.parameter, "stallguard_en_");
+                    setAndSave(stallguard_en_, static_cast<bool>(inbox_.parameter), "stallguard_en_");
                     break;
                 case MOTOR_TCOOLTHRS:
                     setAndSave(coolstep_thrs_, inbox_.parameter, "coolstep_thrs_");
@@ -127,7 +127,7 @@ void MotorTask::run() {
                     setAndSave(stallguard_th_, inbox_.parameter, "stallguard_th_");
                     break;
                 case MOTOR_SPREADCYCL:
-                    setAndSave(spreadcycl_en_, inbox_.parameter, "spreadcycl_en_");
+                    setAndSave(spreadcycl_en_, static_cast<bool>(inbox_.parameter), "spreadcycl_en_");
                     break;
                 case MOTOR_TPWMTHRS:
                     setAndSave(spreadcycl_th_, inbox_.parameter, "spreadcycl_th_");
