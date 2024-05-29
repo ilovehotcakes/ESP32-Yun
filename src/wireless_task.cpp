@@ -122,44 +122,8 @@ void WirelessTask::connectWifi() {
 void WirelessTask::routing() {
     // Root serves UI web page
     webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        request->send_P(200, "text/html", index_html, [=](const String& var) -> String {
-            JsonDocument settings = motor_task_->getSettings();
-            if (var == "SLIDER") {
-                return motor_position_;
-            } else if (var == "SYNC_SETTING") {
-                if (settings["sync_settings_"]) return "checked";
-                return "";
-            } else if (var == "OP_CURR") {
-                return settings["open_current_"];
-            } else if (var == "CL_CURR") {
-                return settings["clos_current_"];
-            } else if (var == "OP_VELO") {
-                return settings["open_velocity_"];
-            } else if (var == "CL_VELO") {
-                return settings["clos_velocity_"];
-            } else if (var == "OP_ACCEL") {
-                return settings["open_accel_"];
-            } else if (var == "CL_ACCEL") {
-                return settings["clos_accel_"];
-            } else if (var  == "DIRECTION") {
-                if (settings["direction_"]) return "checked";
-                return "";
-            } else if (var  == "FULL_STEPS") {
-                return settings["full_steps_"];
-            } else if (var  == "MICROSTEPS") {
-                return settings["microsteps_"];
-            } else if (var  == "FASTMODE") {
-                if (settings["spreadcycl_en_"]) return "checked";
-                return "";
-            } else if (var  == "FASTMODE_THRESH") {
-                return settings["spreadcycl_th_"];
-            } else if (var  == "STALLGUARD") {
-                if (settings["stallguard_en_"]) return "checked";
-            } else if (var  == "STALLGUARD_THRESH") {
-                return settings["stallguard_th_"];
-            }
-            return "";
-        });
+        request->send_P(200, "text/html", index_html, 
+                        std::bind(&WirelessTask::htmlStringProcessor, this, std::placeholders::_1));
     });
 
     // HTTP RESTful API for moving motor and changing motor settings
@@ -326,6 +290,46 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
             LOGE("WebSocket client #%u error: %u", client->id(), *(static_cast<uint16_t*>(arg)));
             break;
     }
+}
+
+
+String WirelessTask::htmlStringProcessor(const String& var) {
+    JsonDocument settings = motor_task_->getSettings();
+    if (var == "SLIDER") {
+        return motor_position_;
+    } else if (var == "SYNC_SETTING") {
+        if (settings["sync_settings_"]) return "checked";
+        return "";
+    } else if (var == "OP_CURR") {
+        return settings["open_current_"];
+    } else if (var == "CL_CURR") {
+        return settings["clos_current_"];
+    } else if (var == "OP_VELO") {
+        return settings["open_velocity_"];
+    } else if (var == "CL_VELO") {
+        return settings["clos_velocity_"];
+    } else if (var == "OP_ACCEL") {
+        return settings["open_accel_"];
+    } else if (var == "CL_ACCEL") {
+        return settings["clos_accel_"];
+    } else if (var  == "DIRECTION") {
+        if (settings["direction_"]) return "checked";
+        return "";
+    } else if (var  == "FULL_STEPS") {
+        return settings["full_steps_"];
+    } else if (var  == "MICROSTEPS") {
+        return settings["microsteps_"];
+    } else if (var  == "FASTMODE") {
+        if (settings["spreadcycl_en_"]) return "checked";
+        return "";
+    } else if (var  == "FASTMODE_THRESH") {
+        return settings["spreadcycl_th_"];
+    } else if (var  == "STALLGUARD") {
+        if (settings["stallguard_en_"]) return "checked";
+    } else if (var  == "STALLGUARD_THRESH") {
+        return settings["stallguard_th_"];
+    }
+    return "";
 }
 
 
