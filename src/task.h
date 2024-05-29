@@ -75,15 +75,31 @@ protected:
         return true;
     }
 
-    template<typename t>
-    void setAndSave(t &setting, t value, const char *key) {
+    void setAndSave(float &setting, float value, const char *key) {
+        setting = value;
+        settings_[key] = serialized(String(value, 1));
+        writeToDisk();
+    }
+
+    template<typename T>
+    void setAndSave(T &setting, T value, const char *key) {
         setting = value;
         settings_[key] = value;
         writeToDisk();
     }
 
-    template<typename t>
-    t getOrDefault(const char *key, t default_value) {
+    float getOrDefault(const char *key, float default_value) {
+        if (!settings_.containsKey(key)) {
+            settings_[key] = serialized(String(default_value, 1));
+            return default_value;
+        }
+        float float_conversion = static_cast<float>(settings_[key]);
+        settings_[key] = serialized(String(float_conversion, 1));
+        return float_conversion;
+    }
+
+    template<typename T>
+    T getOrDefault(const char *key, T default_value) {
         if (!settings_.containsKey(key)) {
             settings_[key] = default_value;
         }
