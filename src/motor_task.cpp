@@ -173,7 +173,7 @@ void MotorTask::loadSettings() {
 
     sync_settings_  = getOrDefault("sync_settings_", sync_settings_);
     open_velocity_  = getOrDefault("open_velocity_", open_velocity_);
-    clos_velocity_  = getOrDefault("clos_velocity_",clos_velocity_);
+    clos_velocity_  = getOrDefault("clos_velocity_", clos_velocity_);
     open_accel_     = getOrDefault("open_accel_", open_accel_);
     clos_accel_     = getOrDefault("clos_accel_", clos_accel_);
     open_current_   = getOrDefault("open_current_", open_current_);
