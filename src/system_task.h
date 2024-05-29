@@ -1,4 +1,5 @@
 #pragma once
+#include <WiFi.h>
 #include "task.h"
 
 #define SYSTEM_WAKE_DURATION 5000   // ms

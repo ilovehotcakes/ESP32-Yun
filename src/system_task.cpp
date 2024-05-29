@@ -113,6 +113,7 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
 
 void SystemTask::systemReset() {
     LOGI("System factory reset\n");
+    WiFi.disconnect();
     LITTLEFS.format();
     ESP.restart();
 }
