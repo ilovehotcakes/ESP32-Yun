@@ -8,12 +8,10 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
 	<style>
 html {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    color: rgba(255, 255, 255, 1);
+    color: white;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
-    margin: 0;
-    padding: 0;
 }
 body {
     display: flex;
@@ -39,16 +37,15 @@ h3 {
     color: rgba(210, 210, 210, 0.85);
 }
 h4 {
+    margin: 0;
     font-size: 1.1em;
     font-weight: 500;
-    margin: 0;
     color: rgba(210, 210, 210, 0.85);
 }
 h5 {
     margin: 0;
     font-size: 0.7em;
     font-weight: 500;
-    color: rgba(255, 255, 255);
 }
 .page {
     position: absolute;
@@ -64,7 +61,6 @@ h5 {
     width: 91%%;
     height: 28%%;
     border-radius: 1em;
-    /* border: 1px solid black; */
     border: none;
 }
 .controls {
@@ -356,7 +352,7 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     opacity: 0;
     height: 0;
 }
-.pointer-hlp {
+.clickable {
     cursor: pointer;
 }
 .white-color {
@@ -404,47 +400,50 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
 
 
 
-
-.unified-settings {
+/* For settings page */
+.default {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%%;
+}
+.four-settings {
     top: 7%%;
     height: 28%%;
     border-radius: 0.5em;
 }
-.motor-settings {
+.three-settings {
     top: 38%%;
     height: 21%%;
     border-radius: 0.5em;
 }
-.advanced-settings {
+.two-settings {
+    top: 62%%;
     height: 14%%;
     border-radius: 0.5em;
-}
-.fastmode {
-    top: 62%%;
+    transition-duration: 0s;
 }
 .stallguard {
     top: 79%%;
 }
-.four-settings {
-    position: absolute;
-    left: 0;
-    width: 100%%;
-    height: 25%%;
+.one-setting {
+    height: 7%%;
+    border-radius: 0.5em;
+    transition-duration: 0s;
 }
-.three-settings {
-    position: absolute;
-    left: 0;
-    width: 100%%;
-    height: 33%%;
+.one-forth-height {
+    height: calc(100%% / 4);
 }
-.two-settings {
-    position: absolute;
-    left: 0;
-    width: 100%%;
-    height: 50%%;
+.one-third-height {
+    height: calc(100%% / 3);
 }
-.zero-pos {
-    top: 0;
+.one-half-height {
+    height: calc(100%% / 2);
+}
+.whole-height {
+    height: 100%%;
 }
 .one-forth-pos {
     top: 25%%;
@@ -467,7 +466,7 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     left: 4.5%%;
     color: rgb(255, 255, 255);
 }
-.opening-setting-txt {
+.setting-opening-txt {
     position: absolute;
     top: 21%%;
     left: 61%%;
@@ -477,12 +476,12 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     opacity: 0;
     transition: 0.1s ease-in-out;
 }
-.opening-setting-txt-show {
+.setting-opening-txt-show {
     opacity: 100;
     transform: translateX(25%%);
     transition: 0.1s ease-in-out;
 }
-.closing-setting-txt {
+.setting-closing-txt {
     position: absolute;
     top: 21%%;
     left: 79%%;
@@ -530,16 +529,16 @@ input:checked + .toggle-cbx::before {
     transition: 0.2s ease-in-out;
 }
 
-.setting-dlg {
-    position: absolute;
+
+
+/* For pop-up dialog to change settings */
+.setting-dialog {
     top: 100%%;
-    left: 0;
-    width: 100%%;
     height: 100%%;
     background: rgba(45, 45, 45, 0.9);
     transition: 0.2s ease-in-out;
 }
-.setting-dlg-show {
+.setting-dialog-show {
     top: 2%%;
     transition: 0.2s ease;
 }
@@ -582,22 +581,24 @@ input:checked + .toggle-cbx::before {
 .form-input-txt {
     position: absolute;
     top: 20%%;
-    left: 5.5%%;
+    left: 5%%;
 }
-.dialog-explanation {
+.dialog-hint {
     position: absolute;
-    top: 31.8%%;
+    top: 25.2%%;
     left: 8%%;
     width: 84%%;
     height: 20%%;
 }
+.dialog-hint-shift {
+    top: 32.2%%;
+}
 input[type="number"] {
     position: absolute;
-    top: 15%%;
-    left: 31%%;
-    width: 62.4%%;
+    top: 14%%;
+    left: 39%%;
+    width: 55%%;
     height: 70%%;
-    margin-top: -1px;
     padding-left: 1px;
     border: none;
     font-size: 1.1em;
@@ -692,7 +693,7 @@ window.addEventListener('load', () => {
         };
 
         websocket.onerror = (error) => {
-            console.log("Websocket error");
+            console.log('Websocket error');
             console.log(error);
         };
 
@@ -700,15 +701,15 @@ window.addEventListener('load', () => {
             const data = event.data;
             console.log(data);
             if (data > -1) {
-                document.getElementById("percent_slider").value = data;
+                document.getElementById('percent_slider').value = data;
             }
         };
     } catch (error) {
-        console.log("Failed to connect to websocket")
-        console.log(error)
+        console.log('Failed to connect to websocket');
+        console.log(error);
     }
 
-    if (document.getElementById("sync_settings").checked) {
+    if (document.getElementById('sync_settings').checked) {
         showOpeningSettings();
     }
 });
@@ -730,36 +731,70 @@ function isMobileDevice() {
 }
 
 function dropdown () {
-    document.getElementById("controls").classList.toggle('hide-hlp');
-    document.getElementById("advanced_controls").classList.toggle('hide-hlp');
+    document.getElementById('controls').classList.toggle('hide-hlp');
+    document.getElementById('advanced_controls').classList.toggle('hide-hlp');
 }
 
-function openSettingDialog(setting_name, input_step) {
+function openSettingDialog(setting_name, prompt="", closing_setting_text, input_step, number_of_settings=1) {
     const lowercase_name = setting_name.toLowerCase();
-    const opening_setting_input = document.getElementById("opening_setting_input");
-    const closing_setting_input = document.getElementById("closing_setting_input");
-    document.getElementById("setting_dialog").action = '/motor?';
-    opening_setting_input.step = input_step;
-    opening_setting_input.name = 'opening-' + lowercase_name;
+    const param = lowercase_name.replaceAll(" ", "-");
+    const id = lowercase_name.replaceAll(" ", "_");
+    const form_input = document.getElementById('form_input');
+    const close_setting = document.getElementById('closing_setting');
+    const opening_setting_input = document.getElementById('opening_setting_input');
+    const closing_setting_input = document.getElementById('closing_setting_input');
+
+    if (number_of_settings > 1 && document.getElementById('sync_settings').checked) {
+        form_input.classList.remove('one-setting');
+        form_input.classList.add('two-settings');
+        document.getElementById('opening_setting').classList.remove('hide-hlp');
+        document.getElementById('opening_setting_separator').classList.remove('hide-hlp');
+        close_setting.classList.add('one-half-pos');
+        close_setting.classList.add('one-half-height');
+        close_setting.classList.remove('whole-height');
+        document.getElementById('dialog_hint').classList.add('dialog-hint-shift');
+
+        document.getElementById('closing_setting_text').innerText = "Closing";
+        opening_setting_input.step = input_step;
+        opening_setting_input.name = `opening-${param}`;
+        closing_setting_input.name = `closing-${param}`;
+        opening_setting_input.placeholder = `${document.getElementById(id + '_setting_opening').innerText}`;
+        opening_setting_input.select();
+    } else {
+        form_input.classList.add('one-setting');
+        form_input.classList.remove('two-settings');
+        document.getElementById('opening_setting').classList.add('hide-hlp');
+        document.getElementById('opening_setting_separator').classList.add('hide-hlp');
+        close_setting.classList.remove('one-half-pos');
+        close_setting.classList.remove('one-half-height');
+        close_setting.classList.add('whole-height');
+        document.getElementById('dialog_hint').classList.remove('dialog-hint-shift');
+
+        document.getElementById('closing_setting_text').innerText = closing_setting_text;
+        opening_setting_input.name = "";
+        closing_setting_input.name = param;
+        closing_setting_input.select();
+    }
+
+    closing_setting_input.placeholder = `${document.getElementById(id + '_setting_closing').innerText}`;
     closing_setting_input.step = input_step;
-    closing_setting_input.name = 'closing-' + lowercase_name;
-    document.getElementById("dialog_setting_prompt").innerText = 'Enter new value for "' 
-                                                            + document.getElementById(lowercase_name + "_setting_name").innerText + '"';
-    document.getElementById("dialog_setting_name").innerText = 'Enter ' + setting_name;
-    opening_setting_input.placeholder = document.getElementById(lowercase_name + "_open_setting").innerText;
-    closing_setting_input.placeholder = document.getElementById(lowercase_name + "_close_setting").innerText;
-    document.getElementById("setting_dialog").classList.add('setting-dlg-show');
-    opening_setting_input.select();
+
+    document.getElementById('dialog_setting_prompt').innerText = `Enter new value for "${prompt}"`;
+    document.getElementById('dialog_setting_name').innerText = `Enter ${setting_name}`;
+
+    const setting_dialog = document.getElementById('setting_dialog');
+    setting_dialog.action = '/motor?';
+    setting_dialog.classList.add('setting-dialog-show');
 }
 
 function cancelForm() {
-    document.getElementById("setting_dialog").classList.remove('setting-dlg-show');
+    document.getElementById('setting_dialog').classList.remove('setting-dialog-show');
 }
 
 function submitForm() {
-    const open_setting = document.getElementById("opening_setting_input");
-    const close_setting = document.getElementById("closing_setting_input");
-    const action = document.getElementById("setting_dialog").action;
+    const open_setting = document.getElementById('opening_setting_input');
+    const close_setting = document.getElementById('closing_setting_input');
+    const action = document.getElementById('setting_dialog').action;
     const request = action + open_setting.name + '=' + open_setting.value + '&' + close_setting.name + '=' + close_setting.value;
     const xhr = new XMLHttpRequest();
     xhr.open('GET', request);
@@ -778,19 +813,19 @@ function motorMove(element) {
 }
 
 function showOpeningSettings() {
-    document.getElementById("current_open_setting").classList.add('opening-setting-txt-show');
-    document.getElementById("velocity_open_setting").classList.add('opening-setting-txt-show');
-    document.getElementById("acceleration_open_setting").classList.add('opening-setting-txt-show');
+    document.getElementById('current_setting_opening').classList.add('setting-opening-txt-show');
+    document.getElementById('velocity_setting_opening').classList.add('setting-opening-txt-show');
+    document.getElementById('acceleration_setting_opening').classList.add('setting-opening-txt-show');
 }
 
 function hideOpeningSettings() {
-    document.getElementById("current_open_setting").classList.remove('opening-setting-txt-show');
-    document.getElementById("velocity_open_setting").classList.remove('opening-setting-txt-show');
-    document.getElementById("acceleration_open_setting").classList.remove('opening-setting-txt-show');
+    document.getElementById('current_setting_opening').classList.remove('setting-opening-txt-show');
+    document.getElementById('velocity_setting_opening').classList.remove('setting-opening-txt-show');
+    document.getElementById('acceleration_setting_opening').classList.remove('setting-opening-txt-show');
 }
 
 function syncSettings() {
-    if (document.getElementById("sync_settings").checked) {
+    if (document.getElementById('sync_settings').checked) {
         motorHttpRequest('sync-settings');
         showOpeningSettings();
     } else {
@@ -865,42 +900,42 @@ function checkboxHttpRequest(param) {
 
 
         <!-- To display and change some motor settings -->
-        <div class="unified-settings glass container">
-            <div class="zero-pos four-settings">
+        <div class="four-settings glass container">
+            <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
-                    <input id="sync_settings" type="checkbox" onclick="syncSettings()"  %SYNC_SETTING%>
+                    <input id="sync_settings" type="checkbox" onclick="syncSettings()" %SYNC_SETTINGS%>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
             <div class="one-forth-pos horizontal-separator"></div>
 
-            <div class="one-forth-pos four-settings pointer-hlp" onclick="openSettingDialog('Current', 1)">
+            <div class="one-forth-pos one-forth-height default clickable" onclick="openSettingDialog('Current', 'Current (mA)', 'Current', 1, 2)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h4 id="current_open_setting" class="opening-setting-txt">%OP_CURR%</h4>
-                <h4 id="current_close_setting" class="closing-setting-txt">%CL_CURR%</h4>
+                <h4 id="current_setting_opening" class="setting-opening-txt">%OP_CURR%</h4>
+                <h4 id="current_setting_closing" class="setting-closing-txt">%CL_CURR%</h4>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half-pos four-settings pointer-hlp" onclick="openSettingDialog('Velocity', 0.1)">
+            <div class="one-half-pos one-forth-height default clickable" onclick="openSettingDialog('Velocity', 'Velocity (Hz)', 'Velocity', 0.1, 2)">
                 <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
-                <h4 id="velocity_open_setting" class="opening-setting-txt">%OP_VELO%</h4>
-                <h4 id="velocity_close_setting" class="closing-setting-txt">%CL_VELO%</h4>
+                <h4 id="velocity_setting_opening" class="setting-opening-txt">%OP_VELO%</h4>
+                <h4 id="velocity_setting_closing" class="setting-closing-txt">%CL_VELO%</h4>
             </div>
 
             <div class="three-forths-pos horizontal-separator"></div>
 
-            <div class="three-forths-pos four-settings pointer-hlp" onclick="openSettingDialog('Acceleration', 0.1)">
+            <div class="three-forths-pos one-forth-height default clickable" onclick="openSettingDialog('Acceleration', 'Acceleration (Hz/s)', 'Acceleration', 0.1, 2)">
                 <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h4 id="acceleration_open_setting" class="opening-setting-txt">%OP_ACCEL%</h4>
-                <h4 id="acceleration_close_setting" class="closing-setting-txt">%CL_ACCEL%</h4>
+                <h4 id="acceleration_setting_opening" class="setting-opening-txt">%OP_ACCEL%</h4>
+                <h4 id="acceleration_setting_closing" class="setting-closing-txt">%CL_ACCEL%</h4>
             </div>
         </div>
 
-        <div class="motor-settings glass container">
-            <div class="zero-pos three-settings">
+        <div class="three-settings glass container">
+            <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
                     <input id="direction" type="checkbox" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
@@ -910,21 +945,21 @@ function checkboxHttpRequest(param) {
 
             <div class="one-third-pos horizontal-separator"></div>
 
-            <div class="one-third-pos three-settings">
-                <h3 class="setting-name-txt">Full Steps (per turn)</h3>
-                <h4 class="closing-setting-txt">%FULL_STEPS%</h4>
+            <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
+                <h3 id="full_steps_setting_name" class="setting-name-txt">Full Steps (per turn)</h3>
+                <h4 id="full_steps_setting_closing" class="setting-closing-txt">%FULL_STEPS%</h4>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
 
-            <div class="two-thirds-pos three-settings">
-                <h3 class="setting-name-txt">Microsteps (per step)</h3>
-                <h4 class="closing-setting-txt">%MICROSTEPS%</h4>
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
+                <h3 id="microsteps_setting_name" class="setting-name-txt">Microsteps (per step)</h3>
+                <h4 id="microsteps_setting_closing" class="setting-closing-txt">%MICROSTEPS%</h4>
             </div>
         </div>
 
-        <div class="fastmode advanced-settings glass container">
-            <div class="zero-pos two-settings">
+        <div class="two-settings glass container">
+            <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
                     <input id="fastmode" type="checkbox" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
@@ -934,14 +969,14 @@ function checkboxHttpRequest(param) {
 
             <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half-pos two-settings">
-                <h3 class="setting-name-txt">Threshold</h3>
-                <h4 class="closing-setting-txt">%FASTMODE_THRESH%</h4>
+            <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Fastmode Threshold', 'Fastmode Threshold', 'Threshold', 1)">
+                <h3 id="fastmode_threshold_setting_name" class="setting-name-txt">Threshold</h3>
+                <h4 id="fastmode_threshold_setting_closing" class="setting-closing-txt">%FASTMODE_THRESH%</h4>
             </div>
         </div>
 
-        <div class="stallguard advanced-settings glass container">
-            <div class="zero-pos two-settings">
+        <div class="stallguard two-settings glass container">
+            <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
                     <input id="stallguard" type="checkbox" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
@@ -951,16 +986,16 @@ function checkboxHttpRequest(param) {
 
             <div class="one-half-pos horizontal-separator"></div>
 
-            <div class="one-half-pos two-settings">
-                <h3 class="setting-name-txt">Threshold</h3>
-                <h4 class="closing-setting-txt">%STALLGUARD_THRESH%</h4>
+            <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Stallguard Threshold', 'Stallguard Threshold', 'Threshold', 1)">
+                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt">Threshold</h3>
+                <h4 id="stallguard_threshold_setting_closing" class="setting-closing-txt">%STALLGUARD_THRESH%</h4>
             </div>
         </div>
 
 
 
         <!-- Dialog box for submitting new values for motor settings -->
-        <form id="setting_dialog" class="setting-dlg glass container" method="GET">
+        <form id="setting_dialog" class="setting-dialog default glass container" method="GET">
             <div class="dialog-prompt">
                 <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>
             </div>
@@ -971,36 +1006,24 @@ function checkboxHttpRequest(param) {
                 <button type="reset" class="form-btn" onclick="submitForm(this)">Submit</button>
             </div>
 
-            <div class="form-input advanced-settings glass container">
-                <div class="zero-pos two-settings">
+            <div id="form_input" class="form-input one-setting glass container">
+                <div id="opening_setting" class="one-half-height default hide-hlp">
                     <h4 class="white-color form-input-txt">Opening</h4>
                     <input type="number" id="opening_setting_input">
                 </div>
 
-                <div class="one-half-pos horizontal-separator"></div>
+                <div id="opening_setting_separator" class="one-half-pos horizontal-separator hide-hlp"></div>
 
-                <div class="one-half-pos two-settings">
-                    <h4 class="white-color form-input-txt">Closing</h4>
+                <div id="closing_setting" class="whole-height default">
+                    <h4 id="closing_setting_text" class="white-color form-input-txt">Closing</h4>
                     <input type="number" id="closing_setting_input">
                 </div>
             </div>
 
-            <div class="dialog-explanation">
+            <div id="dialog_hint" class="dialog-hint">
                 <h5 class="grey-color">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, debitis dolore cumque laboriosam ad nesciunt autem obcaecati, nihil est error, expedita libero totam accusamus quo rem porro enim consequuntur facere.</h5>
             </div>
         </form>
-
-        <!-- <div id="wifi_page" class="wifi-page-initial glass container2">
-        </div>
-
-        <div class="navbar glass container">
-            <input type="radio" id="wireless_radio" name="navbar" onclick="gotoWifiPage()">
-            <label for="wireless_radio" class="wireless-rad radio"></label>
-            <input type="radio" id="home_radio" name="navbar" onclick="gotoHomePage()" checked>
-            <label for="home_radio" class="home-rad radio"></label>
-            <input type="radio" id="motor_radio" name="navbar" onclick="gotoMotorPage(this)">
-            <label for="motor_radio" class="motor-rad radio"></label>
-        </div> -->
     </div>
 </body>
 </html>)rawliteral";
