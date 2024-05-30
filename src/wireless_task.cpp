@@ -192,6 +192,9 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
 
     for (int i = 0; i < request->params(); i++) {
         String param = request->getParam(i)->name();
+        if (param == "") {
+            continue;
+        }
         Command command = hash(param);
         if (command == ERROR_COMMAND) {
             String list_of_commands;
@@ -219,6 +222,9 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
 
     for (int i = 0; i < request->params(); i++) {
         String param = request->getParam(i)->name();
+        if (param == "") {
+            continue;
+        }
         String value_str = request->getParam(param)->value();
         Command command = hash(param);
         if (command >= MOTOR_VLCTY && command <= MOTOR_CL_ACCEL) {
@@ -297,7 +303,7 @@ String WirelessTask::htmlStringProcessor(const String& var) {
     JsonDocument settings = motor_task_->getSettings();
     if (var == "SLIDER") {
         return motor_position_;
-    } else if (var == "SYNC_SETTING") {
+    } else if (var == "SYNC_SETTINGS") {
         if (settings["sync_settings_"]) return "checked";
         return "";
     } else if (var == "OP_CURR") {
