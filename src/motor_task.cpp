@@ -81,30 +81,30 @@ void MotorTask::run() {
                     setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_OP_VLCTY:
-                    if (sync_settings_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
+                    setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
                 case MOTOR_CL_VLCTY:
-                    if (sync_settings_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
+                    setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_ACCEL:
                     setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_OP_ACCEL:
-                    if (sync_settings_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
+                    setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
                 case MOTOR_CL_ACCEL:
-                    if (sync_settings_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
+                    setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
                     setAndSave(open_current_, inbox_.parameter, "open_current_");
                     setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_OP_CURRENT:
-                    if (sync_settings_) setAndSave(open_current_, inbox_.parameter, "open_current_");
+                    setAndSave(open_current_, inbox_.parameter, "open_current_");
                     break;
                 case MOTOR_CL_CURRENT:
-                    if (sync_settings_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
+                    setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
                     setAndSave(direction_, static_cast<bool>(inbox_.parameter), "direction_");
@@ -214,7 +214,7 @@ bool MotorTask::prepareToMove(bool check, bool direction) {
         vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
-    if (direction && sync_settings_) {
+    if (direction && !sync_settings_) {
         updateMotorSettings(open_velocity_, open_accel_, open_current_);
     } else {
         updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);

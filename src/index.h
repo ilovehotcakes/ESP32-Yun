@@ -27,19 +27,18 @@ body {
 }
 h2 {
     margin: 0;
-    font-size: 1.3em;
-    font-weight: bold;
+    /* font-size: 1.3em;
+    font-weight: bold; */
 }
 h3 {
     margin: 0;
     font-size: 1.2em;
     font-weight: 500;
-    color: rgba(210, 210, 210, 0.85);
 }
 h4 {
     margin: 0;
-    font-size: 1.1em;
-    font-weight: 500;
+    /* font-size: 1.1em;
+    font-weight: 500; */
     color: rgba(210, 210, 210, 0.85);
 }
 h5 {
@@ -47,13 +46,28 @@ h5 {
     font-size: 0.7em;
     font-weight: 500;
 }
-.page {
+.canvas {
     position: absolute;
     width: 375px;
     height: 625px;
     border: 1px solid black;
     border-radius: 1em;
     overflow: hidden;
+}
+.default {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%%;
+    height: 100%%;
+    border: inherit;
+    transition: 0.2s ease;
+}
+.default-hide {
+    left: 110%%;
+    transition: 0.2s ease-in-out;
 }
 .container {
     position: absolute;
@@ -72,35 +86,21 @@ h5 {
     /* border: 1px solid rgba(255, 255, 255, 0.3); */
     /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
 }
+
+
+
 .motor-controls-hide {
     left: -110%%;
     transition: 0.2s ease-in-out;
 }
-.motor-settings-button {
-    position: absolute;
-    top: 6%%;
-    left: 75%%;
-    margin: 0;
-    width: 8%%;
-    height: 52.1%%;
-}
-.controls {
-    position: absolute;
-    top: 36.7%%;
-    left: 0;
-    width: 100%%;
-    height: 63%%;
-    border: inherit;
-    transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
-}
-.title {
-    position: absolute;
+.motor-controls-header {
     top: 7%%;
-    left: 0%%;
-    margin: -1px 0 0 -1px;
-    width: 100%%;
     height: 30%%;
-    border: inherit;
+}
+.motor-controls-body {
+    top: 36.7%%;
+    height: 63%%;
+    transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
 }
 .name-txt {
     position: absolute;
@@ -111,57 +111,46 @@ h5 {
     position: absolute;
     top: 50%%;
     left: 9%%;
+    color: rgb(187, 187, 187);
 }
-.slider {
+.more-settings-button {
     position: absolute;
+    top: 6%%;
+    left: 75%%;
+    width: 8%%;
+    height: 52.1%%;
+}
+.percent-slider {
     top: 0;
-    left: 0;
-    margin: 0 0 0 -1px;
     padding-top: 5%%;
-    width: 100%%;
     height: 47.6%%;
-    border: inherit;
 }
 .open-stop-close {
-    position: absolute;
     top: 46%%;
-    left: 0;
-    margin: 0 0 0 -1px;
-    width: 100%%;
     height: 52.4%%;
-    border: inherit;
 }
 .forward-backward {
-    position: absolute;
     top: 0;
-    left: 0%%;
-    margin: 0 0 0 -1px;
-    width: 100%%;
     height: 52.4%%;
-    border: inherit;
+}
+.min-zero-max {
+    top: 52.4%%;
+    margin: 0 0 0 -1px;
+    height: 47%%;
 }
 .horizontal-separator {
     position: absolute;
     top: 52.4%%;
     width: 100%%;
     height: 1px;
-    background-color: rgba(209, 209, 209, 0.527);
-}
-.min-zero-max {
-    position: absolute;
-    top: 52.4%%;
-    left: 0%%;
-    margin: 0 0 0 -1px;
-    width: 100%%;
-    height: 47%%;
-    border: inherit;
+    background-color: rgba(200, 200, 200, 0.525);
 }
 .vertical-separator {
     position: absolute;
     top: 1px;
     width: 1px;
     height: 100%%;
-    background-color: rgba(209, 209, 209, 0.527);
+    background-color: rgba(200, 200, 200, 0.525);
 }
 .left-spr {
     left: 35%%;
@@ -172,18 +161,17 @@ h5 {
 .button2 {
     position: absolute;
     top: 1px;
-    padding: 0;
     width: 35%%;
     height: 100%%;
     font-size: medium;
     font-weight: 600;
-    color: rgb(255, 255, 255);
-    background-color: rgba(255, 255, 255, 0);
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
     border: none;
     transition: 0.1s ease;
 }
 .button2:active {
-    background-color: rgba(194, 194, 194, 0.507);
+    background-color: rgba(194, 194, 194, 0.5);
 }
 .set-min-btn {
     left: 0;
@@ -264,7 +252,7 @@ input[type="range"]:hover ~ .tick {
 input[type="range"]:hover ~ .zero-mkr {
     top: 60%%;
     left: 5%%;
-    color: rgba(255, 255, 255, 0.950);
+    color: white;
 }
 .hundred-mkr {
     left: 87.5%%;
@@ -272,14 +260,13 @@ input[type="range"]:hover ~ .zero-mkr {
 input[type="range"]:hover ~ .hundred-mkr {
     top: 60%%;
     left: 89%%;
-    color: rgba(255, 255, 255, 0.950);
+    color: white;
 }
 .button1 {
     position: absolute;
     top: 5%%;
     width: 14.3%%;
     height: 84.5%%;
-    padding: 0;
     color: rgba(0, 0, 0, 0);
     background-size: 2.5rem;
     background-repeat: no-repeat;
@@ -295,14 +282,12 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-size: 2.2rem;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: rgba(189, 189, 189, 0.747);
-}
-.side-hlp {
-    background-size: 2.4rem;
+    background-color: rgba(189, 189, 189, 0.75);
 }
 .open-btn {
     left: 15%%;
     background-image: url(./img/icon_open_100x100.png);
+    background-size: 2.4rem;
 }
 .stop-btn {
     left: 42.85%%;
@@ -311,6 +296,7 @@ input[type="range"]:hover ~ .hundred-mkr {
 .close-btn {
     left: 70.7%%;
     background-image: url(./img/icon_close_100x100.png);
+    background-size: 2.4rem;
 }
 .forward-btn {
     left: 61.5%%;
@@ -320,11 +306,10 @@ input[type="range"]:hover ~ .hundred-mkr {
     left: 24.5%%;
     background-image: url(./img/icon_backward_100x100.png);
 }
-.dropdown {
+.advanced-controls-cbx {
     position: absolute;
     top: 6%%;
     left: 87%%;
-    margin: 0;
     width: 8%%;
     height: 52.1%%;
 }
@@ -353,15 +338,15 @@ input[type="checkbox"], input[type="range"] {
     -webkit-appearance: none;
     -moz-appearance: none;
 }
-.hide-hlp {
+
+
+
+.hide {
     opacity: 0;
     height: 0;
 }
 .clickable {
     cursor: pointer;
-}
-.white-color {
-    color: white;
 }
 .grey-color {
     color: lightgray;
@@ -369,65 +354,21 @@ input[type="checkbox"], input[type="range"] {
 
 
 
-.radio {
-    position: absolute;
-    top: 12%%;
-    margin: 0;
-    content: '';
-    width: 22%%;
-    height: 76%%;
-    background-size: 2em;
-    background-color: rgba(172, 172, 172, 0);
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 3em;
-    transition: 0.2s;
-}
-.radio:active {
-    background-color: rgba(172, 172, 172, 0.548);
-}
-.wireless-rad {
-    left: 9%%;
-    background-image: url(./img/icon_wifi_100x100.png);
-}
-.home-rad {
-    left: 39%%;
-    background-image: url(./img/icon_home_100x100.png);
-}
-.motor-rad {
-    left: 69%%;
-    background-image: url(./img/icon_motor_100x100.png);
-}
-.wifi-page-initial {
-    left: -96%%;
-    transition: 0.4s ease-in-out;
-}
-
-
-
 /* For settings page */
-.default {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0;
-    padding: 0;
-    width: 100%%;
-}
-.motor-settings-title {
+.motor-settings-header {
     top: 2.5%%;
     left: 4.5%%;
     height: 6%%;
 }
-.motor-settings-title-txt {
+.back-btn {
     position: absolute;
-    left: 30%%;
-    font-weight: 600;
-}
-.back {
-    position: absolute;
-    top: 8%%;
+    top: 17%%;
     left: 0;
+}
+.motor-settings-header-txt {
+    position: absolute;
+    left: 27%%;
+    font-weight: 500;
 }
 .four-settings {
     top: 10%%;
@@ -450,10 +391,6 @@ input[type="checkbox"], input[type="range"] {
 .one-setting {
     height: 7%%;
     border-radius: 0.5em;
-}
-.motor-settings-hide {
-    left: 110%%;
-    transition: 0.15s ease-in;
 }
 .one-forth-height {
     height: calc(100%% / 4);
@@ -484,32 +421,28 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-name-txt {
     position: absolute;
-    top: 16%%;
-    left: 4.5%%;
-    color: rgb(255, 255, 255);
+    top: 19%%;
+    left: 5%%;
+    font-size: 1.1em;
+}
+.setting-value-txt {
+    position: absolute;
+    top: 19%%;
+    left: 79.9%%;
+    width: 15%%;
+    font-size: 1.1em;
+    text-align: right;
+    color: rgb(185, 185, 185);
 }
 .setting-opening-txt {
-    position: absolute;
-    top: 21%%;
-    left: 61%%;
-    width: 15%%;
-    height: 57%%;
-    text-align: right;
+    left: 69%%;
     opacity: 0;
     transition: 0.1s ease-in-out;
 }
 .setting-opening-txt-show {
+    left: 63%%;
     opacity: 100;
-    transform: translateX(25%%);
     transition: 0.1s ease-in-out;
-}
-.setting-closing-txt {
-    position: absolute;
-    top: 21%%;
-    left: 79%%;
-    width: 15%%;
-    height: 57%%;
-    text-align: right;
 }
 .toggle {
     position: absolute;
@@ -556,8 +489,10 @@ input:checked + .toggle-cbx::before {
 /* For pop-up dialog to change settings */
 .setting-dialog {
     top: 100%%;
+    left: 0;
+    width: 100%%;
     height: 100%%;
-    background: rgba(45, 45, 45, 0.9);
+    background: rgba(36, 36, 36, 0.9);
     transition: 0.2s ease-in-out;
 }
 .setting-dialog-show {
@@ -567,22 +502,20 @@ input:checked + .toggle-cbx::before {
 .dialog-prompt {
     display: flex;
     justify-content: center;
-    position: absolute;
-    top: 1%%;
-    left: 20%%;
-    width: 60%%;
+    top: 1.4%%;
+    height: 3%%;
 }
 .dialog-title {
     display: flex;
     justify-content: space-between;
     position: absolute;
-    top: 6%%;
+    top: 6.5%%;
     left: 4.5%%;
     width: 91%%;
     margin-left: -1px;
 }
 .form-btn {
-    margin-top: 1.5%%;
+    margin-top: 1.7%%;
     padding: 0;
     font-size: 1em;
     color: rgb(67, 142, 255);
@@ -593,7 +526,6 @@ input:checked + .toggle-cbx::before {
     color: rgb(31, 105, 216);
 }
 .dialog-title-txt {
-    margin-top: 1px;
     font-size: 1.1em;
     color: rgb(255, 255, 255);
 }
@@ -607,7 +539,7 @@ input:checked + .toggle-cbx::before {
 }
 .dialog-hint {
     position: absolute;
-    top: 25.2%%;
+    top: 25.5%%;
     left: 8%%;
     width: 84%%;
     height: 20%%;
@@ -617,7 +549,7 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"] {
     position: absolute;
-    top: 14%%;
+    top: 13%%;
     left: 39%%;
     width: 55%%;
     height: 70%%;
@@ -731,7 +663,7 @@ window.addEventListener('load', () => {
         console.log(error);
     }
 
-    if (document.getElementById('sync_settings').checked) {
+    if (!document.getElementById('sync_settings').checked) {
         showOpeningSettings();
     }
 });
@@ -752,18 +684,14 @@ function isMobileDevice() {
     return false;
 }
 
-function dropdown () {
-    document.getElementById('controls').classList.toggle('hide-hlp');
-    document.getElementById('advanced_controls').classList.toggle('hide-hlp');
+function toggleAdvancedControls () {
+    document.getElementById('motor_controls_body').classList.toggle('hide');
+    document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
 function toggleMotorSettings() {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    document.getElementById('motor_settings_title').classList.toggle('motor-settings-hide');
-    document.getElementById('motor_settings_1').classList.toggle('motor-settings-hide');
-    document.getElementById('motor_settings_2').classList.toggle('motor-settings-hide');
-    document.getElementById('motor_settings_3').classList.toggle('motor-settings-hide');
-    document.getElementById('motor_settings_4').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings').classList.toggle('default-hide');
 }
 
 function motorHttpRequest(param, value=1) {
@@ -773,16 +701,16 @@ function motorHttpRequest(param, value=1) {
 }
 
 function motorMove(element) {
-    motorHttpRequest('percent=' + element.value);
+    motorHttpRequest('percent', element.value);
 }
 
 function syncSettings() {
     if (document.getElementById('sync_settings').checked) {
         motorHttpRequest('sync-settings');
-        showOpeningSettings();
+        hideOpeningSettings();
     } else {
         motorHttpRequest('sync-settings', 0);
-        hideOpeningSettings();
+        showOpeningSettings();
     }
 }
 
@@ -803,11 +731,11 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     const opening_setting_input = document.getElementById('opening_setting_input');
     const closing_setting_input = document.getElementById('closing_setting_input');
 
-    if (number_of_settings > 1 && document.getElementById('sync_settings').checked) {
+    if (number_of_settings > 1 && !document.getElementById('sync_settings').checked) {
         form_input.classList.remove('one-setting');
         form_input.classList.add('two-settings');
-        document.getElementById('opening_setting').classList.remove('hide-hlp');
-        document.getElementById('opening_setting_separator').classList.remove('hide-hlp');
+        document.getElementById('opening_setting').classList.remove('hide');
+        document.getElementById('opening_setting_separator').classList.remove('hide');
         close_setting.classList.add('one-half-pos');
         close_setting.classList.add('one-half-height');
         close_setting.classList.remove('whole-height');
@@ -822,8 +750,8 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     } else {
         form_input.classList.add('one-setting');
         form_input.classList.remove('two-settings');
-        document.getElementById('opening_setting').classList.add('hide-hlp');
-        document.getElementById('opening_setting_separator').classList.add('hide-hlp');
+        document.getElementById('opening_setting').classList.add('hide');
+        document.getElementById('opening_setting_separator').classList.add('hide');
         close_setting.classList.remove('one-half-pos');
         close_setting.classList.remove('one-half-height');
         close_setting.classList.add('whole-height');
@@ -839,7 +767,7 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     closing_setting_input.step = input_step;
 
     document.getElementById('dialog_setting_prompt').innerText = `Enter new value for "${prompt}"`;
-    document.getElementById('dialog_setting_name').innerText = `Enter ${setting_name}`;
+    document.getElementById('dialog_title').innerText = `Enter ${setting_name}`;
 
     const setting_dialog = document.getElementById('setting_dialog');
     setting_dialog.action = '/motor?';
@@ -874,197 +802,190 @@ function hideOpeningSettings() {
 }	</script>
 </head>
 <body>
-    <div class="page">
-        <!-- Motor controls -->
-        <div id="motor_controls" class="glass container">
-            <div class="title">
-                <h3 class="name-txt white-color">Living Room Window</h3>
-                <h3 class="serial-txt">yun-e5c258</h3>
-                <div class="dropdown">
-                    <input type="checkbox" id="dropdown_checkbox" onclick="dropdown()" unchecked>
-                    <label for="dropdown_checkbox" class="dropdown-cbx"></label>
-                </div>
-                
-                <div class="motor-settings-button">
-                    <button type="button" class="dropdown-cbx" onclick="toggleMotorSettings()">
-                </div>
-            </div>
-
-            <div id="controls" class="controls">
-                <div class="slider">
-                    <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                    <span class="tick one-tck"></span>
-                    <span class="tick two-tck"></span>
-                    <span class="tick three-tck"></span>
-                    <span class="tick four-tck"></span>
-                    <span class="tick five-tck"></span>
-                    <span class="marker zero-mkr">0</span>
-                    <span class="marker hundred-mkr">100</span>
-                </div>
-
-                <div class="open-stop-close">
-                    <button type="button" class="open-btn side-hlp button1" value="0" onclick="motorMove(this)">Open</button>
-                    <button type="button" class="stop-btn button1" onclick="motorHttpRequest('stop')">Stop</button>
-                    <button type="button" class="close-btn side-hlp button1" value="100" onclick="motorMove(this)">Close</button>
-                </div>
-            </div>
-
-            <div id="advanced_controls" class="controls hide-hlp">
-                <div class="forward-backward">
-                    <div class="desktop-only">
-                        <button type="button" class="backward-btn button1" onmousedown="motorHttpRequest('backward')" onmouseup="motorHttpRequest('stop')">Backward</button>
-                        <button type="button" class="forward-btn button1" onmousedown="motorHttpRequest('forward')" onmouseup="motorHttpRequest('stop')">Forward</button>
-                    </div>
-                    <div class="mobile-only">
-                        <button type="button" class="backward-btn button1" ontouchstart="motorHttpRequest('backward')" ontouchend="motorHttpRequest('stop')">Backward</button>
-                        <button type="button" class="forward-btn button1" ontouchstart="motorHttpRequest('forward')" ontouchend="motorHttpRequest('stop')">Forward</button>
-                    </div>
-                </div>
-
-                <div class="horizontal-separator"></div>
-
-                <div class="min-zero-max">
-                    <button type="button" class="set-min-btn button2" onclick="motorHttpRequest('set-min')">Set Min</button>
-                    <span class="left-spr vertical-separator"></span>
-                    <button type="button" class="zeroing-btn button2" onclick="motorHttpRequest('zero')">Zero</button>
-                    <span class="right-spr vertical-separator"></span>
-                    <button type="button" class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
-                </div>
+<div class="canvas">
+    <!-- Motor controls to move the motor -->
+    <div id="motor_controls" class="glass container">
+        <div class="motor-controls-header default">
+            <h3 class="name-txt">Living Room Window</h3>
+            <h3 class="serial-txt">yun-e5c258</h3>
+            <label class="advanced-controls-cbx">
+                <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
+                <span class="dropdown-cbx">
+            </label>
+            <div class="more-settings-button">
+                <button class="dropdown-cbx" onclick="toggleMotorSettings()" unchecked>
             </div>
         </div>
 
-
-
-        <!-- To display and change some motor settings -->
-        <div id="motor_settings_title" class="motor-settings-title container motor-settings-hide">
-            <button type="button" class="back form-btn" onclick="toggleMotorSettings()">Back</button>
-            <h2 class="motor-settings-title-txt">Motor Settings</h2>
+        <div id="motor_controls_body" class="motor-controls-body default">
+            <div class="percent-slider default">
+                <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
+                <span class="tick one-tck"></span>
+                <span class="tick two-tck"></span>
+                <span class="tick three-tck"></span>
+                <span class="tick four-tck"></span>
+                <span class="tick five-tck"></span>
+                <span class="marker zero-mkr">0</span>
+                <span class="marker hundred-mkr">100</span>
+            </div>
+            <div class="open-stop-close default">
+                <button class="open-btn button1" value="0" onclick="motorMove(this)">Open</button>
+                <button class="stop-btn button1" onclick="motorHttpRequest('stop')">Stop</button>
+                <button class="close-btn button1" value="100" onclick="motorMove(this)">Close</button>
+            </div>
         </div>
 
-        <div id="motor_settings_1" class="four-settings glass container motor-settings-hide">
+        <div id="advanced_controls" class="motor-controls-body default hide">
+            <div class="forward-backward default">
+                <div class="desktop-only">
+                    <button class="backward-btn button1" onmousedown="motorHttpRequest('backward')" onmouseup="motorHttpRequest('stop')">Backward</button>
+                    <button class="forward-btn button1" onmousedown="motorHttpRequest('forward')" onmouseup="motorHttpRequest('stop')">Forward</button>
+                </div>
+                <div class="mobile-only">
+                    <button class="backward-btn button1" ontouchstart="motorHttpRequest('backward')" ontouchend="motorHttpRequest('stop')">Backward</button>
+                    <button class="forward-btn button1" ontouchstart="motorHttpRequest('forward')" ontouchend="motorHttpRequest('stop')">Forward</button>
+                </div>
+            </div>
+            <div class="horizontal-separator"></div>
+            <div class="min-zero-max default">
+                <button class="set-min-btn button2" onclick="motorHttpRequest('set-min')">Set Min</button>
+                <span class="left-spr vertical-separator"></span>
+                <button class="zeroing-btn button2" onclick="motorHttpRequest('zero')">Zero</button>
+                <span class="right-spr vertical-separator"></span>
+                <button class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- To display and change some motor settings -->
+    <div id="motor_settings" class="default default-hide">
+        <div class="motor-settings-header container">
+            <button class="back-btn form-btn" onclick="toggleMotorSettings()">Back</button>
+            <h2 class="motor-settings-header-txt">Motor Settings</h2>
+        </div>
+
+        <div id="motor_settings_1" class="four-settings glass container">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
-                    <input id="sync_settings" type="checkbox" onclick="syncSettings()" %SYNC_SETTINGS%>
+                    <input type="checkbox" id="sync_settings" onclick="syncSettings()" %SYNC_SETTINGS%>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
             <div class="one-forth-pos horizontal-separator"></div>
-
             <div class="one-forth-pos one-forth-height default clickable" onclick="openSettingDialog('Current', 'Current (mA)', 'Current', 1, 2)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h4 id="current_setting_opening" class="setting-opening-txt">%OP_CURR%</h4>
-                <h4 id="current_setting_closing" class="setting-closing-txt">%CL_CURR%</h4>
+                <h3 id="current_setting_opening" class="setting-opening-txt setting-value-txt">%OP_CURR%</h3>
+                <h3 id="current_setting_closing" class="setting-value-txt">%CL_CURR%</h3>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-
             <div class="one-half-pos one-forth-height default clickable" onclick="openSettingDialog('Velocity', 'Velocity (Hz)', 'Velocity', 0.1, 2)">
                 <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
-                <h4 id="velocity_setting_opening" class="setting-opening-txt">%OP_VELO%</h4>
-                <h4 id="velocity_setting_closing" class="setting-closing-txt">%CL_VELO%</h4>
+                <h3 id="velocity_setting_opening" class="setting-opening-txt setting-value-txt">%OP_VELO%</h3>
+                <h3 id="velocity_setting_closing" class="setting-value-txt">%CL_VELO%</h3>
             </div>
 
             <div class="three-forths-pos horizontal-separator"></div>
-
             <div class="three-forths-pos one-forth-height default clickable" onclick="openSettingDialog('Acceleration', 'Acceleration (Hz/s)', 'Acceleration', 0.1, 2)">
                 <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h4 id="acceleration_setting_opening" class="setting-opening-txt">%OP_ACCEL%</h4>
-                <h4 id="acceleration_setting_closing" class="setting-closing-txt">%CL_ACCEL%</h4>
+                <h3 id="acceleration_setting_opening" class="setting-opening-txt setting-value-txt">%OP_ACCEL%</h3>
+                <h3 id="acceleration_setting_closing" class="setting-value-txt">%CL_ACCEL%</h3>
             </div>
         </div>
 
-        <div id="motor_settings_2" class="three-settings glass container motor-settings-hide">
+
+        <div id="motor_settings_2" class="three-settings glass container">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
-                    <input id="direction" type="checkbox" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
+                    <input type="checkbox" id="direction" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-
             <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
                 <h3 id="full_steps_setting_name" class="setting-name-txt">Full Steps (per turn)</h3>
-                <h4 id="full_steps_setting_closing" class="setting-closing-txt">%FULL_STEPS%</h4>
+                <h3 id="full_steps_setting_closing" class="setting-value-txt">%FULL_STEPS%</h3>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
-
             <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
                 <h3 id="microsteps_setting_name" class="setting-name-txt">Microsteps (per step)</h3>
-                <h4 id="microsteps_setting_closing" class="setting-closing-txt">%MICROSTEPS%</h4>
+                <h3 id="microsteps_setting_closing" class="setting-value-txt">%MICROSTEPS%</h3>
             </div>
         </div>
 
-        <div id="motor_settings_3" class="two-settings glass container motor-settings-hide">
+
+        <div id="motor_settings_3" class="two-settings glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
-                    <input id="fastmode" type="checkbox" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
+                    <input type="checkbox" id="fastmode" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-
             <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Fastmode Threshold', 'Fastmode Threshold', 'Threshold', 1)">
                 <h3 id="fastmode_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h4 id="fastmode_threshold_setting_closing" class="setting-closing-txt">%FASTMODE_THRESH%</h4>
+                <h3 id="fastmode_threshold_setting_closing" class="setting-value-txt">%FASTMODE_THRESH%</h3>
             </div>
         </div>
 
-        <div id="motor_settings_4" class="stallguard two-settings glass container motor-settings-hide">
+
+        <div id="motor_settings_4" class="stallguard two-settings glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
-                    <input id="stallguard" type="checkbox" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
+                    <input type="checkbox" id="stallguard" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
                     <span class="toggle-cbx">
                 </label>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-
             <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Stallguard Threshold', 'Stallguard Threshold', 'Threshold', 1)">
                 <h3 id="stallguard_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h4 id="stallguard_threshold_setting_closing" class="setting-closing-txt">%STALLGUARD_THRESH%</h4>
+                <h3 id="stallguard_threshold_setting_closing" class="setting-value-txt">%STALLGUARD_THRESH%</h3>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Dialog box for submitting new values for motor settings -->
+    <form id="setting_dialog" class="setting-dialog glass container" method="GET">
+        <div class="dialog-prompt default">
+            <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>
+        </div>
+
+        <div class="dialog-title">
+            <button type="reset" class="form-btn" onclick="cancelForm()">Cancel</button>
+            <h3 id="dialog_title" class="dialog-title-txt">SETTINGNAME</h3>
+            <button type="reset" class="form-btn" onclick="submitForm(this)">Submit</button>
+        </div>
+
+        <div id="form_input" class="form-input one-setting glass container">
+            <div id="opening_setting" class="one-half-height default hide">
+                <h3 class="setting-name-txt">Opening</h3>
+                <input type="number" id="opening_setting_input">
+            </div>
+
+            <div id="opening_setting_separator" class="one-half-pos horizontal-separator hide"></div>
+            <div id="closing_setting" class="whole-height default">
+                <h3 id="closing_setting_text" class="setting-name-txt">Closing</h3>
+                <input type="number" id="closing_setting_input">
             </div>
         </div>
 
-
-
-        <!-- Dialog box for submitting new values for motor settings -->
-        <form id="setting_dialog" class="setting-dialog default glass container" method="GET">
-            <div class="dialog-prompt">
-                <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>
-            </div>
-
-            <div class="dialog-title">
-                <button type="reset" class="form-btn" onclick="cancelForm()">Cancel</button>
-                <h3 id="dialog_setting_name" class="dialog-title-txt">SETTINGNAME</h3>
-                <button type="reset" class="form-btn" onclick="submitForm(this)">Submit</button>
-            </div>
-
-            <div id="form_input" class="form-input one-setting glass container">
-                <div id="opening_setting" class="one-half-height default hide-hlp">
-                    <h4 class="white-color form-input-txt">Opening</h4>
-                    <input type="number" id="opening_setting_input">
-                </div>
-
-                <div id="opening_setting_separator" class="one-half-pos horizontal-separator hide-hlp"></div>
-
-                <div id="closing_setting" class="whole-height default">
-                    <h4 id="closing_setting_text" class="white-color form-input-txt">Closing</h4>
-                    <input type="number" id="closing_setting_input">
-                </div>
-            </div>
-
-            <div id="dialog_hint" class="dialog-hint">
-                <h5 class="grey-color">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, debitis dolore cumque laboriosam ad nesciunt autem obcaecati, nihil est error, expedita libero totam accusamus quo rem porro enim consequuntur facere.</h5>
-            </div>
-        </form>
-    </div>
+        <div id="dialog_hint" class="dialog-hint">
+            <h5 class="grey-color">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, debitis dolore cumque laboriosam ad nesciunt autem obcaecati, nihil est error, expedita libero totam accusamus quo rem porro enim consequuntur facere.</h5>
+        </div>
+    </form>
+</div>
 </body>
 </html>)rawliteral";

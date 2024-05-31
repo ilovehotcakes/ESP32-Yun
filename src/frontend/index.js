@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
         console.log(error);
     }
 
-    if (document.getElementById('sync_settings').checked) {
+    if (!document.getElementById('sync_settings').checked) {
         showOpeningSettings();
     }
 });
@@ -51,14 +51,14 @@ function isMobileDevice() {
     return false;
 }
 
-function dropdown () {
-    document.getElementById('controls').classList.toggle('hide-hlp');
-    document.getElementById('advanced_controls').classList.toggle('hide-hlp');
+function toggleAdvancedControls () {
+    document.getElementById('motor_controls_body').classList.toggle('hide');
+    document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
 function toggleMotorSettings() {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    document.getElementById('motor_settings').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings').classList.toggle('default-hide');
 }
 
 function motorHttpRequest(param, value=1) {
@@ -68,16 +68,16 @@ function motorHttpRequest(param, value=1) {
 }
 
 function motorMove(element) {
-    motorHttpRequest('percent=' + element.value);
+    motorHttpRequest('percent', element.value);
 }
 
 function syncSettings() {
     if (document.getElementById('sync_settings').checked) {
         motorHttpRequest('sync-settings');
-        showOpeningSettings();
+        hideOpeningSettings();
     } else {
         motorHttpRequest('sync-settings', 0);
-        hideOpeningSettings();
+        showOpeningSettings();
     }
 }
 
@@ -98,11 +98,11 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     const opening_setting_input = document.getElementById('opening_setting_input');
     const closing_setting_input = document.getElementById('closing_setting_input');
 
-    if (number_of_settings > 1 && document.getElementById('sync_settings').checked) {
+    if (number_of_settings > 1 && !document.getElementById('sync_settings').checked) {
         form_input.classList.remove('one-setting');
         form_input.classList.add('two-settings');
-        document.getElementById('opening_setting').classList.remove('hide-hlp');
-        document.getElementById('opening_setting_separator').classList.remove('hide-hlp');
+        document.getElementById('opening_setting').classList.remove('hide');
+        document.getElementById('opening_setting_separator').classList.remove('hide');
         close_setting.classList.add('one-half-pos');
         close_setting.classList.add('one-half-height');
         close_setting.classList.remove('whole-height');
@@ -117,8 +117,8 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     } else {
         form_input.classList.add('one-setting');
         form_input.classList.remove('two-settings');
-        document.getElementById('opening_setting').classList.add('hide-hlp');
-        document.getElementById('opening_setting_separator').classList.add('hide-hlp');
+        document.getElementById('opening_setting').classList.add('hide');
+        document.getElementById('opening_setting_separator').classList.add('hide');
         close_setting.classList.remove('one-half-pos');
         close_setting.classList.remove('one-half-height');
         close_setting.classList.add('whole-height');
@@ -134,7 +134,7 @@ function openSettingDialog(setting_name, prompt="", closing_setting_text, input_
     closing_setting_input.step = input_step;
 
     document.getElementById('dialog_setting_prompt').innerText = `Enter new value for "${prompt}"`;
-    document.getElementById('dialog_setting_name').innerText = `Enter ${setting_name}`;
+    document.getElementById('dialog_title').innerText = `Enter ${setting_name}`;
 
     const setting_dialog = document.getElementById('setting_dialog');
     setting_dialog.action = '/motor?';
