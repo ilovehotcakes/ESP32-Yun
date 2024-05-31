@@ -56,6 +56,39 @@ function dropdown () {
     document.getElementById('advanced_controls').classList.toggle('hide-hlp');
 }
 
+function toggleMotorSettings() {
+    document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
+    document.getElementById('motor_settings').classList.toggle('motor-settings-hide');
+}
+
+function motorHttpRequest(param, value=1) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?' + param + '=' + value, true);
+    xhr.send();
+}
+
+function motorMove(element) {
+    motorHttpRequest('percent=' + element.value);
+}
+
+function syncSettings() {
+    if (document.getElementById('sync_settings').checked) {
+        motorHttpRequest('sync-settings');
+        showOpeningSettings();
+    } else {
+        motorHttpRequest('sync-settings', 0);
+        hideOpeningSettings();
+    }
+}
+
+function checkboxHttpRequest(param) {
+    if (document.getElementById(param).checked) {
+        motorHttpRequest(param);
+    } else {
+        motorHttpRequest(param, 0);
+    }
+}
+
 function openSettingDialog(setting_name, prompt="", closing_setting_text, input_step, number_of_settings=1) {
     const lowercase_name = setting_name.toLowerCase();
     const param = lowercase_name.replaceAll(" ", "-");
@@ -123,16 +156,6 @@ function submitForm() {
     cancelForm();
 }
 
-function motorHttpRequest(param, value=1) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?' + param + '=' + value, true);
-    xhr.send();
-}
-
-function motorMove(element) {
-    motorHttpRequest('percent=' + element.value);
-}
-
 function showOpeningSettings() {
     document.getElementById('current_setting_opening').classList.add('setting-opening-txt-show');
     document.getElementById('velocity_setting_opening').classList.add('setting-opening-txt-show');
@@ -143,22 +166,4 @@ function hideOpeningSettings() {
     document.getElementById('current_setting_opening').classList.remove('setting-opening-txt-show');
     document.getElementById('velocity_setting_opening').classList.remove('setting-opening-txt-show');
     document.getElementById('acceleration_setting_opening').classList.remove('setting-opening-txt-show');
-}
-
-function syncSettings() {
-    if (document.getElementById('sync_settings').checked) {
-        motorHttpRequest('sync-settings');
-        showOpeningSettings();
-    } else {
-        motorHttpRequest('sync-settings', 0);
-        hideOpeningSettings();
-    }
-}
-
-function checkboxHttpRequest(param) {
-    if (document.getElementById(param).checked) {
-        motorHttpRequest(param);
-    } else {
-        motorHttpRequest(param, 0);
-    }
 }

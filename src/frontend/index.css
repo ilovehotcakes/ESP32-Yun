@@ -39,12 +39,21 @@ h5 {
     font-size: 0.7em;
     font-weight: 500;
 }
-.page {
+.canvas {
     position: absolute;
     width: 375px;
     height: 625px;
     border: 1px solid black;
+    border-radius: 1em;
     overflow: hidden;
+}
+.page {
+    position: absolute;
+    left: 0;
+    width: 375px;
+    height: 625px;
+    border: none;
+    transition: 0.2s ease;
 }
 .container {
     position: absolute;
@@ -54,6 +63,26 @@ h5 {
     height: 28%;
     border-radius: 1em;
     border: none;
+    transition: 0.2s ease;
+}
+.glass {
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
+    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
+}
+.motor-controls-hide {
+    left: -110%;
+    transition: 0.2s ease-in-out;
+}
+.motor-settings-button {
+    position: absolute;
+    top: 6%;
+    left: 75%;
+    margin: 0;
+    width: 8%;
+    height: 52.1%;
 }
 .controls {
     position: absolute;
@@ -63,22 +92,6 @@ h5 {
     height: 63%;
     border: inherit;
     transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
-}
-.glass {
-    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    /* border: 1px solid rgba(255, 255, 255, 0.3); */
-    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
-    transition: 0.4s ease-in-out;
-}
-.navbar {
-    position: absolute;
-    top: 86%;
-    left: 13%;
-    width: 74%;
-    height: 9%;
-    border-radius: 3em;
 }
 .title {
     position: absolute;
@@ -335,7 +348,7 @@ input:checked + .dropdown-cbx::before {
     background-color: rgba(122, 122, 122, 0.582);
     transform: rotate(0deg);
 }
-input[type="checkbox"], input[type="range"], input[type="radio"] {
+input[type="checkbox"], input[type="range"] {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -401,29 +414,46 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     padding: 0;
     width: 100%;
 }
+.motor-settings-title {
+    top: 2.5%;
+    left: 4.5%;
+    height: 6%;
+}
+.motor-settings-title-txt {
+    position: absolute;
+    left: 30%;
+    font-weight: 600;
+}
+.back {
+    position: absolute;
+    top: 8%;
+    left: 0;
+}
 .four-settings {
-    top: 7%;
+    top: 10%;
     height: 28%;
     border-radius: 0.5em;
 }
 .three-settings {
-    top: 38%;
+    top: 41%;
     height: 21%;
     border-radius: 0.5em;
 }
 .two-settings {
-    top: 62%;
+    top: 65%;
     height: 14%;
     border-radius: 0.5em;
-    transition-duration: 0s;
 }
 .stallguard {
-    top: 79%;
+    top: 82%;
 }
 .one-setting {
     height: 7%;
     border-radius: 0.5em;
-    transition-duration: 0s;
+}
+.motor-settings-hide {
+    left: 110%;
+    transition: 0.15s ease-in;
 }
 .one-forth-height {
     height: calc(100% / 4);
@@ -547,8 +577,8 @@ input:checked + .toggle-cbx::before {
     justify-content: space-between;
     position: absolute;
     top: 6%;
-    left: 4%;
-    width: 92%;
+    left: 4.5%;
+    width: 91%;
     margin-left: -1px;
 }
 .form-btn {

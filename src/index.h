@@ -52,6 +52,7 @@ h5 {
     width: 375px;
     height: 625px;
     border: 1px solid black;
+    border-radius: 1em;
     overflow: hidden;
 }
 .container {
@@ -62,6 +63,26 @@ h5 {
     height: 28%%;
     border-radius: 1em;
     border: none;
+    transition: 0.2s ease;
+}
+.glass {
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
+    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
+}
+.motor-controls-hide {
+    left: -110%%;
+    transition: 0.2s ease-in-out;
+}
+.motor-settings-button {
+    position: absolute;
+    top: 6%%;
+    left: 75%%;
+    margin: 0;
+    width: 8%%;
+    height: 52.1%%;
 }
 .controls {
     position: absolute;
@@ -71,22 +92,6 @@ h5 {
     height: 63%%;
     border: inherit;
     transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
-}
-.glass {
-    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    /* border: 1px solid rgba(255, 255, 255, 0.3); */
-    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
-    transition: 0.4s ease-in-out;
-}
-.navbar {
-    position: absolute;
-    top: 86%%;
-    left: 13%%;
-    width: 74%%;
-    height: 9%%;
-    border-radius: 3em;
 }
 .title {
     position: absolute;
@@ -343,7 +348,7 @@ input:checked + .dropdown-cbx::before {
     background-color: rgba(122, 122, 122, 0.582);
     transform: rotate(0deg);
 }
-input[type="checkbox"], input[type="range"], input[type="radio"] {
+input[type="checkbox"], input[type="range"] {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -409,29 +414,46 @@ input[type="checkbox"], input[type="range"], input[type="radio"] {
     padding: 0;
     width: 100%%;
 }
+.motor-settings-title {
+    top: 2.5%%;
+    left: 4.5%%;
+    height: 6%%;
+}
+.motor-settings-title-txt {
+    position: absolute;
+    left: 30%%;
+    font-weight: 600;
+}
+.back {
+    position: absolute;
+    top: 8%%;
+    left: 0;
+}
 .four-settings {
-    top: 7%%;
+    top: 10%%;
     height: 28%%;
     border-radius: 0.5em;
 }
 .three-settings {
-    top: 38%%;
+    top: 41%%;
     height: 21%%;
     border-radius: 0.5em;
 }
 .two-settings {
-    top: 62%%;
+    top: 65%%;
     height: 14%%;
     border-radius: 0.5em;
-    transition-duration: 0s;
 }
 .stallguard {
-    top: 79%%;
+    top: 82%%;
 }
 .one-setting {
     height: 7%%;
     border-radius: 0.5em;
-    transition-duration: 0s;
+}
+.motor-settings-hide {
+    left: 110%%;
+    transition: 0.15s ease-in;
 }
 .one-forth-height {
     height: calc(100%% / 4);
@@ -555,8 +577,8 @@ input:checked + .toggle-cbx::before {
     justify-content: space-between;
     position: absolute;
     top: 6%%;
-    left: 4%%;
-    width: 92%%;
+    left: 4.5%%;
+    width: 91%%;
     margin-left: -1px;
 }
 .form-btn {
@@ -735,6 +757,43 @@ function dropdown () {
     document.getElementById('advanced_controls').classList.toggle('hide-hlp');
 }
 
+function toggleMotorSettings() {
+    document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
+    document.getElementById('motor_settings_title').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings_1').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings_2').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings_3').classList.toggle('motor-settings-hide');
+    document.getElementById('motor_settings_4').classList.toggle('motor-settings-hide');
+}
+
+function motorHttpRequest(param, value=1) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/motor?' + param + '=' + value, true);
+    xhr.send();
+}
+
+function motorMove(element) {
+    motorHttpRequest('percent=' + element.value);
+}
+
+function syncSettings() {
+    if (document.getElementById('sync_settings').checked) {
+        motorHttpRequest('sync-settings');
+        showOpeningSettings();
+    } else {
+        motorHttpRequest('sync-settings', 0);
+        hideOpeningSettings();
+    }
+}
+
+function checkboxHttpRequest(param) {
+    if (document.getElementById(param).checked) {
+        motorHttpRequest(param);
+    } else {
+        motorHttpRequest(param, 0);
+    }
+}
+
 function openSettingDialog(setting_name, prompt="", closing_setting_text, input_step, number_of_settings=1) {
     const lowercase_name = setting_name.toLowerCase();
     const param = lowercase_name.replaceAll(" ", "-");
@@ -802,16 +861,6 @@ function submitForm() {
     cancelForm();
 }
 
-function motorHttpRequest(param, value=1) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?' + param + '=' + value, true);
-    xhr.send();
-}
-
-function motorMove(element) {
-    motorHttpRequest('percent=' + element.value);
-}
-
 function showOpeningSettings() {
     document.getElementById('current_setting_opening').classList.add('setting-opening-txt-show');
     document.getElementById('velocity_setting_opening').classList.add('setting-opening-txt-show');
@@ -822,35 +871,22 @@ function hideOpeningSettings() {
     document.getElementById('current_setting_opening').classList.remove('setting-opening-txt-show');
     document.getElementById('velocity_setting_opening').classList.remove('setting-opening-txt-show');
     document.getElementById('acceleration_setting_opening').classList.remove('setting-opening-txt-show');
-}
-
-function syncSettings() {
-    if (document.getElementById('sync_settings').checked) {
-        motorHttpRequest('sync-settings');
-        showOpeningSettings();
-    } else {
-        motorHttpRequest('sync-settings', 0);
-        hideOpeningSettings();
-    }
-}
-
-function checkboxHttpRequest(param) {
-    if (document.getElementById(param).checked) {
-        motorHttpRequest(param);
-    } else {
-        motorHttpRequest(param, 0);
-    }
 }	</script>
 </head>
 <body>
     <div class="page">
-        <div id="home_page" class="glass container hide-hlp">
+        <!-- Motor controls -->
+        <div id="motor_controls" class="glass container">
             <div class="title">
                 <h3 class="name-txt white-color">Living Room Window</h3>
                 <h3 class="serial-txt">yun-e5c258</h3>
                 <div class="dropdown">
-                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()" unchecked>
+                    <input type="checkbox" id="dropdown_checkbox" onclick="dropdown()" unchecked>
                     <label for="dropdown_checkbox" class="dropdown-cbx"></label>
+                </div>
+                
+                <div class="motor-settings-button">
+                    <button type="button" class="dropdown-cbx" onclick="toggleMotorSettings()">
                 </div>
             </div>
 
@@ -900,7 +936,12 @@ function checkboxHttpRequest(param) {
 
 
         <!-- To display and change some motor settings -->
-        <div class="four-settings glass container">
+        <div id="motor_settings_title" class="motor-settings-title container motor-settings-hide">
+            <button type="button" class="back form-btn" onclick="toggleMotorSettings()">Back</button>
+            <h2 class="motor-settings-title-txt">Motor Settings</h2>
+        </div>
+
+        <div id="motor_settings_1" class="four-settings glass container motor-settings-hide">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
@@ -934,7 +975,7 @@ function checkboxHttpRequest(param) {
             </div>
         </div>
 
-        <div class="three-settings glass container">
+        <div id="motor_settings_2" class="three-settings glass container motor-settings-hide">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
@@ -958,7 +999,7 @@ function checkboxHttpRequest(param) {
             </div>
         </div>
 
-        <div class="two-settings glass container">
+        <div id="motor_settings_3" class="two-settings glass container motor-settings-hide">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
@@ -975,7 +1016,7 @@ function checkboxHttpRequest(param) {
             </div>
         </div>
 
-        <div class="stallguard two-settings glass container">
+        <div id="motor_settings_4" class="stallguard two-settings glass container motor-settings-hide">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">

@@ -10,14 +10,19 @@
     <script src="./index.js"></script>
 </head>
 <body>
-    <div class="page">
-        <div id="home_page" class="glass container hide-hlp">
+    <div class="canvas">
+        <!-- Motor controls -->
+        <div id="motor_controls" class="glass container">
             <div class="title">
                 <h3 class="name-txt white-color">Living Room Window</h3>
                 <h3 class="serial-txt">yun-e5c258</h3>
                 <div class="dropdown">
-                    <input type="checkbox" id="dropdown_checkbox" class="" onclick="dropdown()" unchecked>
+                    <input type="checkbox" id="dropdown_checkbox" onclick="dropdown()" unchecked>
                     <label for="dropdown_checkbox" class="dropdown-cbx"></label>
+                </div>
+                
+                <div class="motor-settings-button">
+                    <button type="button" class="dropdown-cbx" onclick="toggleMotorSettings()">
                 </div>
             </div>
 
@@ -67,95 +72,102 @@
 
 
         <!-- To display and change some motor settings -->
-        <div class="four-settings glass container">
-            <div class="one-forth-height default">
-                <h3 class="setting-name-txt">Sync Settings</h3>
-                <label class="toggle">
-                    <input id="sync_settings" type="checkbox" onclick="syncSettings()" %SYNC_SETTINGS%>
-                    <span class="toggle-cbx">
-                </label>
+        <div id="motor_settings" class="page motor-settings-hide">
+            <div id="motor_settings_title" class="motor-settings-title container">
+                <button type="button" class="back form-btn" onclick="toggleMotorSettings()">Back</button>
+                <h2 class="motor-settings-title-txt">Motor Settings</h2>
             </div>
 
-            <div class="one-forth-pos horizontal-separator"></div>
+            <div id="motor_settings_1" class="four-settings glass container">
+                <div class="one-forth-height default">
+                    <h3 class="setting-name-txt">Sync Settings</h3>
+                    <label class="toggle">
+                        <input id="sync_settings" type="checkbox" onclick="syncSettings()" %SYNC_SETTINGS%>
+                        <span class="toggle-cbx">
+                    </label>
+                </div>
 
-            <div class="one-forth-pos one-forth-height default clickable" onclick="openSettingDialog('Current', 'Current (mA)', 'Current', 1, 2)">
-                <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h4 id="current_setting_opening" class="setting-opening-txt">%OP_CURR%</h4>
-                <h4 id="current_setting_closing" class="setting-closing-txt">%CL_CURR%</h4>
+                <div class="one-forth-pos horizontal-separator"></div>
+
+                <div class="one-forth-pos one-forth-height default clickable" onclick="openSettingDialog('Current', 'Current (mA)', 'Current', 1, 2)">
+                    <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
+                    <h4 id="current_setting_opening" class="setting-opening-txt">%OP_CURR%</h4>
+                    <h4 id="current_setting_closing" class="setting-closing-txt">%CL_CURR%</h4>
+                </div>
+
+                <div class="one-half-pos horizontal-separator"></div>
+
+                <div class="one-half-pos one-forth-height default clickable" onclick="openSettingDialog('Velocity', 'Velocity (Hz)', 'Velocity', 0.1, 2)">
+                    <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
+                    <h4 id="velocity_setting_opening" class="setting-opening-txt">%OP_VELO%</h4>
+                    <h4 id="velocity_setting_closing" class="setting-closing-txt">%CL_VELO%</h4>
+                </div>
+
+                <div class="three-forths-pos horizontal-separator"></div>
+
+                <div class="three-forths-pos one-forth-height default clickable" onclick="openSettingDialog('Acceleration', 'Acceleration (Hz/s)', 'Acceleration', 0.1, 2)">
+                    <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
+                    <h4 id="acceleration_setting_opening" class="setting-opening-txt">%OP_ACCEL%</h4>
+                    <h4 id="acceleration_setting_closing" class="setting-closing-txt">%CL_ACCEL%</h4>
+                </div>
             </div>
 
-            <div class="one-half-pos horizontal-separator"></div>
+            <div id="motor_settings_2" class="three-settings glass container">
+                <div class="one-third-height default">
+                    <h3 class="setting-name-txt">Direction</h3>
+                    <label class="toggle">
+                        <input id="direction" type="checkbox" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
+                        <span class="toggle-cbx">
+                    </label>
+                </div>
 
-            <div class="one-half-pos one-forth-height default clickable" onclick="openSettingDialog('Velocity', 'Velocity (Hz)', 'Velocity', 0.1, 2)">
-                <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
-                <h4 id="velocity_setting_opening" class="setting-opening-txt">%OP_VELO%</h4>
-                <h4 id="velocity_setting_closing" class="setting-closing-txt">%CL_VELO%</h4>
+                <div class="one-third-pos horizontal-separator"></div>
+
+                <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
+                    <h3 id="full_steps_setting_name" class="setting-name-txt">Full Steps (per turn)</h3>
+                    <h4 id="full_steps_setting_closing" class="setting-closing-txt">%FULL_STEPS%</h4>
+                </div>
+
+                <div class="two-thirds-pos horizontal-separator"></div>
+
+                <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
+                    <h3 id="microsteps_setting_name" class="setting-name-txt">Microsteps (per step)</h3>
+                    <h4 id="microsteps_setting_closing" class="setting-closing-txt">%MICROSTEPS%</h4>
+                </div>
             </div>
 
-            <div class="three-forths-pos horizontal-separator"></div>
+            <div id="motor_settings_3" class="two-settings glass container">
+                <div class="one-half-height default">
+                    <h3 class="setting-name-txt">Fastmode</h3>
+                    <label class="toggle">
+                        <input id="fastmode" type="checkbox" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
+                        <span class="toggle-cbx">
+                    </label>
+                </div>
 
-            <div class="three-forths-pos one-forth-height default clickable" onclick="openSettingDialog('Acceleration', 'Acceleration (Hz/s)', 'Acceleration', 0.1, 2)">
-                <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h4 id="acceleration_setting_opening" class="setting-opening-txt">%OP_ACCEL%</h4>
-                <h4 id="acceleration_setting_closing" class="setting-closing-txt">%CL_ACCEL%</h4>
-            </div>
-        </div>
+                <div class="one-half-pos horizontal-separator"></div>
 
-        <div class="three-settings glass container">
-            <div class="one-third-height default">
-                <h3 class="setting-name-txt">Direction</h3>
-                <label class="toggle">
-                    <input id="direction" type="checkbox" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
-                    <span class="toggle-cbx">
-                </label>
-            </div>
-
-            <div class="one-third-pos horizontal-separator"></div>
-
-            <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
-                <h3 id="full_steps_setting_name" class="setting-name-txt">Full Steps (per turn)</h3>
-                <h4 id="full_steps_setting_closing" class="setting-closing-txt">%FULL_STEPS%</h4>
+                <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Fastmode Threshold', 'Fastmode Threshold', 'Threshold', 1)">
+                    <h3 id="fastmode_threshold_setting_name" class="setting-name-txt">Threshold</h3>
+                    <h4 id="fastmode_threshold_setting_closing" class="setting-closing-txt">%FASTMODE_THRESH%</h4>
+                </div>
             </div>
 
-            <div class="two-thirds-pos horizontal-separator"></div>
+            <div id="motor_settings_4" class="stallguard two-settings glass container">
+                <div class="one-half-height default">
+                    <h3 class="setting-name-txt">Stallguard</h3>
+                    <label class="toggle">
+                        <input id="stallguard" type="checkbox" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
+                        <span class="toggle-cbx">
+                    </label>
+                </div>
 
-            <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
-                <h3 id="microsteps_setting_name" class="setting-name-txt">Microsteps (per step)</h3>
-                <h4 id="microsteps_setting_closing" class="setting-closing-txt">%MICROSTEPS%</h4>
-            </div>
-        </div>
+                <div class="one-half-pos horizontal-separator"></div>
 
-        <div class="two-settings glass container">
-            <div class="one-half-height default">
-                <h3 class="setting-name-txt">Fastmode</h3>
-                <label class="toggle">
-                    <input id="fastmode" type="checkbox" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
-                    <span class="toggle-cbx">
-                </label>
-            </div>
-
-            <div class="one-half-pos horizontal-separator"></div>
-
-            <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Fastmode Threshold', 'Fastmode Threshold', 'Threshold', 1)">
-                <h3 id="fastmode_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h4 id="fastmode_threshold_setting_closing" class="setting-closing-txt">%FASTMODE_THRESH%</h4>
-            </div>
-        </div>
-
-        <div class="stallguard two-settings glass container">
-            <div class="one-half-height default">
-                <h3 class="setting-name-txt">Stallguard</h3>
-                <label class="toggle">
-                    <input id="stallguard" type="checkbox" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
-                    <span class="toggle-cbx">
-                </label>
-            </div>
-
-            <div class="one-half-pos horizontal-separator"></div>
-
-            <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Stallguard Threshold', 'Stallguard Threshold', 'Threshold', 1)">
-                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h4 id="stallguard_threshold_setting_closing" class="setting-closing-txt">%STALLGUARD_THRESH%</h4>
+                <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Stallguard Threshold', 'Stallguard Threshold', 'Threshold', 1)">
+                    <h3 id="stallguard_threshold_setting_name" class="setting-name-txt">Threshold</h3>
+                    <h4 id="stallguard_threshold_setting_closing" class="setting-closing-txt">%STALLGUARD_THRESH%</h4>
+                </div>
             </div>
         </div>
 
