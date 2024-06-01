@@ -31,5 +31,19 @@ def modify_fastaccelstepper_cpp():
         output.write(result)
 
 
+def modify_stpperisr_esp32_cpp():
+    result = ""
+    with open("./.pio/libdeps/esp32dev/FastAccelStepper/src/StepperISR_esp32.cpp", 'r') as file:
+        for line in file:
+            if line == "#define STACK_SIZE 1000\n":
+                result += "#define STACK_SIZE 2000\n"
+            else:
+                result += line
+
+    with open("./.pio/libdeps/esp32dev/FastAccelStepper/src/StepperISR_esp32.cpp", 'w') as output:
+        output.write(result)
+
+
 modify_fastaccelstepper_h()
 modify_fastaccelstepper_cpp()
+modify_stpperisr_esp32_cpp()
