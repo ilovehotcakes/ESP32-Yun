@@ -24,8 +24,8 @@ void WirelessTask::run() {
             switch (inbox_.command) {
                 case UPDATE_POSITION:
                     // If motor has changed position(%), broadcast it to all WS clients
-                    motor_position_ = static_cast<String>(inbox_.parameter);
-                    websocket.textAll(motor_position_);
+                    motor_position_ = inbox_.parameter;
+                    websocket.textAll(getJSON());
                     break;
                 case WIRELESS_SETUP:
                     setAndSave(setup_mode_, static_cast<bool>(inbox_.parameter), "setup_mode_");
@@ -47,7 +47,7 @@ void WirelessTask::run() {
 void WirelessTask::loadSettings() {
     bool load = readFromDisk();
 
-    ap_ssid_ = getOrDefault("ap_ssid_",ap_ssid_);
+    ap_ssid_ = getOrDefault("ap_ssid_", ap_ssid_);
     if (ap_ssid_ == "") {  // Factory reset
         ap_ssid_ = "yun-" + getSerialNumber().substring(6, 12);
         settings_["ap_ssid_"] = ap_ssid_;
@@ -151,13 +151,7 @@ void WirelessTask::routing() {
     });
 
     webserver.on("/json", HTTP_GET, [=](AsyncWebServerRequest *request) {
-        JsonDocument all_settings;
-        all_settings["system"] = system_task_->getSettings();
-        all_settings["wireless"] = getSettings();
-        all_settings["motor"] = motor_task_->getSettings();
-        String result;
-        serializeJson(all_settings, result);
-        request->send(200, "application/json", result);
+        request->send(200, "application/json", getJSON());
     });
 
     webserver.onNotFound([=](AsyncWebServerRequest *request) {
@@ -226,6 +220,9 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
             continue;
         }
         String value_str = request->getParam(param)->value();
+        if (value_str == "") {
+            continue;
+        }
         Command command = hash(param);
         if (command >= MOTOR_VLCTY && command <= MOTOR_CL_ACCEL) {
             std::pair<std::function<bool(float)>, String> eval = getCommandEvalFuncf(command);
@@ -267,11 +264,12 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
 
     if (success) {
         request->send(200, "text/plain", response);
-        delay(100 / portTICK_PERIOD_MS);
-        // WS text all;
     } else {
         request->send(400, "text/plain", response);
     }
+
+    delay(100 / portTICK_PERIOD_MS);
+    websocket.textAll(getJSON());
 }
 
 
@@ -281,7 +279,7 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
     xTimerStart(system_sleep_timer_, portMAX_DELAY);
     switch (type) {
         case WS_EVT_CONNECT:
-            client->printf(motor_position_.c_str());
+            client->printf(getJSON().c_str());
             LOGI("WebSocket client #%u connected from %s", client->id(),
                                                            client->remoteIP().toString().c_str());
             break;
@@ -300,42 +298,24 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
 
 
 String WirelessTask::htmlStringProcessor(const String& var) {
-    JsonDocument settings = motor_task_->getSettings();
     if (var == "SLIDER") {
         return motor_position_;
-    } else if (var == "SYNC_SETTINGS") {
-        if (settings["sync_settings_"]) return "checked";
-        return "";
-    } else if (var == "OP_CURR") {
-        return settings["open_current_"];
-    } else if (var == "CL_CURR") {
-        return settings["clos_current_"];
-    } else if (var == "OP_VELO") {
-        return settings["open_velocity_"];
-    } else if (var == "CL_VELO") {
-        return settings["clos_velocity_"];
-    } else if (var == "OP_ACCEL") {
-        return settings["open_accel_"];
-    } else if (var == "CL_ACCEL") {
-        return settings["clos_accel_"];
-    } else if (var  == "DIRECTION") {
-        if (settings["direction_"]) return "checked";
-        return "";
-    } else if (var  == "FULL_STEPS") {
-        return settings["full_steps_"];
-    } else if (var  == "MICROSTEPS") {
-        return settings["microsteps_"];
-    } else if (var  == "FASTMODE") {
-        if (settings["spreadcycl_en_"]) return "checked";
-        return "";
-    } else if (var  == "FASTMODE_THRESH") {
-        return settings["spreadcycl_th_"];
-    } else if (var  == "STALLGUARD") {
-        if (settings["stallguard_en_"]) return "checked";
-    } else if (var  == "STALLGUARD_THRESH") {
-        return settings["stallguard_th_"];
+    } else if (var == "AP_SSID") {
+        return ap_ssid_;
     }
     return "";
+}
+
+
+String WirelessTask::getJSON() {
+    JsonDocument all_settings;
+    all_settings["motor_position"] = motor_position_;
+    all_settings["system"] = system_task_->getSettings();
+    all_settings["wireless"] = getSettings();
+    all_settings["motor"] = motor_task_->getSettings();
+    String result;
+    serializeJson(all_settings, result);
+    return result;
 }
 
 
