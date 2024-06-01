@@ -356,6 +356,7 @@ input[type="checkbox"], input[type="range"] {
     position: absolute;
     top: 15%;
     left: 0;
+    font-size: 1.1em;
 }
 .motor-settings-header-txt {
     position: absolute;
@@ -457,11 +458,11 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle-cbx::before {
     position: absolute;
-    top: 6.5%;
-    left: 4.6%;
+    top: 4%;
+    left: 3.5%;
     content: '';
-    width: 52.7%;
-    height: 87%;
+    width: 56%;
+    height: 92%;
     border-radius: 3em;
     background-color: rgb(255, 255, 255);
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -472,7 +473,7 @@ input:checked + .toggle-cbx {
     transition: 0.2s ease-in-out;
 }
 input:checked + .toggle-cbx::before {
-    transform: translateX(76%);
+    left: 41%;
     transition: 0.2s ease-in-out;
 }
 
@@ -539,7 +540,7 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"] {
     position: absolute;
-    top: 12.5%;
+    top: 13%;
     left: 39%;
     width: 55%;
     height: 70%;

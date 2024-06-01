@@ -362,8 +362,9 @@ input[type="checkbox"], input[type="range"] {
 }
 .back-btn {
     position: absolute;
-    top: 17%%;
+    top: 15%%;
     left: 0;
+    font-size: 1.1em;
 }
 .motor-settings-header-txt {
     position: absolute;
@@ -465,11 +466,11 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle-cbx::before {
     position: absolute;
-    top: 6.5%%;
-    left: 4.6%%;
+    top: 4%%;
+    left: 3.5%%;
     content: '';
-    width: 52.7%%;
-    height: 87%%;
+    width: 56%%;
+    height: 92%%;
     border-radius: 3em;
     background-color: rgb(255, 255, 255);
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -480,7 +481,7 @@ input:checked + .toggle-cbx {
     transition: 0.2s ease-in-out;
 }
 input:checked + .toggle-cbx::before {
-    transform: translateX(76%%);
+    left: 41%%;
     transition: 0.2s ease-in-out;
 }
 
@@ -502,21 +503,19 @@ input:checked + .toggle-cbx::before {
 .dialog-prompt {
     display: flex;
     justify-content: center;
-    top: 1.4%%;
+    top: 2%%;
     height: 3%%;
 }
 .dialog-title {
     display: flex;
     justify-content: space-between;
     position: absolute;
-    top: 6.5%%;
+    top: 7.1%%;
     left: 4.5%%;
     width: 91%%;
-    margin-left: -1px;
 }
 .form-btn {
-    margin-top: 1.7%%;
-    padding: 0;
+    padding-top: 1.5%%;
     font-size: 1em;
     color: rgb(67, 142, 255);
     background-color: rgba(255, 255, 255, 0);
@@ -530,7 +529,7 @@ input:checked + .toggle-cbx::before {
     color: rgb(255, 255, 255);
 }
 .form-input {
-    top: 17%%;
+    top: 17.7%%;
 }
 .form-input-txt {
     position: absolute;
@@ -539,13 +538,13 @@ input:checked + .toggle-cbx::before {
 }
 .dialog-hint {
     position: absolute;
-    top: 25.5%%;
+    top: 26%%;
     left: 8%%;
     width: 84%%;
     height: 20%%;
 }
 .dialog-hint-shift {
-    top: 32.2%%;
+    top: 33%%;
 }
 input[type="number"] {
     position: absolute;
@@ -652,11 +651,39 @@ window.addEventListener('load', () => {
         };
 
         websocket.onmessage = (event) => {
-            const data = event.data;
-            console.log(data);
-            if (data > -1) {
-                document.getElementById('percent_slider').value = data;
+            const data = JSON.parse(event.data);
+            // console.log(data);
+            document.getElementById('percent_slider').value = data.motor_position;
+            if (data.motor.sync_settings_) {
+                document.getElementById('sync_settings').checked = true;
+            } else {
+                document.getElementById('sync_settings').checked = false;
             }
+            document.getElementById('current_setting_opening').innerText = data.motor.open_current_;
+            document.getElementById('current_setting_closing').innerText = data.motor.clos_current_;
+            document.getElementById('velocity_setting_opening').innerText = data.motor.open_velocity_;
+            document.getElementById('velocity_setting_closing').innerText = data.motor.clos_velocity_;
+            document.getElementById('acceleration_setting_opening').innerText = data.motor.open_accel_;
+            document.getElementById('acceleration_setting_closing').innerText = data.motor.clos_accel_;
+            if (data.motor.direction_) {
+                document.getElementById('direction').checked = true;
+            } else {
+                document.getElementById('direction').checked = false;
+            }
+            document.getElementById('full_steps_setting_closing').innerText = data.motor.full_steps_;
+            document.getElementById('microsteps_setting_closing').innerText = data.motor.microsteps_;
+            if (data.motor.spreadcycl_en_) {
+                document.getElementById('fastmode').checked = true;
+            } else {
+                document.getElementById('fastmode').checked = false;
+            }
+            document.getElementById('fastmode_threshold_setting_closing').innerText = data.motor.spreadcycl_th_;
+            if (data.motor.stallguard_en_) {
+                document.getElementById('stallguard').checked = true;
+            } else {
+                document.getElementById('stallguard').checked = false;
+            }
+            document.getElementById('stallguard_threshold_setting_closing').innerText = data.motor.stallguard_th_;
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
@@ -807,7 +834,7 @@ function hideOpeningSettings() {
     <div id="motor_controls" class="glass container">
         <div class="motor-controls-header default">
             <h3 class="name-txt">Living Room Window</h3>
-            <h3 class="serial-txt">yun-e5c258</h3>
+            <h3 class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-cbx">
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx">
@@ -870,7 +897,7 @@ function hideOpeningSettings() {
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
-                    <input type="checkbox" id="sync_settings" onclick="syncSettings()" %SYNC_SETTINGS%>
+                    <input type="checkbox" id="sync_settings" onclick="syncSettings()">
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -878,22 +905,22 @@ function hideOpeningSettings() {
             <div class="one-forth-pos horizontal-separator"></div>
             <div class="one-forth-pos one-forth-height default clickable" onclick="openSettingDialog('Current', 'Current (mA)', 'Current', 1, 2)">
                 <h3 id="current_setting_name" class="setting-name-txt">Current (mA)</h3>
-                <h3 id="current_setting_opening" class="setting-opening-txt setting-value-txt">%OP_CURR%</h3>
-                <h3 id="current_setting_closing" class="setting-value-txt">%CL_CURR%</h3>
+                <h3 id="current_setting_opening" class="setting-opening-txt setting-value-txt">75</h3>
+                <h3 id="current_setting_closing" class="setting-value-txt">200</h3>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
             <div class="one-half-pos one-forth-height default clickable" onclick="openSettingDialog('Velocity', 'Velocity (Hz)', 'Velocity', 0.1, 2)">
                 <h3 id="velocity_setting_name" class="setting-name-txt">Velocity (Hz)</h3>
-                <h3 id="velocity_setting_opening" class="setting-opening-txt setting-value-txt">%OP_VELO%</h3>
-                <h3 id="velocity_setting_closing" class="setting-value-txt">%CL_VELO%</h3>
+                <h3 id="velocity_setting_opening" class="setting-opening-txt setting-value-txt">3.0</h3>
+                <h3 id="velocity_setting_closing" class="setting-value-txt">3.0</h3>
             </div>
 
             <div class="three-forths-pos horizontal-separator"></div>
             <div class="three-forths-pos one-forth-height default clickable" onclick="openSettingDialog('Acceleration', 'Acceleration (Hz/s)', 'Acceleration', 0.1, 2)">
                 <h3 id="acceleration_setting_name" class="setting-name-txt">Acceleration (Hz/s)</h3>
-                <h3 id="acceleration_setting_opening" class="setting-opening-txt setting-value-txt">%OP_ACCEL%</h3>
-                <h3 id="acceleration_setting_closing" class="setting-value-txt">%CL_ACCEL%</h3>
+                <h3 id="acceleration_setting_opening" class="setting-opening-txt setting-value-txt">0.5</h3>
+                <h3 id="acceleration_setting_closing" class="setting-value-txt">0.5</h3>
             </div>
         </div>
 
@@ -902,7 +929,7 @@ function hideOpeningSettings() {
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
-                    <input type="checkbox" id="direction" onclick="checkboxHttpRequest('direction')" %DIRECTION%>
+                    <input type="checkbox" id="direction" onclick="checkboxHttpRequest('direction')">
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -910,13 +937,13 @@ function hideOpeningSettings() {
             <div class="one-third-pos horizontal-separator"></div>
             <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
                 <h3 id="full_steps_setting_name" class="setting-name-txt">Full Steps (per turn)</h3>
-                <h3 id="full_steps_setting_closing" class="setting-value-txt">%FULL_STEPS%</h3>
+                <h3 id="full_steps_setting_closing" class="setting-value-txt">200</h3>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
             <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
                 <h3 id="microsteps_setting_name" class="setting-name-txt">Microsteps (per step)</h3>
-                <h3 id="microsteps_setting_closing" class="setting-value-txt">%MICROSTEPS%</h3>
+                <h3 id="microsteps_setting_closing" class="setting-value-txt">16</h3>
             </div>
         </div>
 
@@ -925,7 +952,7 @@ function hideOpeningSettings() {
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
-                    <input type="checkbox" id="fastmode" onclick="checkboxHttpRequest('fastmode')" %FASTMODE%>
+                    <input type="checkbox" id="fastmode" onclick="checkboxHttpRequest('fastmode')">
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -933,7 +960,7 @@ function hideOpeningSettings() {
             <div class="one-half-pos horizontal-separator"></div>
             <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Fastmode Threshold', 'Fastmode Threshold', 'Threshold', 1)">
                 <h3 id="fastmode_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h3 id="fastmode_threshold_setting_closing" class="setting-value-txt">%FASTMODE_THRESH%</h3>
+                <h3 id="fastmode_threshold_setting_closing" class="setting-value-txt">33</h3>
             </div>
         </div>
 
@@ -942,7 +969,7 @@ function hideOpeningSettings() {
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
-                    <input type="checkbox" id="stallguard" onclick="checkboxHttpRequest('stallguard')" %STALLGUARD%>
+                    <input type="checkbox" id="stallguard" onclick="checkboxHttpRequest('stallguard')">
                     <span class="toggle-cbx">
                 </label>
             </div>
@@ -950,7 +977,7 @@ function hideOpeningSettings() {
             <div class="one-half-pos horizontal-separator"></div>
             <div class="one-half-pos one-half-height default clickable" onclick="openSettingDialog('Stallguard Threshold', 'Stallguard Threshold', 'Threshold', 1)">
                 <h3 id="stallguard_threshold_setting_name" class="setting-name-txt">Threshold</h3>
-                <h3 id="stallguard_threshold_setting_closing" class="setting-value-txt">%STALLGUARD_THRESH%</h3>
+                <h3 id="stallguard_threshold_setting_closing" class="setting-value-txt">10</h3>
             </div>
         </div>
     </div>

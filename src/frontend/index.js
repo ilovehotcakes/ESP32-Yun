@@ -19,11 +19,39 @@ window.addEventListener('load', () => {
         };
 
         websocket.onmessage = (event) => {
-            const data = event.data;
-            console.log(data);
-            if (data > -1) {
-                document.getElementById('percent_slider').value = data;
+            const data = JSON.parse(event.data);
+            // console.log(data);
+            document.getElementById('percent_slider').value = data.motor_position;
+            if (data.motor.sync_settings_) {
+                document.getElementById('sync_settings').checked = true;
+            } else {
+                document.getElementById('sync_settings').checked = false;
             }
+            document.getElementById('current_setting_opening').innerText = data.motor.open_current_;
+            document.getElementById('current_setting_closing').innerText = data.motor.clos_current_;
+            document.getElementById('velocity_setting_opening').innerText = data.motor.open_velocity_;
+            document.getElementById('velocity_setting_closing').innerText = data.motor.clos_velocity_;
+            document.getElementById('acceleration_setting_opening').innerText = data.motor.open_accel_;
+            document.getElementById('acceleration_setting_closing').innerText = data.motor.clos_accel_;
+            if (data.motor.direction_) {
+                document.getElementById('direction').checked = true;
+            } else {
+                document.getElementById('direction').checked = false;
+            }
+            document.getElementById('full_steps_setting_closing').innerText = data.motor.full_steps_;
+            document.getElementById('microsteps_setting_closing').innerText = data.motor.microsteps_;
+            if (data.motor.spreadcycl_en_) {
+                document.getElementById('fastmode').checked = true;
+            } else {
+                document.getElementById('fastmode').checked = false;
+            }
+            document.getElementById('fastmode_threshold_setting_closing').innerText = data.motor.spreadcycl_th_;
+            if (data.motor.stallguard_en_) {
+                document.getElementById('stallguard').checked = true;
+            } else {
+                document.getElementById('stallguard').checked = false;
+            }
+            document.getElementById('stallguard_threshold_setting_closing').innerText = data.motor.stallguard_th_;
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
