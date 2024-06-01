@@ -211,7 +211,6 @@ bool MotorTask::prepareToMove(bool check, bool direction) {
 
     while (driver_stdby_) {
         driverStartup();
-        vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
     if (direction && !sync_settings_) {
@@ -356,6 +355,7 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
         driver_.SGTHRS(stallguard_th_);
     }
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for settings to be updated
 }
 
 
@@ -408,6 +408,8 @@ void MotorTask::driverStartup() {
         // Enable StallGuard or else it will stall the motor when starting the driver
         attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
+
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
 
     // TODO: check via UART driver register read/write ok?
     driver_stdby_ = false;
