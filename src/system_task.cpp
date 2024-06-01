@@ -36,6 +36,7 @@ void SystemTask::run() {
                     systemReset();
                     break;
                 case SYSTEM_RESTART:
+                    WiFi.disconnect();
                     ESP.restart();
                     break;
             }
