@@ -52,6 +52,8 @@ window.addEventListener('load', () => {
                 document.getElementById('stallguard').checked = false;
             }
             document.getElementById('stallguard_threshold_setting_closing').innerText = data.motor.stallguard_th_;
+            document.getElementById('name').innerText = data.system.system_name_;
+            document.getElementById('name_setting').innerText = data.system.system_name_;
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
@@ -87,6 +89,14 @@ function toggleAdvancedControls () {
 function toggleMotorSettings() {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
     document.getElementById('motor_settings').classList.toggle('default-hide');
+}
+
+function toggleSystemSettings() {
+
+}
+
+function hello(element) {
+    console.log(element.length);
 }
 
 function motorHttpRequest(param, value=1) {

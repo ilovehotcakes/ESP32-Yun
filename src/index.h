@@ -27,8 +27,6 @@ body {
 }
 h2 {
     margin: 0;
-    /* font-size: 1.3em;
-    font-weight: bold; */
 }
 h3 {
     margin: 0;
@@ -152,12 +150,6 @@ h5 {
     height: 100%%;
     background-color: rgba(200, 200, 200, 0.525);
 }
-.left-spr {
-    left: 35%%;
-}
-.right-spr {
-    left: 65%%;
-}
 .button2 {
     position: absolute;
     top: 1px;
@@ -224,21 +216,6 @@ input[type="range"]:hover::-webkit-slider-thumb {
 input[type="range"]:hover ~ .tick {
     width: 0px;
 }
-.one-tck {
-    left: 8.75%%;
-}
-.two-tck {
-    left: 30%%;
-}
-.three-tck {
-    left: 50.5%%;
-}
-.four-tck {
-    left: 72%%;
-}
-.five-tck {
-    left: 92.5%%;
-}
 .marker {
     position: absolute;
     top: 50%%;
@@ -246,20 +223,8 @@ input[type="range"]:hover ~ .tick {
     color: rgba(172, 172, 172, 0.75);
     transition: 0.25s ease;
 }
-.zero-mkr {
-    left: 7.85%%;
-}
-input[type="range"]:hover ~ .zero-mkr {
+input[type="range"]:hover ~ .marker {
     top: 60%%;
-    left: 5%%;
-    color: white;
-}
-.hundred-mkr {
-    left: 87.5%%;
-}
-input[type="range"]:hover ~ .hundred-mkr {
-    top: 60%%;
-    left: 89%%;
     color: white;
 }
 .button1 {
@@ -355,9 +320,8 @@ input[type="checkbox"], input[type="range"] {
 
 
 /* For settings page */
-.motor-settings-header {
+.settings-header {
     top: 2.5%%;
-    left: 4.5%%;
     height: 6%%;
 }
 .back-btn {
@@ -366,7 +330,7 @@ input[type="checkbox"], input[type="range"] {
     left: 0;
     font-size: 1.1em;
 }
-.motor-settings-header-txt {
+.settings-header-txt {
     position: absolute;
     left: 27%%;
     font-weight: 500;
@@ -385,9 +349,6 @@ input[type="checkbox"], input[type="range"] {
     top: 65%%;
     height: 14%%;
     border-radius: 0.5em;
-}
-.stallguard {
-    top: 82%%;
 }
 .one-setting {
     height: 7%%;
@@ -435,6 +396,15 @@ input[type="checkbox"], input[type="range"] {
     text-align: right;
     color: rgb(185, 185, 185);
 }
+.setting-value-txt2 {
+    position: absolute;
+    top: 19%%;
+    left: 31.9%%;
+    width: 63%%;
+    font-size: 1.1em;
+    text-align: right;
+    color: rgb(185, 185, 185);
+}
 .setting-opening-txt {
     left: 69%%;
     opacity: 0;
@@ -449,6 +419,7 @@ input[type="checkbox"], input[type="range"] {
     position: absolute;
     top: 15%%;
     left: 80.5%%;
+    margin-top: -1px;
     width: 14.8%%;
     height: 70%%;
 }
@@ -484,7 +455,6 @@ input:checked + .toggle-cbx::before {
     left: 41%%;
     transition: 0.2s ease-in-out;
 }
-
 
 
 /* For pop-up dialog to change settings */
@@ -572,62 +542,7 @@ textarea:focus, input[type="number"]:focus {
 .mobile-only-elements {
     display: inline-block;
 }
-input[type="number" i] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 80%%;
-    height: 90%%;
-    padding: 0px;
-    margin: 0px auto -35px;
-    font-size: 60px;
-    font-weight: 600;
-    color: #333333;
-    text-align: center;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    border-width: 0px;
-    background-color: #ffffff00;
-}
-textarea:focus, input[type="number" i]:focus {
-    outline: none;
-    background-color: hsla(24, 100%%, 73%, 0.459);
-    border-radius: 20px;
-}
-input[type=checkbox i] {
-    margin: -16px auto;
-    height: 100%%;
-    width: 100%%;
-    background-color: #002B4E;
-}
-.toggle {
-    margin: -16px auto;
-    border: 0.2rem solid rgb(0, 0, 0);
-    border-radius: calc( 2.5rem / 2 );
-    width: 4.5rem;
-    height: 2.5rem;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    transition: transform 0.07s;
-    cursor: pointer;
-}
-
-
-.toggle::after {
-    content: "";
-    display: inline-block;
-    margin: 0.2rem;
-    border-radius: 50%%;
-    width: 1.7rem;
-    height: 1.7rem;
-    background: black;
-    transition: transform 0.07s linear;
-}
-
-.toggle:checked::after {
-    transform: translateX(2rem);
-} */
-
-	</style>
+*/	</style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 window.addEventListener('load', () => {
@@ -684,6 +599,8 @@ window.addEventListener('load', () => {
                 document.getElementById('stallguard').checked = false;
             }
             document.getElementById('stallguard_threshold_setting_closing').innerText = data.motor.stallguard_th_;
+            document.getElementById('name').innerText = data.system.system_name_;
+            document.getElementById('name_setting').innerText = data.system.system_name_;
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
@@ -719,6 +636,14 @@ function toggleAdvancedControls () {
 function toggleMotorSettings() {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
     document.getElementById('motor_settings').classList.toggle('default-hide');
+}
+
+function toggleSystemSettings() {
+
+}
+
+function hello(element) {
+    console.log(element.length);
 }
 
 function motorHttpRequest(param, value=1) {
@@ -833,8 +758,8 @@ function hideOpeningSettings() {
     <!-- Motor controls to move the motor -->
     <div id="motor_controls" class="glass container">
         <div class="motor-controls-header default">
-            <h3 class="name-txt">Living Room Window</h3>
-            <h3 class="serial-txt">%AP_SSID%</h3>
+            <h3 id="name" class="name-txt">%NAME%</h3>
+            <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-cbx">
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx">
@@ -847,13 +772,13 @@ function hideOpeningSettings() {
         <div id="motor_controls_body" class="motor-controls-body default">
             <div class="percent-slider default">
                 <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                <span class="tick one-tck"></span>
-                <span class="tick two-tck"></span>
-                <span class="tick three-tck"></span>
-                <span class="tick four-tck"></span>
-                <span class="tick five-tck"></span>
-                <span class="marker zero-mkr">0</span>
-                <span class="marker hundred-mkr">100</span>
+                <span class="tick" style="left:8.75%%;"></span>
+                <span class="tick" style="left:30%%;"></span>
+                <span class="tick" style="left:50.5%%;"></span>
+                <span class="tick" style="left:72%%;"></span>
+                <span class="tick" style="left:92.5%%;"></span>
+                <span class="marker" style="left:7.85%%;">0</span>
+                <span class="marker" style="left:87.5%%;">100</span>
             </div>
             <div class="open-stop-close default">
                 <button class="open-btn button1" value="0" onclick="motorMove(this)">Open</button>
@@ -876,9 +801,9 @@ function hideOpeningSettings() {
             <div class="horizontal-separator"></div>
             <div class="min-zero-max default">
                 <button class="set-min-btn button2" onclick="motorHttpRequest('set-min')">Set Min</button>
-                <span class="left-spr vertical-separator"></span>
+                <span class="vertical-separator" style="left:35%%;"></span>
                 <button class="zeroing-btn button2" onclick="motorHttpRequest('zero')">Zero</button>
-                <span class="right-spr vertical-separator"></span>
+                <span class="vertical-separator" style="left:65%%;"></span>
                 <button class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
             </div>
         </div>
@@ -886,14 +811,14 @@ function hideOpeningSettings() {
 
 
 
-    <!-- To display and change some motor settings -->
+    <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide">
-        <div class="motor-settings-header container">
+        <div class="settings-header container">
             <button class="back-btn form-btn" onclick="toggleMotorSettings()">Back</button>
-            <h2 class="motor-settings-header-txt">Motor Settings</h2>
+            <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
-        <div id="motor_settings_1" class="four-settings glass container">
+        <div class="four-settings glass container">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
@@ -925,7 +850,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div id="motor_settings_2" class="three-settings glass container">
+        <div class="three-settings glass container">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
@@ -948,7 +873,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div id="motor_settings_3" class="two-settings glass container">
+        <div class="two-settings glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
@@ -965,7 +890,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div id="motor_settings_4" class="stallguard two-settings glass container">
+        <div class="two-settings glass container" style="top:82%%;">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
@@ -984,7 +909,58 @@ function hideOpeningSettings() {
 
 
 
-    <!-- Dialog box for submitting new values for motor settings -->
+    <!-- To display and change system and wifi settings -->
+    <div id="system_settings" class="default hide">
+        <div class="settings-header container">
+            <button class="back-btn form-btn" onclick="toggleSystemSettings()">Back</button>
+            <h2 class="settings-header-txt" style="left:26%%;">System Settings</h2>
+        </div>
+
+        <div class="one-setting glass container" style="top:10%%;">
+            <div class="whole-height default clickable" onclick="hello(['1', '2', '3'])">
+                <h3 class="setting-name-txt">Name</h3>
+                <h3 id="name_setting" class="setting-value-txt2">Living Room Window</h3>
+            </div>
+        </div>
+
+        <div class="three-settings glass container" style="top:20%%;">
+            <div class="one-third-height default">
+                <h3 class="setting-name-txt">Setup Mode</h3>
+                <label class="toggle">
+                    <input type="checkbox" id="setup" onclick="checkboxHttpRequest('setup')">
+                    <span class="toggle-cbx">
+                </label>
+            </div>
+
+            <div class="one-third-pos horizontal-separator"></div>
+            <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
+                <h3 id="full_steps_setting_name" class="setting-name-txt">SSID</h3>
+                <h3 id="full_steps_setting_closing" class="setting-value-txt2">Red Rocks 2.4</h3>
+            </div>
+
+            <div class="two-thirds-pos horizontal-separator"></div>
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
+                <h3 id="microsteps_setting_name" class="setting-name-txt">Password</h3>
+                <h3 id="microsteps_setting_closing" class="setting-value-txt2">123456</h3>
+            </div>
+        </div>
+
+        <div class="one-setting glass container" style="top:44%%;">
+            <div class="whole-height default clickable" onclick="restart()">
+                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt" style="left:41%%;">Restart</h3>
+            </div>
+        </div>
+
+        <div class="one-setting glass container" style="top:54%%;">
+            <div class="whole-height default clickable" onclick="reset()">
+                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt" style="left:42.5%%;">Reset</h3>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Dialog box for submitting new values for settings -->
     <form id="setting_dialog" class="setting-dialog glass container" method="GET">
         <div class="dialog-prompt default">
             <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>

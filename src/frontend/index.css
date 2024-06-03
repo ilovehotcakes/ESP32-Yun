@@ -19,8 +19,6 @@ body {
 }
 h2 {
     margin: 0;
-    /* font-size: 1.3em;
-    font-weight: bold; */
 }
 h3 {
     margin: 0;
@@ -144,12 +142,6 @@ h5 {
     height: 100%;
     background-color: rgba(200, 200, 200, 0.525);
 }
-.left-spr {
-    left: 35%;
-}
-.right-spr {
-    left: 65%;
-}
 .button2 {
     position: absolute;
     top: 1px;
@@ -216,21 +208,6 @@ input[type="range"]:hover::-webkit-slider-thumb {
 input[type="range"]:hover ~ .tick {
     width: 0px;
 }
-.one-tck {
-    left: 8.75%;
-}
-.two-tck {
-    left: 30%;
-}
-.three-tck {
-    left: 50.5%;
-}
-.four-tck {
-    left: 72%;
-}
-.five-tck {
-    left: 92.5%;
-}
 .marker {
     position: absolute;
     top: 50%;
@@ -238,20 +215,8 @@ input[type="range"]:hover ~ .tick {
     color: rgba(172, 172, 172, 0.75);
     transition: 0.25s ease;
 }
-.zero-mkr {
-    left: 7.85%;
-}
-input[type="range"]:hover ~ .zero-mkr {
+input[type="range"]:hover ~ .marker {
     top: 60%;
-    left: 5%;
-    color: white;
-}
-.hundred-mkr {
-    left: 87.5%;
-}
-input[type="range"]:hover ~ .hundred-mkr {
-    top: 60%;
-    left: 89%;
     color: white;
 }
 .button1 {
@@ -347,9 +312,8 @@ input[type="checkbox"], input[type="range"] {
 
 
 /* For settings page */
-.motor-settings-header {
+.settings-header {
     top: 2.5%;
-    left: 4.5%;
     height: 6%;
 }
 .back-btn {
@@ -358,7 +322,7 @@ input[type="checkbox"], input[type="range"] {
     left: 0;
     font-size: 1.1em;
 }
-.motor-settings-header-txt {
+.settings-header-txt {
     position: absolute;
     left: 27%;
     font-weight: 500;
@@ -377,9 +341,6 @@ input[type="checkbox"], input[type="range"] {
     top: 65%;
     height: 14%;
     border-radius: 0.5em;
-}
-.stallguard {
-    top: 82%;
 }
 .one-setting {
     height: 7%;
@@ -427,6 +388,15 @@ input[type="checkbox"], input[type="range"] {
     text-align: right;
     color: rgb(185, 185, 185);
 }
+.setting-value-txt2 {
+    position: absolute;
+    top: 19%;
+    left: 31.9%;
+    width: 63%;
+    font-size: 1.1em;
+    text-align: right;
+    color: rgb(185, 185, 185);
+}
 .setting-opening-txt {
     left: 69%;
     opacity: 0;
@@ -441,6 +411,7 @@ input[type="checkbox"], input[type="range"] {
     position: absolute;
     top: 15%;
     left: 80.5%;
+    margin-top: -1px;
     width: 14.8%;
     height: 70%;
 }
@@ -476,7 +447,6 @@ input:checked + .toggle-cbx::before {
     left: 41%;
     transition: 0.2s ease-in-out;
 }
-
 
 
 /* For pop-up dialog to change settings */
@@ -564,58 +534,4 @@ textarea:focus, input[type="number"]:focus {
 .mobile-only-elements {
     display: inline-block;
 }
-input[type="number" i] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 80%;
-    height: 90%;
-    padding: 0px;
-    margin: 0px auto -35px;
-    font-size: 60px;
-    font-weight: 600;
-    color: #333333;
-    text-align: center;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    border-width: 0px;
-    background-color: #ffffff00;
-}
-textarea:focus, input[type="number" i]:focus {
-    outline: none;
-    background-color: hsla(24, 100%, 73%, 0.459);
-    border-radius: 20px;
-}
-input[type=checkbox i] {
-    margin: -16px auto;
-    height: 100%;
-    width: 100%;
-    background-color: #002B4E;
-}
-.toggle {
-    margin: -16px auto;
-    border: 0.2rem solid rgb(0, 0, 0);
-    border-radius: calc( 2.5rem / 2 );
-    width: 4.5rem;
-    height: 2.5rem;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    transition: transform 0.07s;
-    cursor: pointer;
-}
-
-
-.toggle::after {
-    content: "";
-    display: inline-block;
-    margin: 0.2rem;
-    border-radius: 50%;
-    width: 1.7rem;
-    height: 1.7rem;
-    background: black;
-    transition: transform 0.07s linear;
-}
-
-.toggle:checked::after {
-    transform: translateX(2rem);
-} */
-
+*/

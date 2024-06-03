@@ -14,8 +14,8 @@
     <!-- Motor controls to move the motor -->
     <div id="motor_controls" class="glass container">
         <div class="motor-controls-header default">
-            <h3 class="name-txt">Living Room Window</h3>
-            <h3 class="serial-txt">%AP_SSID%</h3>
+            <h3 id="name" class="name-txt">%NAME%</h3>
+            <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-cbx">
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx">
@@ -28,13 +28,13 @@
         <div id="motor_controls_body" class="motor-controls-body default">
             <div class="percent-slider default">
                 <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                <span class="tick one-tck"></span>
-                <span class="tick two-tck"></span>
-                <span class="tick three-tck"></span>
-                <span class="tick four-tck"></span>
-                <span class="tick five-tck"></span>
-                <span class="marker zero-mkr">0</span>
-                <span class="marker hundred-mkr">100</span>
+                <span class="tick" style="left:8.75%;"></span>
+                <span class="tick" style="left:30%;"></span>
+                <span class="tick" style="left:50.5%;"></span>
+                <span class="tick" style="left:72%;"></span>
+                <span class="tick" style="left:92.5%;"></span>
+                <span class="marker" style="left:7.85%;">0</span>
+                <span class="marker" style="left:87.5%;">100</span>
             </div>
             <div class="open-stop-close default">
                 <button class="open-btn button1" value="0" onclick="motorMove(this)">Open</button>
@@ -57,9 +57,9 @@
             <div class="horizontal-separator"></div>
             <div class="min-zero-max default">
                 <button class="set-min-btn button2" onclick="motorHttpRequest('set-min')">Set Min</button>
-                <span class="left-spr vertical-separator"></span>
+                <span class="vertical-separator" style="left:35%;"></span>
                 <button class="zeroing-btn button2" onclick="motorHttpRequest('zero')">Zero</button>
-                <span class="right-spr vertical-separator"></span>
+                <span class="vertical-separator" style="left:65%;"></span>
                 <button class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
             </div>
         </div>
@@ -67,14 +67,14 @@
 
 
 
-    <!-- To display and change some motor settings -->
+    <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide">
-        <div class="motor-settings-header container">
+        <div class="settings-header container">
             <button class="back-btn form-btn" onclick="toggleMotorSettings()">Back</button>
-            <h2 class="motor-settings-header-txt">Motor Settings</h2>
+            <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
-        <div id="motor_settings_1" class="four-settings glass container">
+        <div class="four-settings glass container">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
@@ -106,7 +106,7 @@
         </div>
 
 
-        <div id="motor_settings_2" class="three-settings glass container">
+        <div class="three-settings glass container">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
@@ -129,7 +129,7 @@
         </div>
 
 
-        <div id="motor_settings_3" class="two-settings glass container">
+        <div class="two-settings glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode</h3>
                 <label class="toggle">
@@ -146,7 +146,7 @@
         </div>
 
 
-        <div id="motor_settings_4" class="stallguard two-settings glass container">
+        <div class="two-settings glass container" style="top:82%;">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
@@ -165,7 +165,58 @@
 
 
 
-    <!-- Dialog box for submitting new values for motor settings -->
+    <!-- To display and change system and wifi settings -->
+    <div id="system_settings" class="default hide">
+        <div class="settings-header container">
+            <button class="back-btn form-btn" onclick="toggleSystemSettings()">Back</button>
+            <h2 class="settings-header-txt" style="left:26%;">System Settings</h2>
+        </div>
+
+        <div class="one-setting glass container" style="top:10%;">
+            <div class="whole-height default clickable" onclick="hello(['1', '2', '3'])">
+                <h3 class="setting-name-txt">Name</h3>
+                <h3 id="name_setting" class="setting-value-txt2">Living Room Window</h3>
+            </div>
+        </div>
+
+        <div class="three-settings glass container" style="top:20%;">
+            <div class="one-third-height default">
+                <h3 class="setting-name-txt">Setup Mode</h3>
+                <label class="toggle">
+                    <input type="checkbox" id="setup" onclick="checkboxHttpRequest('setup')">
+                    <span class="toggle-cbx">
+                </label>
+            </div>
+
+            <div class="one-third-pos horizontal-separator"></div>
+            <div class="one-third-pos one-third-height default clickable" onclick="openSettingDialog('Full Steps', 'Full Steps (per turn)', 'Full Steps', 1)">
+                <h3 id="full_steps_setting_name" class="setting-name-txt">SSID</h3>
+                <h3 id="full_steps_setting_closing" class="setting-value-txt2">Red Rocks 2.4</h3>
+            </div>
+
+            <div class="two-thirds-pos horizontal-separator"></div>
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openSettingDialog('Microsteps', 'Microsteps (per step)', 'Microsteps', 1)">
+                <h3 id="microsteps_setting_name" class="setting-name-txt">Password</h3>
+                <h3 id="microsteps_setting_closing" class="setting-value-txt2">123456</h3>
+            </div>
+        </div>
+
+        <div class="one-setting glass container" style="top:44%;">
+            <div class="whole-height default clickable" onclick="restart()">
+                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt" style="left:41%;">Restart</h3>
+            </div>
+        </div>
+
+        <div class="one-setting glass container" style="top:54%;">
+            <div class="whole-height default clickable" onclick="reset()">
+                <h3 id="stallguard_threshold_setting_name" class="setting-name-txt" style="left:42.5%;">Reset</h3>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Dialog box for submitting new values for settings -->
     <form id="setting_dialog" class="setting-dialog glass container" method="GET">
         <div class="dialog-prompt default">
             <h5 id="dialog_setting_prompt">SETTINGPROMPT</h5>

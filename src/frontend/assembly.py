@@ -29,6 +29,8 @@ def process_html():
                     href_tag = html_line[:html_line.index("href=") + 6] + "data:image/png;base64," + b64_string + "\" />\n"
                     assembled_html += href_tag
             else:
+                if "%;" in html_line:
+                    html_line = html_line.replace("%;", "%%;")
                 assembled_html += html_line
 
     assembled_html += ")rawliteral\";"
