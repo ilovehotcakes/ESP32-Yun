@@ -39,6 +39,21 @@ void SystemTask::run() {
                     WiFi.disconnect();
                     ESP.restart();
                     break;
+                case SYSTEM_RENAME:
+                    int shift[4] = {24, 16, 8, 0};
+                    int mask[4] = {2130706432, 8323072, 32512, 127};
+                    if ((inbox_.parameter & 2147483648) == 2147483648) {
+                        system_name_ = "";
+                    }
+                    for (int i = 0; i < 4; i++) {
+                        char c = static_cast<char>((inbox_.parameter & mask[i]) >> shift[i]);
+                        if (c == '\0') {
+                            setAndSave(system_name_, system_name_, "system_name_");
+                            break;
+                        } else {
+                            system_name_ += c;
+                        }
+                    }
             }
         }
 
@@ -56,6 +71,7 @@ void SystemTask::run() {
 void SystemTask::loadSettings() {
     bool load = readFromDisk();
 
+    system_name_ = getOrDefault("system_name_", system_name_);
     serial_ = getOrDefault("serial_", serial_);
     if (serial_ == "") {  // Factory reset
         serial_ = getSerialNumber();

@@ -20,8 +20,8 @@ protected:
     void run();
 
 private:
-    String name_   = "";
-    String serial_ = "";
+    String system_name_ = "Hello World";
+    String serial_      = "";
     // String manufacturer_ = "";
     // String model_ = "";
     // String firmware_ = "0.1.1";

@@ -36,6 +36,7 @@ Command hash(String command) {
     else if (command == "sleep") return SYSTEM_SLEEP;
     else if (command == "restart") return SYSTEM_RESTART;
     else if (command == "reset") return SYSTEM_RESET;
+    else if (command == "name") return SYSTEM_RENAME;
 
     else if (command == "setup") return WIRELESS_SETUP;
     else if (command == "ssid") return WIRELESS_SSID;
@@ -80,6 +81,7 @@ String hash(Command command) {
     else if (command == SYSTEM_SLEEP) return "sleep";
     else if (command == SYSTEM_RESTART) return "restart";
     else if (command == SYSTEM_RESET) return "reset";
+    else if (command == SYSTEM_RENAME) return "name";
 
     else if (command == WIRELESS_SETUP) return "setup";
     else if (command == WIRELESS_SSID) return "ssid";
@@ -176,7 +178,7 @@ String listMotorCommands() {
 
 String listSystemCommands() {
     String list = "";
-    for (int command = SYSTEM_SLEEP; command >= SYSTEM_RESET; command--) {
+    for (int command = SYSTEM_SLEEP; command >= SYSTEM_RENAME; command--) {
         list = list + hash(Command(command)) + " | ";
     }
     return list.substring(0, list.length() - 3);

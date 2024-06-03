@@ -40,6 +40,7 @@ enum Command {
     SYSTEM_SLEEP     = -1,
     SYSTEM_RESTART   = -2,
     SYSTEM_RESET     = -3,
+    SYSTEM_RENAME    = -4,
 
     WIRELESS_SETUP   = -51,
     WIRELESS_SSID    = -52,

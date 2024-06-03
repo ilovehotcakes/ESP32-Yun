@@ -248,6 +248,27 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
             LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
             response += "success: " + param + "\n";
             setAndSave(sta_password_, value_str, "sta_password_");
+        } else if (command == SYSTEM_RENAME) {
+            if (value_str.length() > 30) {
+                response += "failed: " + param + " needs less than 30 characters long\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
+            response += "success: " + param + "\n";
+            int shift[4] = {24, 16, 8, 0};
+            int temp_value = 2147483648;
+            for (int i = 0; i < value_str.length(); i += 4) {
+                for (int j = i; j < i + 4; j++) {
+                    int shifted = static_cast<int>(value_str.charAt(j)) << shift[j % 4];
+                    temp_value |= shifted;
+                }
+                sendTo(task, Message(command, temp_value), portMAX_DELAY);
+                temp_value = 0;
+            }
+            if (value_str.length() % 4 == 0) {
+                sendTo(task, Message(command, 0), portMAX_DELAY);
+            }
         } else {
             std::pair<std::function<bool(int)>, String> eval = getCommandEvalFunc(command);
             int value = value_str.toInt();
@@ -300,6 +321,10 @@ void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *
 String WirelessTask::htmlStringProcessor(const String& var) {
     if (var == "SLIDER") {
         return motor_position_;
+    } else if (var == "AP_SSID") {
+        return ap_ssid_;
+    } else if (var == "NAME") {
+        return system_task_->getSettings()["system_name_"];
     } else if (var == "AP_SSID") {
         return ap_ssid_;
     }
