@@ -186,9 +186,6 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
 
     for (int i = 0; i < request->params(); i++) {
         String param = request->getParam(i)->name();
-        if (param == "") {
-            continue;
-        }
         Command command = hash(param);
         if (command == ERROR_COMMAND) {
             String list_of_commands;
@@ -216,13 +213,7 @@ void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
 
     for (int i = 0; i < request->params(); i++) {
         String param = request->getParam(i)->name();
-        if (param == "") {
-            continue;
-        }
         String value_str = request->getParam(param)->value();
-        if (value_str == "") {
-            continue;
-        }
         Command command = hash(param);
         if (command >= MOTOR_VLCTY && command <= MOTOR_CL_ACCEL) {
             std::pair<std::function<bool(float)>, String> eval = getCommandEvalFuncf(command);
