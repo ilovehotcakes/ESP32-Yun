@@ -39,5 +39,6 @@ private:
     void loadSettings();
     inline void checkButtonPress();
     void systemSleep(TimerHandle_t timer);
+    void systemRestart();
     void systemReset();
 };

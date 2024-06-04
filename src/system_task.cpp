@@ -36,8 +36,7 @@ void SystemTask::run() {
                     systemReset();
                     break;
                 case SYSTEM_RESTART:
-                    WiFi.disconnect();
-                    ESP.restart();
+                    systemRestart();
                     break;
                 case SYSTEM_RENAME:
                     int shift[4] = {24, 16, 8, 0};
@@ -98,7 +97,10 @@ inline void SystemTask::checkButtonPress() {
         button_press_duration_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
         if (button_press_duration_ > SETUP_MODE_TIMER && button_press_duration_ < FACTORY_RESET_TIMER) {
             LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
-            sendTo(wireless_task_, Message(WIRELESS_SETUP, 1), 10);
+            bool toggle_setup_mode = !static_cast<bool>(wireless_task_->getSettings()["setup_mode_"]);
+            sendTo(wireless_task_, Message(WIRELESS_SETUP, toggle_setup_mode), portMAX_DELAY);
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            systemRestart();
         } else if (button_press_duration_ > FACTORY_RESET_TIMER) {
             LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
             systemReset();
@@ -128,10 +130,17 @@ void SystemTask::systemSleep(TimerHandle_t timer) {
 }
 
 
+void SystemTask::systemRestart() {
+    WiFi.disconnect();
+    ESP.restart();
+}
+
+
 void SystemTask::systemReset() {
     LOGI("System factory reset\n");
     WiFi.disconnect();
     LITTLEFS.format();
+    vTaskDelay(10 / portTICK_PERIOD_MS);
     ESP.restart();
 }
 
