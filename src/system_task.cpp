@@ -76,6 +76,7 @@ void SystemTask::loadSettings() {
         serial_ = getSerialNumber();
         settings_["serial_"] = serial_;
     }
+    firmware_ = getOrDefault("firmware_", firmware_);
     system_wake_time_ = getOrDefault("system_wake_time_", system_wake_time_);
     system_sleep_time_ = getOrDefault("system_sleep_time_", system_sleep_time_);
 

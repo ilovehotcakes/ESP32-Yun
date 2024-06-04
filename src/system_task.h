@@ -24,8 +24,8 @@ private:
     String serial_      = "";
     // String manufacturer_ = "";
     // String model_ = "";
-    // String firmware_ = "0.1.1";
-    int system_wake_time_  = SYSTEM_WAKE_DURATION;          // ms
+    String firmware_ = "d0e7373";
+    int system_wake_time_  = SYSTEM_WAKE_DURATION;         // ms
     int system_sleep_time_ = SYSTEM_SLEEP_DURTION * 1000;  // us
 
     bool button_pressed_        = false;
