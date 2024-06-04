@@ -103,10 +103,10 @@ h5 {
     left: 9%;
     color: rgb(187, 187, 187);
 }
-.more-settings-button {
+.more-settings {
     position: absolute;
     top: 6%;
-    left: 75%;
+    left: 74.5%;
     width: 8%;
     height: 52.1%;
 }
@@ -215,8 +215,20 @@ input[type="range"]:hover ~ .tick {
     color: rgba(172, 172, 172, 0.75);
     transition: 0.25s ease;
 }
-input[type="range"]:hover ~ .marker {
+.zero-mkr {
+    left: 7.85%;
+}
+input[type="range"]:hover ~ .zero-mkr {
     top: 60%;
+    left: 5.5%;
+    color: white;
+}
+.hundred-mkr {
+    left: 87.5%;
+}
+input[type="range"]:hover ~ .hundred-mkr {
+    top: 60%;
+    left: 89%;
     color: white;
 }
 .button1 {
@@ -263,7 +275,7 @@ input[type="range"]:hover ~ .marker {
     left: 24.5%;
     background-image: url(./img/icon_backward_100x100.png);
 }
-.advanced-controls-cbx {
+.advanced-controls-dropdown {
     position: absolute;
     top: 6%;
     left: 87%;
@@ -305,15 +317,12 @@ input[type="checkbox"], input[type="range"] {
 .clickable {
     cursor: pointer;
 }
-.grey-color {
-    color: lightgray;
-}
 
 
 
 /* For settings page */
 .settings-header {
-    top: 2.5%;
+    top: 2%;
     height: 6%;
 }
 .back-btn {
@@ -324,21 +333,21 @@ input[type="checkbox"], input[type="range"] {
 }
 .settings-header-txt {
     position: absolute;
-    left: 27%;
+    left: 28%;
     font-weight: 500;
 }
 .four-settings {
-    top: 10%;
+    top: 9.5%;
     height: 28%;
     border-radius: 0.5em;
 }
 .three-settings {
-    top: 41%;
+    top: 40.5%;
     height: 21%;
     border-radius: 0.5em;
 }
 .two-settings {
-    top: 65%;
+    top: 64.5%;
     height: 14%;
     border-radius: 0.5em;
 }
@@ -429,11 +438,11 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle-cbx::before {
     position: absolute;
-    top: 4%;
-    left: 3.5%;
+    top: 5%;
+    left: 4%;
     content: '';
-    width: 56%;
-    height: 92%;
+    width: 54.5%;
+    height: 90%;
     border-radius: 3em;
     background-color: rgb(255, 255, 255);
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -444,13 +453,13 @@ input:checked + .toggle-cbx {
     transition: 0.2s ease-in-out;
 }
 input:checked + .toggle-cbx::before {
-    left: 41%;
+    left: 42%;
     transition: 0.2s ease-in-out;
 }
 
 
 /* For pop-up dialog to change settings */
-.setting-dialog {
+.popup-dialog {
     top: 100%;
     left: 0;
     width: 100%;
@@ -458,26 +467,26 @@ input:checked + .toggle-cbx::before {
     background: rgba(36, 36, 36, 0.9);
     transition: 0.2s ease-in-out;
 }
-.setting-dialog-show {
+.popup-dialog-show {
     top: 2%;
     transition: 0.2s ease;
 }
 .dialog-prompt {
     display: flex;
     justify-content: center;
-    top: 2%;
+    top: 1.5%;
     height: 3%;
 }
 .dialog-title {
     display: flex;
     justify-content: space-between;
     position: absolute;
-    top: 7.1%;
+    top: 7%;
     left: 4.5%;
     width: 91%;
 }
 .form-btn {
-    padding-top: 1.5%;
+    padding-top: 1.8%;
     font-size: 1em;
     color: rgb(67, 142, 255);
     background-color: rgba(255, 255, 255, 0);
@@ -504,14 +513,15 @@ input:checked + .toggle-cbx::before {
     left: 8%;
     width: 84%;
     height: 20%;
+    color: lightgray;
 }
 .dialog-hint-shift {
     top: 33%;
 }
-input[type="number"] {
+input[type="number"], input[type="text"] {
     position: absolute;
-    top: 13%;
-    left: 39%;
+    top: 12.5%;
+    left: 38.5%;
     width: 55%;
     height: 70%;
     padding-left: 1px;
@@ -520,7 +530,7 @@ input[type="number"] {
     color: white;
     background-color: rgba(0, 0, 0, 0);
 }
-textarea:focus, input[type="number"]:focus {
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
 }
 

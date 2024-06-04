@@ -24,36 +24,44 @@ window.addEventListener('load', () => {
             document.getElementById('percent_slider').value = data.motor_position;
             if (data.motor.sync_settings_) {
                 document.getElementById('sync_settings').checked = true;
+                hideOpeningSettings();
             } else {
                 document.getElementById('sync_settings').checked = false;
             }
-            document.getElementById('current_setting_opening').innerText = data.motor.open_current_;
-            document.getElementById('current_setting_closing').innerText = data.motor.clos_current_;
-            document.getElementById('velocity_setting_opening').innerText = data.motor.open_velocity_;
-            document.getElementById('velocity_setting_closing').innerText = data.motor.clos_velocity_;
-            document.getElementById('acceleration_setting_opening').innerText = data.motor.open_accel_;
-            document.getElementById('acceleration_setting_closing').innerText = data.motor.clos_accel_;
+            document.getElementById('opening_current').innerText = data.motor.open_current_;
+            document.getElementById('closing_current').innerText = data.motor.clos_current_;
+            document.getElementById('opening_velocity').innerText = parseFloat(data.motor.open_velocity_).toFixed(1);
+            document.getElementById('closing_velocity').innerText = parseFloat(data.motor.clos_velocity_).toFixed(1);
+            document.getElementById('opening_acceleration').innerText = parseFloat(data.motor.open_accel_).toFixed(1);
+            document.getElementById('closing_acceleration').innerText = parseFloat(data.motor.clos_accel_).toFixed(1);
             if (data.motor.direction_) {
                 document.getElementById('direction').checked = true;
             } else {
                 document.getElementById('direction').checked = false;
             }
-            document.getElementById('full_steps_setting_closing').innerText = data.motor.full_steps_;
-            document.getElementById('microsteps_setting_closing').innerText = data.motor.microsteps_;
+            document.getElementById('full_steps').innerText = data.motor.full_steps_;
+            document.getElementById('microsteps').innerText = data.motor.microsteps_;
             if (data.motor.spreadcycl_en_) {
                 document.getElementById('fastmode').checked = true;
             } else {
                 document.getElementById('fastmode').checked = false;
             }
-            document.getElementById('fastmode_threshold_setting_closing').innerText = data.motor.spreadcycl_th_;
+            document.getElementById('fastmode_threshold').innerText = data.motor.spreadcycl_th_;
             if (data.motor.stallguard_en_) {
                 document.getElementById('stallguard').checked = true;
             } else {
                 document.getElementById('stallguard').checked = false;
             }
-            document.getElementById('stallguard_threshold_setting_closing').innerText = data.motor.stallguard_th_;
+            document.getElementById('stallguard_threshold').innerText = data.motor.stallguard_th_;
+            if (data.wireless.setup_mode_) {
+                document.getElementById('setup').checked = true;
+            } else {
+                document.getElementById('setup').checked = false;
+            }
+            document.getElementById('ssid').innerText = data.wireless.sta_ssid_;
+            document.getElementById('password').innerText = data.wireless.sta_password_;
+            document.getElementById('system_name').innerText = data.system.system_name_;
             document.getElementById('name').innerText = data.system.system_name_;
-            document.getElementById('name_setting').innerText = data.system.system_name_;
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
@@ -64,10 +72,6 @@ window.addEventListener('load', () => {
         showOpeningSettings();
     }
 });
-
-function print(element) {
-    console.log(element);
-}
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -86,23 +90,19 @@ function toggleAdvancedControls () {
     document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
-function toggleMotorSettings() {
+function toggleSettings(setting="") {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    document.getElementById('motor_settings').classList.toggle('default-hide');
+    document.getElementById(setting).classList.toggle('default-hide');
 }
 
-function toggleSystemSettings() {
-
-}
-
-function hello(element) {
-    console.log(element.length);
+function httpRequest(uri, param, value=1) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/${uri}?${param}=${value}`, true);
+    xhr.send();
 }
 
 function motorHttpRequest(param, value=1) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/motor?' + param + '=' + value, true);
-    xhr.send();
+    httpRequest('motor', param, value);
 }
 
 function motorMove(element) {
@@ -119,89 +119,104 @@ function syncSettings() {
     }
 }
 
-function checkboxHttpRequest(param) {
+function checkboxHttpRequest(uri, param) {
     if (document.getElementById(param).checked) {
-        motorHttpRequest(param);
+        httpRequest(uri, param);
     } else {
-        motorHttpRequest(param, 0);
+        httpRequest(uri, param, 0);
     }
 }
 
-function openSettingDialog(setting_name, prompt="", closing_setting_text, input_step, number_of_settings=1) {
-    const lowercase_name = setting_name.toLowerCase();
-    const param = lowercase_name.replaceAll(" ", "-");
-    const id = lowercase_name.replaceAll(" ", "_");
+function openPopupDialog(uri, dialog_prompt, dialog_title, settings, dialog_hint, input_step=0) {
     const form_input = document.getElementById('form_input');
-    const close_setting = document.getElementById('closing_setting');
+    const closing_setting = document.getElementById('closing_setting');
+    const sync_setting = document.getElementById('sync_settings').checked;
     const opening_setting_input = document.getElementById('opening_setting_input');
-    const closing_setting_input = document.getElementById('closing_setting_input');
+    let closing_setting_input = document.getElementById('closing_setting_input');
 
-    if (number_of_settings > 1 && !document.getElementById('sync_settings').checked) {
+    document.getElementById('dialog_prompt').innerText = `Enter new ${dialog_prompt}`;
+    document.getElementById('dialog_title').innerText = `Enter ${dialog_title}`;
+
+    closing_setting.removeChild(closing_setting_input);
+    closing_setting_input = document.createElement('input');
+    closing_setting_input.setAttribute('id', 'closing_setting_input');
+    if (input_step == 0) {
+        closing_setting_input.setAttribute('type', 'text');
+    } else {
+        closing_setting_input.setAttribute('type', 'number');
+    }
+    closing_setting.appendChild(closing_setting_input);
+
+    if (settings.length > 1 && !sync_setting) {
         form_input.classList.remove('one-setting');
         form_input.classList.add('two-settings');
         document.getElementById('opening_setting').classList.remove('hide');
         document.getElementById('opening_setting_separator').classList.remove('hide');
-        close_setting.classList.add('one-half-pos');
-        close_setting.classList.add('one-half-height');
-        close_setting.classList.remove('whole-height');
+        closing_setting.classList.add('one-half-pos');
+        closing_setting.classList.add('one-half-height');
+        closing_setting.classList.remove('whole-height');
         document.getElementById('dialog_hint').classList.add('dialog-hint-shift');
 
-        document.getElementById('closing_setting_text').innerText = "Closing";
+        document.getElementById('opening_setting_name').innerText = settings[0][0];
+        document.getElementById('closing_setting_name').innerText = settings[1][0];
+        opening_setting_input.placeholder = document.getElementById(settings[0][1]).innerText;
+        opening_setting_input.name = settings[0][1].replaceAll("_", "-");
         opening_setting_input.step = input_step;
-        opening_setting_input.name = `opening-${param}`;
-        closing_setting_input.name = `closing-${param}`;
-        opening_setting_input.placeholder = `${document.getElementById(id + '_setting_opening').innerText}`;
         opening_setting_input.select();
     } else {
         form_input.classList.add('one-setting');
         form_input.classList.remove('two-settings');
         document.getElementById('opening_setting').classList.add('hide');
         document.getElementById('opening_setting_separator').classList.add('hide');
-        close_setting.classList.remove('one-half-pos');
-        close_setting.classList.remove('one-half-height');
-        close_setting.classList.add('whole-height');
+        closing_setting.classList.remove('one-half-pos');
+        closing_setting.classList.remove('one-half-height');
+        closing_setting.classList.add('whole-height');
         document.getElementById('dialog_hint').classList.remove('dialog-hint-shift');
 
-        document.getElementById('closing_setting_text').innerText = closing_setting_text;
-        opening_setting_input.name = "";
-        closing_setting_input.name = param;
+        document.getElementById('closing_setting_name').innerText = dialog_title;
         closing_setting_input.select();
     }
 
-    closing_setting_input.placeholder = `${document.getElementById(id + '_setting_closing').innerText}`;
+    closing_setting_input.placeholder = document.getElementById(settings.at(-1)[1]).innerText;
+    if (settings.length > 1 && sync_setting) {
+        closing_setting_input.name = settings.at(-1)[1].split("_")[1];
+    } else {
+        closing_setting_input.name = settings.at(-1)[1].replaceAll("_", "-");
+    }
     closing_setting_input.step = input_step;
 
-    document.getElementById('dialog_setting_prompt').innerText = `Enter new value for "${prompt}"`;
-    document.getElementById('dialog_title').innerText = `Enter ${setting_name}`;
+    document.getElementById('dialog_hint_text').innerText = dialog_hint;
 
-    const setting_dialog = document.getElementById('setting_dialog');
-    setting_dialog.action = '/motor?';
-    setting_dialog.classList.add('setting-dialog-show');
+    const popup_dialog = document.getElementById('popup_dialog');
+    popup_dialog.uri = uri;
+    popup_dialog.classList.add('popup-dialog-show');
 }
 
 function cancelForm() {
-    document.getElementById('setting_dialog').classList.remove('setting-dialog-show');
+    document.getElementById('popup_dialog').classList.remove('popup-dialog-show');
 }
 
 function submitForm() {
-    const open_setting = document.getElementById('opening_setting_input');
-    const close_setting = document.getElementById('closing_setting_input');
-    const action = document.getElementById('setting_dialog').action;
-    const request = action + open_setting.name + '=' + open_setting.value + '&' + close_setting.name + '=' + close_setting.value;
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', request);
-    xhr.send();
+    const opening_setting = document.getElementById('opening_setting_input');
+    const closing_setting = document.getElementById('closing_setting_input');
+    const uri = document.getElementById('popup_dialog').uri;
+    if (closing_setting.value != "") {
+        httpRequest(uri, closing_setting.name, closing_setting.value);
+    }
+    if (opening_setting.value != "") {
+        httpRequest(uri, opening_setting.name, opening_setting.value);
+    }
     cancelForm();
 }
 
 function showOpeningSettings() {
-    document.getElementById('current_setting_opening').classList.add('setting-opening-txt-show');
-    document.getElementById('velocity_setting_opening').classList.add('setting-opening-txt-show');
-    document.getElementById('acceleration_setting_opening').classList.add('setting-opening-txt-show');
+    document.getElementById('opening_current').classList.add('setting-opening-txt-show');
+    document.getElementById('opening_velocity').classList.add('setting-opening-txt-show');
+    document.getElementById('opening_acceleration').classList.add('setting-opening-txt-show');
 }
 
 function hideOpeningSettings() {
-    document.getElementById('current_setting_opening').classList.remove('setting-opening-txt-show');
-    document.getElementById('velocity_setting_opening').classList.remove('setting-opening-txt-show');
-    document.getElementById('acceleration_setting_opening').classList.remove('setting-opening-txt-show');
+    document.getElementById('opening_current').classList.remove('setting-opening-txt-show');
+    document.getElementById('opening_velocity').classList.remove('setting-opening-txt-show');
+    document.getElementById('opening_acceleration').classList.remove('setting-opening-txt-show');
 }
