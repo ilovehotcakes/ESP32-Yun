@@ -103,13 +103,6 @@ h5 {
     left: 9%;
     color: rgb(187, 187, 187);
 }
-.more-settings {
-    position: absolute;
-    top: 6%;
-    left: 74.5%;
-    width: 8%;
-    height: 52.1%;
-}
 .percent-slider {
     top: 0;
     padding-top: 5%;
@@ -275,10 +268,24 @@ input[type="range"]:hover ~ .hundred-mkr {
     left: 24.5%;
     background-image: url(./img/icon_backward_100x100.png);
 }
-.advanced-controls-dropdown {
+.more-setting-txt {
+    position: absolute;
+    top: 25%;
+    left: 10.5%;
+    font-weight: 400;
+    font-size: 1em;
+}
+.more-settings-dropdown {
     position: absolute;
     top: 6%;
     left: 87%;
+    width: 8%;
+    height: 52.1%;
+}
+.advanced-controls-dropdown {
+    position: absolute;
+    top: 6%;
+    left: 74%;
     width: 8%;
     height: 52.1%;
 }
@@ -454,6 +461,24 @@ input:checked + .toggle-cbx {
 }
 input:checked + .toggle-cbx::before {
     left: 42%;
+    transition: 0.2s ease-in-out;
+}
+.more-settings {
+    top: 23.5%;
+    left: 54%;
+    width: 38%;
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.4), rgba(65, 65, 65, 0.7));
+    overflow: hidden;
+}
+.more-settings-hide {
+    top: 38%;
+    left: 90%;
+    height: 0;
+    width: 0;
+    transition: 0.18s ease-in-out;
+}
+.more-settings-shift {
+    left: -60%;
     transition: 0.2s ease-in-out;
 }
 

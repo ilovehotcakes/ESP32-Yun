@@ -111,13 +111,6 @@ h5 {
     left: 9%%;
     color: rgb(187, 187, 187);
 }
-.more-settings {
-    position: absolute;
-    top: 6%%;
-    left: 74.5%%;
-    width: 8%%;
-    height: 52.1%%;
-}
 .percent-slider {
     top: 0;
     padding-top: 5%%;
@@ -283,10 +276,24 @@ input[type="range"]:hover ~ .hundred-mkr {
     left: 24.5%%;
     background-image: url(./img/icon_backward_100x100.png);
 }
-.advanced-controls-dropdown {
+.more-setting-txt {
+    position: absolute;
+    top: 25%%;
+    left: 10.5%%;
+    font-weight: 400;
+    font-size: 1em;
+}
+.more-settings-dropdown {
     position: absolute;
     top: 6%%;
     left: 87%%;
+    width: 8%%;
+    height: 52.1%%;
+}
+.advanced-controls-dropdown {
+    position: absolute;
+    top: 6%%;
+    left: 74%%;
     width: 8%%;
     height: 52.1%%;
 }
@@ -341,7 +348,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .settings-header-txt {
     position: absolute;
-    left: 27%%;
+    left: 28%%;
     font-weight: 500;
 }
 .four-settings {
@@ -462,6 +469,24 @@ input:checked + .toggle-cbx {
 }
 input:checked + .toggle-cbx::before {
     left: 42%%;
+    transition: 0.2s ease-in-out;
+}
+.more-settings {
+    top: 23.5%%;
+    left: 54%%;
+    width: 38%%;
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.4), rgba(65, 65, 65, 0.7));
+    overflow: hidden;
+}
+.more-settings-hide {
+    top: 38%%;
+    left: 90%%;
+    height: 0;
+    width: 0;
+    transition: 0.18s ease-in-out;
+}
+.more-settings-shift {
+    left: -60%%;
     transition: 0.2s ease-in-out;
 }
 
@@ -630,10 +655,6 @@ window.addEventListener('load', () => {
     }
 });
 
-function print(element) {
-    console.log(element);
-}
-
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     // Is mobile device
@@ -646,19 +667,21 @@ function isMobileDevice() {
     return false;
 }
 
-function toggleAdvancedControls () {
+function toggleAdvancedControls() {
     document.getElementById('motor_controls_body').classList.toggle('hide');
     document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
-function toggleSettings(setting="") {
-    document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    console.log(setting);
-    document.getElementById(setting).classList.toggle('default-hide');
+function toggleMoreSettings() {
+    document.getElementById('more-settings').classList.toggle('more-settings-hide');
 }
 
-function toggleSystemSettings() {
-
+function toggleSettings(setting="") {
+    document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
+    document.getElementById('more-settings').classList.toggle('more-settings-shift');
+    document.getElementById(setting).classList.toggle('default-hide');
+    setTimeout(document.getElementById('more_settings_dropdown').checked = false, 1000);
+    setTimeout(document.getElementById('more-settings').classList.add('more-settings-hide'), 1000);
 }
 
 function httpRequest(uri, param, value=1) {
@@ -798,12 +821,10 @@ function hideOpeningSettings() {
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx">
             </label>
-            <div class="more-settings">
-                <button class="dropdown-cbx" onclick="toggleSettings('motor_settings')" unchecked>
-            </div>
-            <div class="more-settings" style="left:62%%;">
-                <button class="dropdown-cbx" onclick="toggleSettings('system_settings')" unchecked>
-            </div>
+            <label class="more-settings-dropdown">
+                <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
+                <span class="dropdown-cbx">
+            </label>
         </div>
 
         <div id="motor_controls_body" class="motor-controls-body default">
@@ -843,6 +864,15 @@ function hideOpeningSettings() {
                 <span class="vertical-separator" style="left:65%%;"></span>
                 <button class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
             </div>
+        </div>
+    </div>
+    <div id="more-settings" class="two-settings glass container more-settings more-settings-hide">
+        <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
+            <h3 class="more-setting-txt">Motor Settings</h3>
+        </div>
+        <div class="one-half-pos horizontal-separator"></div>
+        <div class="one-half-pos one-half-height default clickable" onclick="toggleSettings('system_settings')">
+            <h3 class="more-setting-txt" style="top:23%%;">System Settings</h3>
         </div>
     </div>
 
@@ -971,7 +1001,7 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'WiFi SSID', 'SSID', [['SSID', 'ssid']], '')">
+            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], '')">
                 <h3 class="setting-name-txt">SSID</h3>
                 <h3 id="ssid" class="setting-value-txt2">Get Off My LAN</h3>
             </div>
@@ -997,7 +1027,7 @@ function hideOpeningSettings() {
                 <h3 id="reset" class="setting-name-txt" style="left:42.5%%;">Reset</h3>
             </div>
         </div>
-        <div id="reset_hint" class="dialog-hint" style="top:77.2%%;">
+        <div id="reset_hint" class="dialog-hint" style="top:77.8%%;">
             <h5>Resets the system to factory settings.</h5>
         </div>
     </div>

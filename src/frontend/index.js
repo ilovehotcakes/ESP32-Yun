@@ -85,14 +85,21 @@ function isMobileDevice() {
     return false;
 }
 
-function toggleAdvancedControls () {
+function toggleAdvancedControls() {
     document.getElementById('motor_controls_body').classList.toggle('hide');
     document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
+function toggleMoreSettings() {
+    document.getElementById('more-settings').classList.toggle('more-settings-hide');
+}
+
 function toggleSettings(setting="") {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
+    document.getElementById('more-settings').classList.toggle('more-settings-shift');
     document.getElementById(setting).classList.toggle('default-hide');
+    setTimeout(document.getElementById('more_settings_dropdown').checked = false, 1000);
+    setTimeout(document.getElementById('more-settings').classList.add('more-settings-hide'), 1000);
 }
 
 function httpRequest(uri, param, value=1) {

@@ -20,12 +20,10 @@
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx">
             </label>
-            <div class="more-settings">
-                <button class="dropdown-cbx" onclick="toggleSettings('motor_settings')" unchecked>
-            </div>
-            <div class="more-settings" style="left:62%;">
-                <button class="dropdown-cbx" onclick="toggleSettings('system_settings')" unchecked>
-            </div>
+            <label class="more-settings-dropdown">
+                <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
+                <span class="dropdown-cbx">
+            </label>
         </div>
 
         <div id="motor_controls_body" class="motor-controls-body default">
@@ -65,6 +63,15 @@
                 <span class="vertical-separator" style="left:65%;"></span>
                 <button class="set-max-btn button2" onclick="motorHttpRequest('set-max')">Set Max</button>
             </div>
+        </div>
+    </div>
+    <div id="more-settings" class="two-settings glass container more-settings more-settings-hide">
+        <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
+            <h3 class="more-setting-txt">Motor Settings</h3>
+        </div>
+        <div class="one-half-pos horizontal-separator"></div>
+        <div class="one-half-pos one-half-height default clickable" onclick="toggleSettings('system_settings')">
+            <h3 class="more-setting-txt" style="top:23%;">System Settings</h3>
         </div>
     </div>
 
@@ -193,7 +200,7 @@
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'WiFi SSID', 'SSID', [['SSID', 'ssid']], '')">
+            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], '')">
                 <h3 class="setting-name-txt">SSID</h3>
                 <h3 id="ssid" class="setting-value-txt2">Get Off My LAN</h3>
             </div>
@@ -219,7 +226,7 @@
                 <h3 id="reset" class="setting-name-txt" style="left:42.5%;">Reset</h3>
             </div>
         </div>
-        <div id="reset_hint" class="dialog-hint" style="top:77.2%;">
+        <div id="reset_hint" class="dialog-hint" style="top:77.8%;">
             <h5>Resets the system to factory settings.</h5>
         </div>
     </div>
