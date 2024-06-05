@@ -22,7 +22,7 @@
             </label>
             <label class="more-settings-dropdown">
                 <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
-                <span class="dropdown-cbx">
+                <span class="more-settings-cbx dropdown-cbx">
             </label>
         </div>
 
@@ -80,7 +80,8 @@
     <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <button class="back-btn form-btn" onclick="toggleSettings('motor_settings')">Back</button>
+            <div class="back-arrow clickable" onclick="toggleSettings('motor_settings')"></div>
+            <button class="back-btn form-btn clickable" onclick="toggleSettings('motor_settings')">Back</button>
             <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
@@ -178,12 +179,13 @@
     <!-- To display and change system and wifi settings -->
     <div id="system_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <button class="back-btn form-btn" onclick="toggleSettings('system_settings')">Back</button>
+            <div class="back-arrow clickable" onclick="toggleSettings('system_settings')"></div>
+            <button class="back-btn form-btn clickable" onclick="toggleSettings('system_settings')">Back</button>
             <h2 class="settings-header-txt" style="left:26%;">System Settings</h2>
         </div>
 
         <div class="one-setting glass container" style="top:10%;">
-            <div class="whole-height default clickable" onclick="openPopupDialog('system', 'name for ESP32 Yun', 'Name', [['Name', 'name']], '')">
+            <div class="whole-height default clickable" onclick="openPopupDialog('system', 'name for ESP32 Yun', 'Name', [['Name', 'name']], 'Name can\'t be longer than 30 characters.')">
                 <h3 class="setting-name-txt">Name</h3>
                 <h3 id="name" class="setting-value-txt2">Living Room Window</h3>
             </div>
@@ -200,13 +202,13 @@
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], '')">
+            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], 'SSID can\'t be empty.')">
                 <h3 class="setting-name-txt">SSID</h3>
                 <h3 id="ssid" class="setting-value-txt2">Get Off My LAN</h3>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
-            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'password for WiFi', 'Password', [['Password', 'password']], '')">
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'password for WiFi', 'Password', [['Password', 'password']], 'Leave password blank if WiFi doesn\'t have security.')">
                 <h3 class="setting-name-txt">Password</h3>
                 <h3 id="password" class="setting-value-txt2">123456</h3>
             </div>

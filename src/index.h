@@ -266,9 +266,11 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACgklEQVR4nO3cMY7TQBjF8SdoEB2UcAZaEIhuS3bhCogL0EODhFbiCrTpc4NNwiHCAdJskwoWpQnij6KYAlDIZGPHb8L7SW49M/pix288HikiIiIiIiIiIiIiIiIiIiIOBngFfAa+AWPgkSoFvAA+NWNZHRPgTJUV409L4C1wUxUBPrDZuWrQXBmbrK6W+6rnytjmVO6A71sGMQeeyxzr29Q2Y7mj3AC4LVPAVcEYvuqICkJze3sgQxTSkRVkZQG8lhn+44L8MgTuykQKsjYDnspACvJ7ZnnXd2ZJQf426TOzpCBmmYVCckc3BofOLCmIWWahkNzRrcWhMktph+SOwxgCdxzGIXcczqzLzFLaCbnjsJZdZZbSDsgd/Zi0nVlKG5Y7+jNv89VqaaNyR/8GbWSW0sbkDg/TfTNLaUNyh4/FPpmltBG5w8/wOpml9ORyh6fZrpml9MRyh6/lLpml9KRyh79JSWYpPZncUYc58KSNccgd9bgEbu07DrmjLif7jkPuqMvJvuOQO+pxmVuW15/64zZ+WHKHv3Eeez0sEwx9zDJ14mOYyUUPi0y/+/ypT/OCyucpa5BXuB6PvfMscvDJIeMsA/IIhssslPNJ6rMsJfWZOhlmsXWhjguxyOcIO3LOFrso7ZTcdVCIH8DHfNLmUZB5X3tTlXZQ7losxjifRXsUZJmNA1q0ZzFm2VqjZc7ZYhelnZa7axQi2zN1yTlb7KJ0AHLnnC062OLvi45kE0z7fW9Zr5LfZqTKt4kdAfdUAeCsoCDP5A54uSFbvAFuqCLA+T+K8V61aIoybe7DF8BDVQo4bWYNrppjVMWVERERERERERERERERERERoePyE14pI9B/KIdyAAAAAElFTkSuQmCC');    background-size: 2.4rem;
 }
 .forward-btn {
-    left: 61.5%%;
+    top: 6%%;
+    left: 61%%;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACOklEQVR4nO3cO44TQRhF4RYkiAxCWAMpCEQ2sVkDggWQAwHbIHXuHcB4E4bcCYlD0CRGHGRpRkJCHvnxV/u2+3wruKWSu+q2q7rrJEmSJEmSJEmSJEnS0YA3wDfgF3AJPOuCEJ6vFPCW/62BT8Bd8/UM+M52c+Bx35mGlK8c8JvbrYBJeL5X3blgd1PgvvlyJoTrhfVJ60xDynfqAW9cAe/MlzMhN2bAw7HnSxrwxhJ4OeZ8aQNu3lkIz5c44KadgPB8XfCAm3QW6vNldxbaKOsshOcrRzuLik5AO5mdhbaO7iyE5ytHP2bAg3PMV47+LA/pBOn5ytGv9b6dID1fOU5jvmsnSM9XjtNZ7dJZ0vOV4/Smt3WCU4frvbOQYbGtE5ChpFMNaUK2dgJy9NNZyDP7txOQp21nIdPyphOQqV1nIdcaeE9+vjtjmZChqO0spx7Nmdh0lhdOSJYfwD1/IVkunJAsTkgQH1lhi/pzF/UMl2PZ9q6Bj2Tn+zCWYrj01UmOmS8XM1z5+j3nkbXwD6qcNWTqX7gZi/rKQw45u6x5+DGg2m6xj54HuvagXM6ELD1KmvMLmXnYOuOR5XWEfY34ws5iTBd2kq+0/QE+j+VK2xAufU66ZOl7d8LzlSsYqB8OqHTkZPhpjWrpFyUJz1fugIH6eaaW0vfuhOcrl753JzxfuTP5COakOxfX3/zY5ivwyHw9Al5HXqAfSL6Wg94siD+BL8DTLgjh+SRJkiRJkiRJkiRJUnewv8vYpqnx1cELAAAAAElFTkSuQmCC');}
 .backward-btn {
+    top: 6%%;
     left: 24.5%%;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACaklEQVR4nO3cPW6UMRSFYUMDNLQpWABsAJBIC+lgByB2QA8sgJY9ENaQiiWEIqGjB4kSKv5eNGKKUVDQZ7j387F9nhUcz5GS6xnbpZiZmZmZmZmZmZmZmZmZmdkQgFvAG+AL8A54XIQAt5XzhQEuAE+Ar/yp+aLV84UC9oAjznfqfOuVcR/4xN99b1WIer4wwCXgJfCTBZwvt4wbwNslRbQoRD1fKODRdkKp4nzxRVwFDmuLWKsQ9XwZe4v3/7rY7AWr51trdq8yY7619xZVZssXCjgAPkQtdmOmfM32FjVmyNd8dq8xej6JvUWNkfPJzO41/iPfa1YQ/+k2mN1rjJZPcnavMUo+6dm9xgj5SsLs/rHFYjd6zxcmc3av0Wu+6DJSZ/caPeaLLiN9dq/RW77IIlab3Wv0ki+6jFVn9xo95Iss4iLwDPiGrufK+SLLaDa7jySqjP0FZ45sgYgyrkT/SDOzElDI3daLGIkLGbCQy/6TJVTItpQ7/qcuVMi2FI+9SoXsbAyfKm+8EM8XWshOMTeVv5pAPF/3BxdqnMn3ilkKOfP19mdElM7yZZVyHThGQOkwX1Yp0j+R8jvfC+CHYr40GQeUayzId085Xwr1YzaI50uhfhAN8Xxp1I9qsvKepSjo5LD1oWq+NOrH/Vlhz1LUqF+IIXnPUhSpXxlDPF8a9UuViOdLoX7tGPF8ZcaL+Yjnm/bpCsTzTfm4C+L50uDnmfQg/kCYer4U+Ik/TcAD5Ucmp3kEcxdwbfs48XlOSkPq+UqDPcFD59N4yvt0M5UVIer5zMzMzMzMzMzMzMzMzMzMSqd+AUQFoXyF3p61AAAAAElFTkSuQmCC');}
 .more-setting-txt {
@@ -316,6 +318,10 @@ input[type="checkbox"], input[type="range"] {
     -webkit-appearance: none;
     -moz-appearance: none;
 }
+.more-settings-cbx::before {
+    background-size: 64%%;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACu0lEQVR4nO3ay0sWURjH8elC7dMW1qYihKiMVpl/Q0FEEOXaNpVkBm1btm1d3moTBG3N/oEu/0A3u+w1SFxV1jcOTCBh1nvmPONbfD8gvpdxzvP8Bud2pqokSZIkSZIkSZIkSZIkSZIkSZIkSZL0bwB2AyeBC8D1+nd6v2sDa9oKDAHDwFj9k14fT9/9d1kB24FR4DnwnbWlz58Bl9PyxbpaB3AEmAE+8nuL9TIDVQvCswLOAB/ozHvgdGDTvcBd4FsHNaVlp4GewLrisgI2ATdo5hawuXDTh4B3DWp6m9ZRuKb4rIAJyrhTeGMsFajpE3CwYF2xWQHXKGusQNM9wHzBmtKuYmeBumKzAvqBL4UH+QocaNj4PcqbblhTfFbAQ2I8aND4QIcH8L+V1nm0QV2xWQH71jlVayqtd29m4zPEmcqsKT4rYJxYVzIv+hYDa1rMuXhsJSvgcfAgjzIaHyLeYEZd8VkBr4MHeZnR+DDxzmXUFZ8VsBw8yHIXnFauZTyjrvisWhhkqQv31cnVLtwgS2mQV8GDvMho/DzxzmbUFZ8VMBc8yOx/dFCfC65ptqrnESKNZjS+BVjowtPe+KxauNjZ02njSX3bPMpklaG1rNJle9Ag93MaT4DDwEpATStNbsW3klW95T8XHiDdgNuf23jgf8lE1UBrWQXsHzs+dvwK2AG8KVhTmuTqrRpqLas0WVJogNtNm/4pTSrVk0vdNkEVn9WqacncA1f6u5sBU7j96bZCg6bnS26M1rNKE/D17Fqn89anSja9xuzhdIdzJOkAPpl2fVWQ1rKqH225BDxdJ4T0+RPgIrAtquk1zr6m/nB7fqFepuiDDV2TFdAHnABG6oe/Rur3fcW6yrt4HEx3bVc9KJdeH0vfbWBdXZeVJEmSJEmSJEmSJEmSJEmSJEmSJEmSqs78AE8fYB2kVgzxAAAAAElFTkSuQmCC');    transform: none;
+}
 
 
 
@@ -334,11 +340,19 @@ input[type="checkbox"], input[type="range"] {
     top: 2%%;
     height: 6%%;
 }
+.back-arrow {
+    position: absolute;
+    top: 28%%;
+    left: -1.5%%;
+    width: 5.5%%;
+    height: 50%%;
+    background-size: 1.3em;
+    background-position: center;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO3dS0rEQBhF4d6atxz7QnGgS+pU71AQEUWX0MIvcdhkbB2t80Hmlz4kZFKd3U6SJEmSNFSWum693lqvz/S6Hbtmcm1f963XsfWq9cpSH6M3TaudxPi5lnofvWtKbStGr+P5oW5Gb5tOlro7jZGlvlqvh9HbphNjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwGAPEGCDGADEGiDFAjAGSQ11tHbBcD17u9PvaUi/GADEIjI8soPU/RLbOhmepx9HbpmUUIKMAGQXIKEBGAYpvXzwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDHK3/k4cet1OXrbtNpGlCz1PHrX1NrpB+57vY7eNL3W6zK9nta742xfF9P/IJIkSZJ2/903ktnd2iGdTLAAAAAASUVORK5CYII=');}
 .back-btn {
     position: absolute;
     top: 15%%;
-    left: 0;
-    font-size: 1.1em;
+    left: 3.5%%;
 }
 .settings-header-txt {
     position: absolute;
@@ -817,7 +831,7 @@ function hideOpeningSettings() {
             </label>
             <label class="more-settings-dropdown">
                 <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
-                <span class="dropdown-cbx">
+                <span class="more-settings-cbx dropdown-cbx">
             </label>
         </div>
 
@@ -875,7 +889,8 @@ function hideOpeningSettings() {
     <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <button class="back-btn form-btn" onclick="toggleSettings('motor_settings')">Back</button>
+            <div class="back-arrow clickable" onclick="toggleSettings('motor_settings')"></div>
+            <button class="back-btn form-btn clickable" onclick="toggleSettings('motor_settings')">Back</button>
             <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
@@ -973,12 +988,13 @@ function hideOpeningSettings() {
     <!-- To display and change system and wifi settings -->
     <div id="system_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <button class="back-btn form-btn" onclick="toggleSettings('system_settings')">Back</button>
+            <div class="back-arrow clickable" onclick="toggleSettings('system_settings')"></div>
+            <button class="back-btn form-btn clickable" onclick="toggleSettings('system_settings')">Back</button>
             <h2 class="settings-header-txt" style="left:26%%;">System Settings</h2>
         </div>
 
         <div class="one-setting glass container" style="top:10%%;">
-            <div class="whole-height default clickable" onclick="openPopupDialog('system', 'name for ESP32 Yun', 'Name', [['Name', 'name']], '')">
+            <div class="whole-height default clickable" onclick="openPopupDialog('system', 'name for ESP32 Yun', 'Name', [['Name', 'name']], 'Name can\'t be longer than 30 characters.')">
                 <h3 class="setting-name-txt">Name</h3>
                 <h3 id="name" class="setting-value-txt2">Living Room Window</h3>
             </div>
@@ -995,13 +1011,13 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], '')">
+            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'SSID for WiFi', 'SSID', [['SSID', 'ssid']], 'SSID can\'t be empty.')">
                 <h3 class="setting-name-txt">SSID</h3>
                 <h3 id="ssid" class="setting-value-txt2">Get Off My LAN</h3>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
-            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'password for WiFi', 'Password', [['Password', 'password']], '')">
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('wireless', 'password for WiFi', 'Password', [['Password', 'password']], 'Leave password blank if WiFi doesn\'t have security.')">
                 <h3 class="setting-name-txt">Password</h3>
                 <h3 id="password" class="setting-value-txt2">123456</h3>
             </div>

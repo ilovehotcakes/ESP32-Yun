@@ -261,10 +261,12 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-size: 2.4rem;
 }
 .forward-btn {
-    left: 61.5%;
+    top: 6%;
+    left: 61%;
     background-image: url(./img/icon_forward_100x100.png);
 }
 .backward-btn {
+    top: 6%;
     left: 24.5%;
     background-image: url(./img/icon_backward_100x100.png);
 }
@@ -314,6 +316,11 @@ input[type="checkbox"], input[type="range"] {
     -webkit-appearance: none;
     -moz-appearance: none;
 }
+.more-settings-cbx::before {
+    background-size: 64%;
+    background-image: url(./img/icon_more_100x100.png);
+    transform: none;
+}
 
 
 
@@ -332,11 +339,20 @@ input[type="checkbox"], input[type="range"] {
     top: 2%;
     height: 6%;
 }
+.back-arrow {
+    position: absolute;
+    top: 28%;
+    left: -1.5%;
+    width: 5.5%;
+    height: 50%;
+    background-size: 1.3em;
+    background-position: center;
+    background-image: url(./img/icon_back_100x100.png);
+}
 .back-btn {
     position: absolute;
     top: 15%;
-    left: 0;
-    font-size: 1.1em;
+    left: 3.5%;
 }
 .settings-header-txt {
     position: absolute;

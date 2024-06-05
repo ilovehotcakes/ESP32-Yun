@@ -22,7 +22,6 @@ def process_html():
                         elif "background-image: url" in line and "https://" not in line:
                             file_path = current_directory + line[27:-3]
                             line = line[:26] + f"'{base_64(file_path)}');"
-                            print(line)
                         assembled_html += line
                 assembled_html += "\t</style>\n"
             elif "index.js" in html_line:
