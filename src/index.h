@@ -259,7 +259,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACkElEQVR4nO3cwY4MURjF8Q8LbGwlPAAvgISt2DC8wWTewJ6lTGLrIXgGmx6egIWxsyexoq0Qf7mZqoVEddedqnvr3M75Jf0AZ85Ud39dt74IMzMzMzMzMzMzMzMzMzMzqwp4BLwFfnSvN8BeNAq4BRx1WT4CB9EK4DnDDqMhwFngCfDrP1kOWrkytnkQDQCuAKsNOY5DXfc2tc1RiAP2gK9bcvwOdcB6RCHfQxRwHngB/BmRg1A3JoRqEOA68H5sBtUc/2g1CLDffYPKEupaCwJcAl7mFqGWY1BLQYCbwKfTlqGSY6MWggBngMfAzyllLJ1jFPUgwGXg9dQils4xmnIQ4B7wea4yXEil2cKFiM0WOUKdUhBOOVu4ELHZIkeoWzoIM8wWOULdUkGYcbbIEeqWCMLMs0WOUFc7CCezxZeyf/byOYqpFYSCs0WOUFcjCIVnixyhrnQQKswWOUJdqSCczBavEBPqSgSh8myRI9TNGYSFZoscoW6uICw4W+QIdXMEAe6MOBMlIdRNDQJcnPsmUkmhbmoQ4C4NCXVTg+BC5Aq54LcsoUIS4LY/1IUKSfy1V6yQxIOhWCE94IZ/OhEqpPbBhRyhrtLP72tEhLoaQYBrwDsEhLpaQfAtXK1CSh6gzhHqlgiCjwFpFZL4oNyApS91fJRUq5DEh63FCun5cQSxQhI/sCNWSOJH2sQK6fmhT7FCEj8WLVZI4sUBYoX0vFpDrJDEy2fECul5PZMgdnSB2Zi7ed9CFDu44i/t591mFeKAh7uyBDNt89zmfjQAuNotTx7yIVqQliVvCPEsGgKcA54OLFLej1akZcndf9e6e61auTJGrBo/bqoMMzMzMzMzMzMzMzMzMzOzaN9f+4MhS8pduO0AAAAASUVORK5CYII=');    background-size: 2.4rem;
 }
 .stop-btn {
-    left: 42.85%%;
+    left: 42.9%%;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABU0lEQVR4nO3cy00DQBCDYVMPD1EhEW3waC2hjUSJfrTScuHGBXnX/joYrWa8J0tVVVVVVVVVVVVVVVVVVVX174An4BP4Ai6s6zJn+AAetRrgDngFbuznBhzGjFrFfIzdHbTQmdpxM34bMz7L3cyMFO9yN8MvxVHuFv9N/dVZ7ggjd4SRO8LIHWHkjjByRxi5I4zcEUbuCCN3hJE7wsgdYeSOMHJHGLkjjNwRRu4II3eEkTvCyB1h5I4wckcYuSOM3BFG7ggjd4SRO8LIHWHkjjByRxi5I4zcEUbuCCN3hJE7wsgdYeSOMHJHGLkjjNwRRu4II3eEkTvCyB1h5I4wckcYuWs9kxngRI6j3M0q1RRvcjd6bYEr+7sC91rB7LXd3YsWK1I+bLop1/EYSxUp/wAeRpXqDPoz6zqPAB+ZscyZqqqqqqqqqqqqqqqqqqqq0l6+AZWPqGgwCJLvAAAAAElFTkSuQmCC');}
 .close-btn {
     left: 70.7%%;
@@ -349,11 +349,6 @@ input[type="checkbox"], input[type="range"] {
     background-size: 1.3em;
     background-position: center;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO3dS0rEQBhF4d6atxz7QnGgS+pU71AQEUWX0MIvcdhkbB2t80Hmlz4kZFKd3U6SJEmSNFSWum693lqvz/S6Hbtmcm1f963XsfWq9cpSH6M3TaudxPi5lnofvWtKbStGr+P5oW5Gb5tOlro7jZGlvlqvh9HbphNjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwGAPEGCDGADEGiDFAjAGSQ11tHbBcD17u9PvaUi/GADEIjI8soPU/RLbOhmepx9HbpmUUIKMAGQXIKEBGAYpvXzwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDHK3/k4cet1OXrbtNpGlCz1PHrX1NrpB+57vY7eNL3W6zK9nta742xfF9P/IJIkSZJ2/903ktnd2iGdTLAAAAAASUVORK5CYII=');}
-.back-btn {
-    position: absolute;
-    top: 15%%;
-    left: 3.5%%;
-}
 .settings-header-txt {
     position: absolute;
     left: 28%%;
@@ -536,6 +531,12 @@ input:checked + .toggle-cbx::before {
 .form-btn:active {
     color: rgb(31, 105, 216);
 }
+.back-btn {
+    position: absolute;
+    top: 11%%;
+    left: 3.9%%;
+    font-size: 1.1em;
+}
 .dialog-title-txt {
     font-size: 1.1em;
     color: rgb(255, 255, 255);
@@ -573,20 +574,7 @@ input[type="number"], input[type="text"] {
 }
 textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
-}
-
-
-
-
-/* 
-.desktop-only-elements {
-    display: none;
-}
-.mobile-only-elements {
-    display: inline-block;
-}
-*/	</style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+}	</style>
 	<script>
 window.addEventListener('load', () => {
     isMobileDevice();
@@ -665,13 +653,13 @@ window.addEventListener('load', () => {
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    // Is mobile device
+    // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
+        document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
         return true;
     }
-    // Is desktop device
-    $('.mobile-only').hide();
-    $('.desktop-only').show();
+    // Desktop device
+    document.getElementById('forward_backward').removeChild(document.getElementById('mobile_elements'));
     return false;
 }
 
@@ -681,15 +669,15 @@ function toggleAdvancedControls() {
 }
 
 function toggleMoreSettings() {
-    document.getElementById('more-settings').classList.toggle('more-settings-hide');
+    document.getElementById('more_settings').classList.toggle('more-settings-hide');
 }
 
 function toggleSettings(setting="") {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    document.getElementById('more-settings').classList.toggle('more-settings-shift');
+    document.getElementById('more_settings').classList.toggle('more-settings-shift');
     document.getElementById(setting).classList.toggle('default-hide');
     setTimeout(document.getElementById('more_settings_dropdown').checked = false, 1000);
-    setTimeout(document.getElementById('more-settings').classList.add('more-settings-hide'), 1000);
+    setTimeout(document.getElementById('more_settings').classList.add('more-settings-hide'), 1000);
 }
 
 function httpRequest(uri, param, value=1) {
@@ -827,11 +815,11 @@ function hideOpeningSettings() {
             <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-dropdown">
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
-                <span class="dropdown-cbx">
+                <span class="dropdown-cbx clickable">
             </label>
             <label class="more-settings-dropdown">
                 <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
-                <span class="more-settings-cbx dropdown-cbx">
+                <span class="more-settings-cbx dropdown-cbx clickable">
             </label>
         </div>
 
@@ -854,12 +842,12 @@ function hideOpeningSettings() {
         </div>
 
         <div id="advanced_controls" class="motor-controls-body default hide">
-            <div class="forward-backward default">
-                <div class="desktop-only">
+            <div id="forward_backward" class="forward-backward default">
+                <div id="desktop_elements">
                     <button class="backward-btn button1" onmousedown="motorHttpRequest('backward')" onmouseup="motorHttpRequest('stop')">Backward</button>
                     <button class="forward-btn button1" onmousedown="motorHttpRequest('forward')" onmouseup="motorHttpRequest('stop')">Forward</button>
                 </div>
-                <div class="mobile-only">
+                <div id="mobile_elements">
                     <button class="backward-btn button1" ontouchstart="motorHttpRequest('backward')" ontouchend="motorHttpRequest('stop')">Backward</button>
                     <button class="forward-btn button1" ontouchstart="motorHttpRequest('forward')" ontouchend="motorHttpRequest('stop')">Forward</button>
                 </div>
@@ -874,7 +862,7 @@ function hideOpeningSettings() {
             </div>
         </div>
     </div>
-    <div id="more-settings" class="two-settings glass container more-settings more-settings-hide">
+    <div id="more_settings" class="two-settings glass container more-settings more-settings-hide">
         <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
             <h3 class="more-setting-txt">Motor Settings</h3>
         </div>

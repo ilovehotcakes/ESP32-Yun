@@ -252,7 +252,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-size: 2.4rem;
 }
 .stop-btn {
-    left: 42.85%;
+    left: 42.9%;
     background-image: url(./img/icon_stop_100x100.png);
 }
 .close-btn {
@@ -348,11 +348,6 @@ input[type="checkbox"], input[type="range"] {
     background-size: 1.3em;
     background-position: center;
     background-image: url(./img/icon_back_100x100.png);
-}
-.back-btn {
-    position: absolute;
-    top: 15%;
-    left: 3.5%;
 }
 .settings-header-txt {
     position: absolute;
@@ -536,6 +531,12 @@ input:checked + .toggle-cbx::before {
 .form-btn:active {
     color: rgb(31, 105, 216);
 }
+.back-btn {
+    position: absolute;
+    top: 11%;
+    left: 3.9%;
+    font-size: 1.1em;
+}
 .dialog-title-txt {
     font-size: 1.1em;
     color: rgb(255, 255, 255);
@@ -574,15 +575,3 @@ input[type="number"], input[type="text"] {
 textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
 }
-
-
-
-
-/* 
-.desktop-only-elements {
-    display: none;
-}
-.mobile-only-elements {
-    display: inline-block;
-}
-*/

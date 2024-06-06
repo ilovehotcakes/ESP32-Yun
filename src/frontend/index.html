@@ -6,7 +6,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./img/touch_icon_180x180.png" />
     <title>ESP32 Yun</title>
     <link rel="stylesheet" type="text/css" href="./index.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./index.js"></script>
 </head>
 <body>
@@ -18,11 +17,11 @@
             <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-dropdown">
                 <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
-                <span class="dropdown-cbx">
+                <span class="dropdown-cbx clickable">
             </label>
             <label class="more-settings-dropdown">
                 <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
-                <span class="more-settings-cbx dropdown-cbx">
+                <span class="more-settings-cbx dropdown-cbx clickable">
             </label>
         </div>
 
@@ -45,12 +44,12 @@
         </div>
 
         <div id="advanced_controls" class="motor-controls-body default hide">
-            <div class="forward-backward default">
-                <div class="desktop-only">
+            <div id="forward_backward" class="forward-backward default">
+                <div id="desktop_elements">
                     <button class="backward-btn button1" onmousedown="motorHttpRequest('backward')" onmouseup="motorHttpRequest('stop')">Backward</button>
                     <button class="forward-btn button1" onmousedown="motorHttpRequest('forward')" onmouseup="motorHttpRequest('stop')">Forward</button>
                 </div>
-                <div class="mobile-only">
+                <div id="mobile_elements">
                     <button class="backward-btn button1" ontouchstart="motorHttpRequest('backward')" ontouchend="motorHttpRequest('stop')">Backward</button>
                     <button class="forward-btn button1" ontouchstart="motorHttpRequest('forward')" ontouchend="motorHttpRequest('stop')">Forward</button>
                 </div>
@@ -65,7 +64,7 @@
             </div>
         </div>
     </div>
-    <div id="more-settings" class="two-settings glass container more-settings more-settings-hide">
+    <div id="more_settings" class="two-settings glass container more-settings more-settings-hide">
         <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
             <h3 class="more-setting-txt">Motor Settings</h3>
         </div>

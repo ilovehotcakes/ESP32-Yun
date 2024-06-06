@@ -75,13 +75,13 @@ window.addEventListener('load', () => {
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    // Is mobile device
+    // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
+        document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
         return true;
     }
-    // Is desktop device
-    $('.mobile-only').hide();
-    $('.desktop-only').show();
+    // Desktop device
+    document.getElementById('forward_backward').removeChild(document.getElementById('mobile_elements'));
     return false;
 }
 
@@ -91,15 +91,15 @@ function toggleAdvancedControls() {
 }
 
 function toggleMoreSettings() {
-    document.getElementById('more-settings').classList.toggle('more-settings-hide');
+    document.getElementById('more_settings').classList.toggle('more-settings-hide');
 }
 
 function toggleSettings(setting="") {
     document.getElementById('motor_controls').classList.toggle('motor-controls-hide');
-    document.getElementById('more-settings').classList.toggle('more-settings-shift');
+    document.getElementById('more_settings').classList.toggle('more-settings-shift');
     document.getElementById(setting).classList.toggle('default-hide');
     setTimeout(document.getElementById('more_settings_dropdown').checked = false, 1000);
-    setTimeout(document.getElementById('more-settings').classList.add('more-settings-hide'), 1000);
+    setTimeout(document.getElementById('more_settings').classList.add('more-settings-hide'), 1000);
 }
 
 function httpRequest(uri, param, value=1) {
