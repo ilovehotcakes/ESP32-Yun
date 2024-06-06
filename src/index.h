@@ -17,13 +17,83 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* height: 625px; */
+    width: 100vw;
     height: 100vh;
-    background-image: url(https://wallpapers.com/images/featured/iphone-wltnz5o1xymafqmo.jpg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 400px 1200px;
+    margin: 0;
+    background-color: rgb(50, 50, 50);
     overflow: hidden;
+}
+@property --hue1 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 217;
+}
+@property --hue2 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 42;
+}
+@property --hue3 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 306;
+}
+@property --hue4 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 243;
+}
+@property --hue5 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 155;
+}
+@property --hue6 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 247;
+}
+@property --hue7 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 357;
+}
+@property --hue8 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 352;
+}
+@keyframes a {
+    from {
+        --hue1: 217;
+        --hue2: 42;
+        --hue3: 306;
+        --hue4: 243;
+        --hue5: 155;
+        --hue6: 247;
+        --hue7: 357;
+        --hue8: 352;
+    }
+    50%% {
+        --hue1: 37;
+        --hue2: 222;
+        --hue3: 126;
+        --hue4: 63;
+        --hue5: 335;
+        --hue6: 67;
+        --hue7: 177;
+        --hue8: 172;
+    }
+    to {
+        --hue1: 217;
+        --hue2: 42;
+        --hue3: 306;
+        --hue4: 243;
+        --hue5: 155;
+        --hue6: 247;
+        --hue7: 357;
+        --hue8: 352;
+    }
 }
 h2 {
     margin: 0;
@@ -35,20 +105,43 @@ h3 {
 }
 h4 {
     margin: 0;
-    /* font-size: 1.1em;
-    font-weight: 500; */
-    color: rgba(210, 210, 210, 0.85);
+    color: rgb(245,245,245);
 }
 h5 {
     margin: 0;
     font-size: 0.7em;
     font-weight: 500;
 }
+
+
+
+.background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%%;
+    height: 100%%;
+    min-width: 600px;
+    min-height: 700px;
+    background-color: hsl(63, 100%%, 80%%);
+    background-image:
+        radial-gradient(at 35%% 25%%, hsl(var(--hue1), 65%%, 70%%) 0px, transparent 50%%),
+        radial-gradient(at  4%% 92%%, hsl(var(--hue2), 89%%, 66%%) 0px, transparent 50%%),
+        radial-gradient(at 91%% 13%%, hsl(var(--hue3), 99%%, 76%%) 0px, transparent 50%%),
+        radial-gradient(at 67%% 39%%, hsl(var(--hue4), 73%%, 64%%) 0px, transparent 50%%),
+        radial-gradient(at 38%% 70%%, hsl(var(--hue5), 96%%, 62%%) 0px, transparent 50%%),
+        radial-gradient(at 88%% 82%%, hsl(var(--hue6), 70%%, 71%%) 0px, transparent 50%%),
+        radial-gradient(at  7%% 18%%, hsl(var(--hue7), 80%%, 72%%) 0px, transparent 50%%),
+        radial-gradient(at 15%% 51%%, hsl(var(--hue8), 81%%, 74%%) 0px, transparent 50%%);
+    background-position: center;
+    animation: a 30s linear infinite;
+}
 .canvas {
     position: absolute;
     width: 375px;
     height: 625px;
-    border: 1px solid black;
+    /* border: 1px solid black; */
+    border: none;
     border-radius: 1em;
     overflow: hidden;
 }
@@ -60,7 +153,7 @@ h5 {
     padding: 0;
     width: 100%%;
     height: 100%%;
-    border: inherit;
+    border: none;
     transition: 0.2s ease;
 }
 .default-hide {
@@ -76,9 +169,10 @@ h5 {
     border-radius: 1em;
     border: none;
     transition: 0.2s ease;
+    overflow: hidden;
 }
 .glass {
-    background: linear-gradient(135deg, rgba(145, 145, 145, 0.4), rgba(95, 95, 95, 0.7));
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.5), rgba(100, 100, 100, 0.6));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     /* border: 1px solid rgba(255, 255, 255, 0.3); */
@@ -89,7 +183,7 @@ h5 {
 
 .motor-controls-hide {
     left: -110%%;
-    transition: 0.2s ease-in-out;
+    transition: 0.15s ease-in-out;
 }
 .motor-controls-header {
     top: 7%%;
@@ -98,7 +192,7 @@ h5 {
 .motor-controls-body {
     top: 36.7%%;
     height: 63%%;
-    transition: height 0.17s ease-in-out, opacity 75ms ease-in-out;
+    transition: height 0.12s ease-in-out, opacity 75ms ease-in-out;
 }
 .name-txt {
     position: absolute;
@@ -109,7 +203,7 @@ h5 {
     position: absolute;
     top: 50%%;
     left: 9%%;
-    color: rgb(187, 187, 187);
+    color: rgb(200, 200, 200);
 }
 .percent-slider {
     top: 0;
@@ -203,7 +297,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     top: 40%%;
     width: 1px;
     height: 7px;
-    background-color: rgba(148, 148, 148, 0.75);
+    background-color: rgba(195, 195, 195, 0.6);
     transition: 50ms ease;
 }
 input[type="range"]:hover ~ .tick {
@@ -213,7 +307,7 @@ input[type="range"]:hover ~ .tick {
     position: absolute;
     top: 50%%;
     font-size: 0.8em;
-    color: rgba(172, 172, 172, 0.75);
+    color: rgba(195, 195, 195, 0.6);
     transition: 0.25s ease;
 }
 .zero-mkr {
@@ -242,7 +336,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(0, 0, 0, 0);
-    border: inherit;
+    border: none;
     border-radius: 3em;
     cursor: pointer;
     outline: none;
@@ -259,7 +353,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACkElEQVR4nO3cwY4MURjF8Q8LbGwlPAAvgISt2DC8wWTewJ6lTGLrIXgGmx6egIWxsyexoq0Qf7mZqoVEddedqnvr3M75Jf0AZ85Ud39dt74IMzMzMzMzMzMzMzMzMzMzqwp4BLwFfnSvN8BeNAq4BRx1WT4CB9EK4DnDDqMhwFngCfDrP1kOWrkytnkQDQCuAKsNOY5DXfc2tc1RiAP2gK9bcvwOdcB6RCHfQxRwHngB/BmRg1A3JoRqEOA68H5sBtUc/2g1CLDffYPKEupaCwJcAl7mFqGWY1BLQYCbwKfTlqGSY6MWggBngMfAzyllLJ1jFPUgwGXg9dQils4xmnIQ4B7wea4yXEil2cKFiM0WOUKdUhBOOVu4ELHZIkeoWzoIM8wWOULdUkGYcbbIEeqWCMLMs0WOUFc7CCezxZeyf/byOYqpFYSCs0WOUFcjCIVnixyhrnQQKswWOUJdqSCczBavEBPqSgSh8myRI9TNGYSFZoscoW6uICw4W+QIdXMEAe6MOBMlIdRNDQJcnPsmUkmhbmoQ4C4NCXVTg+BC5Aq54LcsoUIS4LY/1IUKSfy1V6yQxIOhWCE94IZ/OhEqpPbBhRyhrtLP72tEhLoaQYBrwDsEhLpaQfAtXK1CSh6gzhHqlgiCjwFpFZL4oNyApS91fJRUq5DEh63FCun5cQSxQhI/sCNWSOJH2sQK6fmhT7FCEj8WLVZI4sUBYoX0vFpDrJDEy2fECul5PZMgdnSB2Zi7ed9CFDu44i/t591mFeKAh7uyBDNt89zmfjQAuNotTx7yIVqQliVvCPEsGgKcA54OLFLej1akZcndf9e6e61auTJGrBo/bqoMMzMzMzMzMzMzMzMzMzOzaN9f+4MhS8pduO0AAAAASUVORK5CYII=');    background-size: 2.4rem;
 }
 .stop-btn {
-    left: 42.9%%;
+    left: 43%%;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABU0lEQVR4nO3cy00DQBCDYVMPD1EhEW3waC2hjUSJfrTScuHGBXnX/joYrWa8J0tVVVVVVVVVVVVVVVVVVVX174An4BP4Ai6s6zJn+AAetRrgDngFbuznBhzGjFrFfIzdHbTQmdpxM34bMz7L3cyMFO9yN8MvxVHuFv9N/dVZ7ggjd4SRO8LIHWHkjjByRxi5I4zcEUbuCCN3hJE7wsgdYeSOMHJHGLkjjNwRRu4II3eEkTvCyB1h5I4wckcYuSOM3BFG7ggjd4SRO8LIHWHkjjByRxi5I4zcEUbuCCN3hJE7wsgdYeSOMHJHGLkjjNwRRu4II3eEkTvCyB1h5I4wckcYuWs9kxngRI6j3M0q1RRvcjd6bYEr+7sC91rB7LXd3YsWK1I+bLop1/EYSxUp/wAeRpXqDPoz6zqPAB+ZscyZqqqqqqqqqqqqqqqqqqqq0l6+AZWPqGgwCJLvAAAAAElFTkSuQmCC');}
 .close-btn {
     left: 70.7%%;
@@ -283,14 +377,14 @@ input[type="range"]:hover ~ .hundred-mkr {
 .more-settings-dropdown {
     position: absolute;
     top: 6%%;
-    left: 87%%;
+    left: 86.2%%;
     width: 8%%;
     height: 52.1%%;
 }
 .advanced-controls-dropdown {
     position: absolute;
     top: 6%%;
-    left: 74%%;
+    left: 73.4%%;
     width: 8%%;
     height: 52.1%%;
 }
@@ -325,16 +419,6 @@ input[type="checkbox"], input[type="range"] {
 
 
 
-.hide {
-    opacity: 0;
-    height: 0;
-}
-.clickable {
-    cursor: pointer;
-}
-
-
-
 /* For settings page */
 .settings-header {
     top: 2%%;
@@ -342,7 +426,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .back-arrow {
     position: absolute;
-    top: 28%%;
+    top: 27%%;
     left: -1.5%%;
     width: 5.5%%;
     height: 50%%;
@@ -413,7 +497,7 @@ input[type="checkbox"], input[type="range"] {
     width: 15%%;
     font-size: 1.1em;
     text-align: right;
-    color: rgb(185, 185, 185);
+    color: rgb(200, 200, 200);
 }
 .setting-value-txt2 {
     position: absolute;
@@ -422,7 +506,7 @@ input[type="checkbox"], input[type="range"] {
     width: 63%%;
     font-size: 1.1em;
     text-align: right;
-    color: rgb(185, 185, 185);
+    color: rgb(200, 200, 200);
 }
 .setting-opening-txt {
     left: 69%%;
@@ -478,15 +562,16 @@ input:checked + .toggle-cbx::before {
     top: 23.5%%;
     left: 54%%;
     width: 38%%;
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.4), rgba(65, 65, 65, 0.7));
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.6), rgba(65, 65, 65, 0.7));
     overflow: hidden;
+    transition: 0.12s ease-in-out;
 }
 .more-settings-hide {
     top: 38%%;
     left: 90%%;
     height: 0;
     width: 0;
-    transition: 0.18s ease-in-out;
+    transition: 0.12s ease-in-out;
 }
 .more-settings-shift {
     left: -60%%;
@@ -533,7 +618,7 @@ input:checked + .toggle-cbx::before {
 }
 .back-btn {
     position: absolute;
-    top: 11%%;
+    top: 10%%;
     left: 3.9%%;
     font-size: 1.1em;
 }
@@ -574,6 +659,21 @@ input[type="number"], input[type="text"] {
 }
 textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
     outline: none;
+}
+
+
+
+.hide {
+    opacity: 0;
+    height: 0;
+}
+.clickable {
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+.clickable:active {
+    background-color: rgba(100, 100, 100, 0.6);
+    transition: 0.1s ease;
 }	</style>
 	<script>
 window.addEventListener('load', () => {
@@ -807,6 +907,7 @@ function hideOpeningSettings() {
 }	</script>
 </head>
 <body>
+<div class="background">
 <div class="canvas">
     <!-- Motor controls to move the motor -->
     <div id="motor_controls" class="glass container">
@@ -978,7 +1079,7 @@ function hideOpeningSettings() {
         <div class="settings-header container">
             <div class="back-arrow clickable" onclick="toggleSettings('system_settings')"></div>
             <button class="back-btn form-btn clickable" onclick="toggleSettings('system_settings')">Back</button>
-            <h2 class="settings-header-txt" style="left:26%%;">System Settings</h2>
+            <h2 class="settings-header-txt">System Settings</h2>
         </div>
 
         <div class="one-setting glass container" style="top:10%%;">
@@ -988,7 +1089,7 @@ function hideOpeningSettings() {
             </div>
         </div>
 
-        <h4 style="position:absolute;left:8.5%%;top:20%%;font-size:1em;font-weight:400;color:lightgrey;">WiFi</h4>
+        <h4 style="position:absolute;left:8.5%%;top:20%%;font-size:1em;font-weight:400;">WiFi</h4>
         <div class="three-settings glass container" style="top:24.3%%;">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Setup Mode</h3>
@@ -1010,7 +1111,7 @@ function hideOpeningSettings() {
                 <h3 id="password" class="setting-value-txt2">123456</h3>
             </div>
         </div>
-        <div id="wifi_hint" class="dialog-hint" style="top:46%%;">
+        <div class="dialog-hint" style="top:46%%;color:rgb(245,245,245);">
             <h5>Restart the system to apply new WiFi settings. Setup Mode toggles between connecting to an existing LAN network and using ESP32 as a WiFi network.</h5>
         </div>
 
@@ -1025,7 +1126,7 @@ function hideOpeningSettings() {
                 <h3 id="reset" class="setting-name-txt" style="left:42.5%%;">Reset</h3>
             </div>
         </div>
-        <div id="reset_hint" class="dialog-hint" style="top:77.8%%;">
+        <div id="reset_hint" class="dialog-hint" style="top:77.8%%;color:rgb(245,245,245);">
             <h5>Resets the system to factory settings.</h5>
         </div>
     </div>
@@ -1061,6 +1162,7 @@ function hideOpeningSettings() {
             <h5 id="dialog_hint_text" style="color:lightgrey;">Lorem ipsum.</h5>
         </div>
     </form>
+</div>
 </div>
 </body>
 </html>)rawliteral";

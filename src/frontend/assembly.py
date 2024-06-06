@@ -17,8 +17,7 @@ def process_html():
                 with open(file_path, 'r') as css_file:
                     for line in css_file:
                         if "%" in line:
-                            i = line.index("%")
-                            line = line[:i] + "%" + line[i:]
+                            line = line.replace("%", "%%")
                         elif "background-image: url" in line and "https://" not in line:
                             file_path = current_directory + line[27:-3]
                             line = line[:26] + f"'{base_64(file_path)}');"
@@ -37,7 +36,7 @@ def process_html():
                 assembled_html += href_tag
             else:
                 if "%;" in html_line:
-                    html_line = html_line.replace("%;", "%%;")
+                    html_line = html_line.replace("%", "%%")
                 assembled_html += html_line
 
     assembled_html += ")rawliteral\";"
