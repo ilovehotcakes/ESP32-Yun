@@ -354,6 +354,9 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
         // sensitive and requires less torque to stall. The double of this value is compared to
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
         driver_.SGTHRS(stallguard_th_);
+
+        // Enable StallGuard or else it will stall the motor when starting the driver
+        attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
     vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for settings to be updated
 }
@@ -367,6 +370,7 @@ void MotorTask::driverStartup() {
 
     // Pull standby pin low to disable driver standby
     digitalWrite(STBY_PIN, LOW);
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
     // sets mstep_reg_select=1: use UART to change microstepping settings.
@@ -404,17 +408,16 @@ void MotorTask::driverStartup() {
         // If SG is sampled equal to or above this threshold enough times, CoolStep decreases the
         // current to both coils.
         driver_.semax(0);
-
-        // Enable StallGuard or else it will stall the motor when starting the driver
-        attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
     vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
 
-    // TODO: check via UART driver register read/write ok?
-    driver_stdby_ = false;
-
-    LOGI("Driver has started");
+    if (driver_.blank_time() == 24) {
+        driver_stdby_ = false;
+        LOGI("Driver has started");
+    } else {
+        driver_stdby_ = true;
+    }
 }
 
 
