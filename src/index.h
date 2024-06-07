@@ -283,7 +283,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]:hover {
     top: 10%%;
-    left: 5%%;
+    left: 4.5%%;
     width: 90%%;
     height: 44%%;
 }
@@ -309,19 +309,19 @@ input[type="range"]:hover ~ .tick {
     transition: 0.25s ease;
 }
 .zero-mkr {
-    left: 7.85%%;
+    left: 7.5%%;
 }
 input[type="range"]:hover ~ .zero-mkr {
     top: 60%%;
-    left: 5.5%%;
+    left: 4.5%%;
     color: white;
 }
 .hundred-mkr {
-    left: 87.5%%;
+    left: 86.75%%;
 }
 input[type="range"]:hover ~ .hundred-mkr {
     top: 60%%;
-    left: 89%%;
+    left: 88%%;
     color: white;
 }
 .button1 {
@@ -518,7 +518,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle {
     position: absolute;
-    top: 15%%;
+    top: 16%%;
     left: 80.5%%;
     margin-top: -1px;
     width: 14.8%%;
@@ -932,11 +932,11 @@ function hideOpeningSettings() {
         <div id="motor_controls_body" class="motor-controls-body default">
             <div class="percent-slider default">
                 <input type="range" id="percent_slider" class="glass" onchange="motorMove(this)" value="%SLIDER%" min="0" max="100" step="1">
-                <span class="tick" style="left:8.75%%;"></span>
+                <span class="tick" style="left:8.5%%;"></span>
                 <span class="tick" style="left:30%%;"></span>
                 <span class="tick" style="left:50.5%%;"></span>
                 <span class="tick" style="left:72%%;"></span>
-                <span class="tick" style="left:92.5%%;"></span>
+                <span class="tick" style="left:92.25%%;"></span>
                 <span class="marker zero-mkr">0</span>
                 <span class="marker hundred-mkr">100</span>
             </div>
