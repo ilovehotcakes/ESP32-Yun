@@ -1,4 +1,8 @@
-window.addEventListener('load', () => {
+window.addEventListener('load', function() {
+    connect();
+});
+
+function connect() {
     isMobileDevice();
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
@@ -11,6 +15,7 @@ window.addEventListener('load', () => {
         websocket.onclose = (event) => {
             console.log(`Connection with ${window.location.hostname} closed`);
             console.log(event);
+            setTimeout(connect(), 1000);
         };
 
         websocket.onerror = (error) => {
@@ -71,17 +76,23 @@ window.addEventListener('load', () => {
     if (!document.getElementById('sync_settings').checked) {
         showOpeningSettings();
     }
-});
+}
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    var desktop_elements = document.getElementById('desktop_elements');
+    var mobile_elements = document.getElementById('mobile_elements');
     // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
-        document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
+        if (mobile_elements != null) {
+            document.getElementById('forward_backward').removeChild(mobile_elements);
+        }
         return true;
     }
     // Desktop device
-    document.getElementById('forward_backward').removeChild(document.getElementById('mobile_elements'));
+    if (desktop_elements != null) {
+        document.getElementById('forward_backward').removeChild(desktop_elements);
+    }
     return false;
 }
 

@@ -97,6 +97,7 @@ body {
 }
 h2 {
     margin: 0;
+    font-size: 1.4em;
 }
 h3 {
     margin: 0;
@@ -423,7 +424,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .back-arrow {
     position: absolute;
-    top: 27%%;
+    top: 24%%;
     left: -1.5%%;
     width: 5.5%%;
     height: 50%%;
@@ -432,7 +433,7 @@ input[type="checkbox"], input[type="range"] {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO3dS0rEQBhF4d6atxz7QnGgS+pU71AQEUWX0MIvcdhkbB2t80Hmlz4kZFKd3U6SJEmSNFSWum693lqvz/S6Hbtmcm1f963XsfWq9cpSH6M3TaudxPi5lnofvWtKbStGr+P5oW5Gb5tOlro7jZGlvlqvh9HbphNjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwGAPEGCDGADEGiDFAjAGSQ11tHbBcD17u9PvaUi/GADEIjI8soPU/RLbOhmepx9HbpmUUIKMAGQXIKEBGAYpvXzwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDHK3/k4cet1OXrbtNpGlCz1PHrX1NrpB+57vY7eNL3W6zK9nta742xfF9P/IJIkSZJ2/903ktnd2iGdTLAAAAAASUVORK5CYII=');}
 .settings-header-txt {
     position: absolute;
-    top: 6%%;
+    top: 7%%;
     left: 26%%;
     font-weight: 500;
 }
@@ -616,9 +617,8 @@ input:checked + .toggle-cbx::before {
 }
 .back-btn {
     position: absolute;
-    top: 10%%;
-    left: 3.9%%;
-    font-size: 1.1em;
+    top: 11%%;
+    left: 3.5%%;
     cursor: pointer;
 }
 .dialog-title-txt {
@@ -646,7 +646,7 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"], input[type="text"] {
     position: absolute;
-    top: 12.5%%;
+    top: 14%%;
     left: 38.5%%;
     width: 55%%;
     height: 70%%;
@@ -681,7 +681,11 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }	</style>
 	<script>
-window.addEventListener('load', () => {
+window.addEventListener('load', function() {
+    connect();
+});
+
+function connect() {
     isMobileDevice();
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
@@ -694,6 +698,7 @@ window.addEventListener('load', () => {
         websocket.onclose = (event) => {
             console.log(`Connection with ${window.location.hostname} closed`);
             console.log(event);
+            setTimeout(connect(), 1000);
         };
 
         websocket.onerror = (error) => {
@@ -754,17 +759,23 @@ window.addEventListener('load', () => {
     if (!document.getElementById('sync_settings').checked) {
         showOpeningSettings();
     }
-});
+}
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    var desktop_elements = document.getElementById('desktop_elements');
+    var mobile_elements = document.getElementById('mobile_elements');
     // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
-        document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
+        if (mobile_elements != null) {
+            document.getElementById('forward_backward').removeChild(mobile_elements);
+        }
         return true;
     }
     // Desktop device
-    document.getElementById('forward_backward').removeChild(document.getElementById('mobile_elements'));
+    if (desktop_elements != null) {
+        document.getElementById('forward_backward').removeChild(desktop_elements);
+    }
     return false;
 }
 
