@@ -7,7 +7,7 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
     <title>ESP32 Yun</title>
 	<style>
 html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: verdana, serif;
     color: white;
     user-select: none;
     -webkit-user-select: none;
@@ -175,8 +175,6 @@ h5 {
     background: linear-gradient(135deg, rgba(145, 145, 145, 0.5), rgba(100, 100, 100, 0.6));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    /* border: 1px solid rgba(255, 255, 255, 0.3); */
-    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); */
 }
 
 
@@ -196,17 +194,17 @@ h5 {
 }
 .name-txt {
     position: absolute;
-    top: 3%%;
-    left: 8.7%%;
+    top: 10%%;
+    left: 8%%;
 }
 .serial-txt {
     position: absolute;
-    top: 50%%;
-    left: 9%%;
+    top: 53%%;
+    left: 8%%;
     color: rgb(200, 200, 200);
 }
 .percent-slider {
-    top: 0;
+    top: 1%%;
     padding-top: 5%%;
     height: 47.6%%;
 }
@@ -242,8 +240,8 @@ h5 {
     top: 1px;
     width: 35%%;
     height: 100%%;
-    font-size: medium;
-    font-weight: 600;
+    font-size: 1.1em;
+    font-weight: normal;
     color: white;
     background-color: rgba(0, 0, 0, 0);
     border: none;
@@ -367,11 +365,10 @@ input[type="range"]:hover ~ .hundred-mkr {
     top: 6%%;
     left: 24.5%%;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACaklEQVR4nO3cPW6UMRSFYUMDNLQpWABsAJBIC+lgByB2QA8sgJY9ENaQiiWEIqGjB4kSKv5eNGKKUVDQZ7j387F9nhUcz5GS6xnbpZiZmZmZmZmZmZmZmZmZmdkQgFvAG+AL8A54XIQAt5XzhQEuAE+Ar/yp+aLV84UC9oAjznfqfOuVcR/4xN99b1WIer4wwCXgJfCTBZwvt4wbwNslRbQoRD1fKODRdkKp4nzxRVwFDmuLWKsQ9XwZe4v3/7rY7AWr51trdq8yY7619xZVZssXCjgAPkQtdmOmfM32FjVmyNd8dq8xej6JvUWNkfPJzO41/iPfa1YQ/+k2mN1rjJZPcnavMUo+6dm9xgj5SsLs/rHFYjd6zxcmc3av0Wu+6DJSZ/caPeaLLiN9dq/RW77IIlab3Wv0ki+6jFVn9xo95Iss4iLwDPiGrufK+SLLaDa7jySqjP0FZ45sgYgyrkT/SDOzElDI3daLGIkLGbCQy/6TJVTItpQ7/qcuVMi2FI+9SoXsbAyfKm+8EM8XWshOMTeVv5pAPF/3BxdqnMn3ilkKOfP19mdElM7yZZVyHThGQOkwX1Yp0j+R8jvfC+CHYr40GQeUayzId085Xwr1YzaI50uhfhAN8Xxp1I9qsvKepSjo5LD1oWq+NOrH/Vlhz1LUqF+IIXnPUhSpXxlDPF8a9UuViOdLoX7tGPF8ZcaL+Yjnm/bpCsTzTfm4C+L50uDnmfQg/kCYer4U+Ik/TcAD5Ucmp3kEcxdwbfs48XlOSkPq+UqDPcFD59N4yvt0M5UVIer5zMzMzMzMzMzMzMzMzMzMSqd+AUQFoXyF3p61AAAAAElFTkSuQmCC');}
-.more-setting-txt {
+.more-settings-txt {
     position: absolute;
     top: 25%%;
-    left: 10.5%%;
-    font-weight: 400;
+    left: 9.5%%;
     font-size: 1em;
 }
 .more-settings-dropdown {
@@ -435,7 +432,8 @@ input[type="checkbox"], input[type="range"] {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO3dS0rEQBhF4d6atxz7QnGgS+pU71AQEUWX0MIvcdhkbB2t80Hmlz4kZFKd3U6SJEmSNFSWum693lqvz/S6Hbtmcm1f963XsfWq9cpSH6M3TaudxPi5lnofvWtKbStGr+P5oW5Gb5tOlro7jZGlvlqvh9HbphNjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwxBgcMQZHjMERY3DEGBwxBkeMwRFjcMQYHDEGR4zBEWNwGAPEGCDGADEGiDFAjAGSQ11tHbBcD17u9PvaUi/GADEIjI8soPU/RLbOhmepx9HbpmUUIKMAGQXIKEBGAYpvXzwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDEKT4zCE6PwxCg8MQpPjMITo/DEKDwxCk+MwhOj8MQoPDHK3/k4cet1OXrbtNpGlCz1PHrX1NrpB+57vY7eNL3W6zK9nta742xfF9P/IJIkSZJ2/903ktnd2iGdTLAAAAAASUVORK5CYII=');}
 .settings-header-txt {
     position: absolute;
-    left: 28%%;
+    top: 6%%;
+    left: 26%%;
     font-weight: 500;
 }
 .four-settings {
@@ -486,13 +484,13 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-name-txt {
     position: absolute;
-    top: 19%%;
+    top: 25%%;
     left: 5%%;
     font-size: 1.1em;
 }
 .setting-value-txt {
     position: absolute;
-    top: 19%%;
+    top: 25%%;
     left: 79.9%%;
     width: 15%%;
     font-size: 1.1em;
@@ -540,7 +538,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle-cbx::before {
     position: absolute;
-    top: 5%%;
+    top: 4.5%%;
     left: 4%%;
     content: '';
     width: 54.5%%;
@@ -560,9 +558,9 @@ input:checked + .toggle-cbx::before {
 }
 .more-settings {
     top: 23.5%%;
-    left: 54%%;
-    width: 38%%;
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.6), rgba(65, 65, 65, 0.7));
+    left: 47%%;
+    width: 44%%;
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.7), rgba(65, 65, 65, 0.8));
     overflow: hidden;
     transition: 0.12s ease-in-out;
 }
@@ -621,6 +619,7 @@ input:checked + .toggle-cbx::before {
     top: 10%%;
     left: 3.9%%;
     font-size: 1.1em;
+    cursor: pointer;
 }
 .dialog-title-txt {
     font-size: 1.1em;
@@ -674,6 +673,12 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
 .clickable:active {
     background-color: rgba(100, 100, 100, 0.6);
     transition: 0.1s ease;
+}
+.shadow {
+    box-shadow: 0 7px 20px 0 rgba(0, 0, 0, 0.15);
+}
+.border {
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }	</style>
 	<script>
 window.addEventListener('load', () => {
@@ -910,7 +915,7 @@ function hideOpeningSettings() {
 <div class="background">
 <div class="canvas">
     <!-- Motor controls to move the motor -->
-    <div id="motor_controls" class="glass container">
+    <div id="motor_controls" class="glass container shadow">
         <div class="motor-controls-header default">
             <h3 id="system_name" class="name-txt">%NAME%</h3>
             <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
@@ -965,11 +970,11 @@ function hideOpeningSettings() {
     </div>
     <div id="more_settings" class="two-settings glass container more-settings more-settings-hide">
         <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
-            <h3 class="more-setting-txt">Motor Settings</h3>
+            <h3 class="more-settings-txt">Motor Settings</h3>
         </div>
         <div class="one-half-pos horizontal-separator"></div>
         <div class="one-half-pos one-half-height default clickable" onclick="toggleSettings('system_settings')">
-            <h3 class="more-setting-txt" style="top:23%%;">System Settings</h3>
+            <h3 class="more-settings-txt" style="top:23%%;">System Settings</h3>
         </div>
     </div>
 
@@ -978,12 +983,12 @@ function hideOpeningSettings() {
     <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <div class="back-arrow clickable" onclick="toggleSettings('motor_settings')"></div>
-            <button class="back-btn form-btn clickable" onclick="toggleSettings('motor_settings')">Back</button>
+            <div class="back-arrow" onclick="toggleSettings('motor_settings')"></div>
+            <button class="back-btn form-btn" onclick="toggleSettings('motor_settings')">Back</button>
             <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
-        <div class="four-settings glass container">
+        <div class="four-settings shadow glass container">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
                 <label class="toggle">
@@ -1015,7 +1020,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div class="three-settings glass container">
+        <div class="three-settings shadow glass container">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
                 <label class="toggle">
@@ -1038,7 +1043,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div class="two-settings glass container">
+        <div class="two-settings shadow glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode (exclusively)</h3>
                 <label class="toggle">
@@ -1055,7 +1060,7 @@ function hideOpeningSettings() {
         </div>
 
 
-        <div class="two-settings glass container" style="top:81.5%%;">
+        <div class="two-settings glass shadow container" style="top:81.5%%;">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
                 <label class="toggle">
@@ -1077,20 +1082,21 @@ function hideOpeningSettings() {
     <!-- To display and change system and wifi settings -->
     <div id="system_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <div class="back-arrow clickable" onclick="toggleSettings('system_settings')"></div>
-            <button class="back-btn form-btn clickable" onclick="toggleSettings('system_settings')">Back</button>
+            <div class="back-arrow" onclick="toggleSettings('system_settings')"></div>
+            <button class="back-btn form-btn" onclick="toggleSettings('system_settings')">Back</button>
             <h2 class="settings-header-txt">System Settings</h2>
         </div>
 
-        <div class="one-setting glass container" style="top:10%%;">
+
+        <div class="one-setting glass shadow container" style="top:10%%;">
             <div class="whole-height default clickable" onclick="openPopupDialog('system', 'name for ESP32 Yun', 'Name', [['Name', 'name']], 'Name can\'t be longer than 30 characters.')">
                 <h3 class="setting-name-txt">Name</h3>
                 <h3 id="name" class="setting-value-txt2">Living Room Window</h3>
             </div>
         </div>
 
-        <h4 style="position:absolute;left:8.5%%;top:20%%;font-size:1em;font-weight:400;">WiFi</h4>
-        <div class="three-settings glass container" style="top:24.3%%;">
+        <h4 style="position:absolute;left:8.5%%;top:20.5%%;font-size:1em;font-weight:400;">Wi-Fi</h4>
+        <div class="three-settings glass shadow container" style="top:24.3%%;">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Setup Mode</h3>
                 <label class="toggle">
@@ -1115,15 +1121,17 @@ function hideOpeningSettings() {
             <h5>Restart the system to apply new WiFi settings. Setup Mode toggles between connecting to an existing LAN network and using ESP32 as a WiFi network.</h5>
         </div>
 
-        <div class="one-setting glass container" style="top:58%%;">
+
+        <div class="one-setting glass shadow container" style="top:58%%;">
             <div class="whole-height default clickable" onclick="httpRequest('system', 'restart')">
                 <h3 id="restart" class="setting-name-txt" style="left:41%%;">Restart</h3>
             </div>
         </div>
 
-        <div class="one-setting glass container" style="top:70%%;">
+
+        <div class="one-setting glass shadow container" style="top:70%%;">
             <div class="whole-height default clickable" onclick="httpRequest('system', 'reset')">
-                <h3 id="reset" class="setting-name-txt" style="left:42.5%%;">Reset</h3>
+                <h3 id="reset" class="setting-name-txt" style="left:43%%;">Reset</h3>
             </div>
         </div>
         <div id="reset_hint" class="dialog-hint" style="top:77.8%%;color:rgb(245,245,245);">

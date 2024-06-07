@@ -67,11 +67,11 @@
     </div>
     <div id="more_settings" class="two-settings glass container more-settings more-settings-hide">
         <div class="one-half-height default clickable" onclick="toggleSettings('motor_settings')">
-            <h3 class="more-setting-txt">Motor Settings</h3>
+            <h3 class="more-settings-txt">Motor Settings</h3>
         </div>
         <div class="one-half-pos horizontal-separator"></div>
         <div class="one-half-pos one-half-height default clickable" onclick="toggleSettings('system_settings')">
-            <h3 class="more-setting-txt" style="top:23%;">System Settings</h3>
+            <h3 class="more-settings-txt" style="top:23%;">System Settings</h3>
         </div>
     </div>
 
@@ -80,8 +80,8 @@
     <!-- To display and change motor settings -->
     <div id="motor_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <div class="back-arrow clickable" onclick="toggleSettings('motor_settings')"></div>
-            <button class="back-btn form-btn clickable" onclick="toggleSettings('motor_settings')">Back</button>
+            <div class="back-arrow" onclick="toggleSettings('motor_settings')"></div>
+            <button class="back-btn form-btn" onclick="toggleSettings('motor_settings')">Back</button>
             <h2 class="settings-header-txt">Motor Settings</h2>
         </div>
 
@@ -179,8 +179,8 @@
     <!-- To display and change system and wifi settings -->
     <div id="system_settings" class="default default-hide" style="border:none;">
         <div class="settings-header container">
-            <div class="back-arrow clickable" onclick="toggleSettings('system_settings')"></div>
-            <button class="back-btn form-btn clickable" onclick="toggleSettings('system_settings')">Back</button>
+            <div class="back-arrow" onclick="toggleSettings('system_settings')"></div>
+            <button class="back-btn form-btn" onclick="toggleSettings('system_settings')">Back</button>
             <h2 class="settings-header-txt">System Settings</h2>
         </div>
 
@@ -192,7 +192,7 @@
             </div>
         </div>
 
-        <h4 style="position:absolute;left:8.5%;top:20%;font-size:1em;font-weight:400;">WiFi</h4>
+        <h4 style="position:absolute;left:8.5%;top:20.5%;font-size:1em;font-weight:400;">Wi-Fi</h4>
         <div class="three-settings glass shadow container" style="top:24.3%;">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Setup Mode</h3>
@@ -228,7 +228,7 @@
 
         <div class="one-setting glass shadow container" style="top:70%;">
             <div class="whole-height default clickable" onclick="httpRequest('system', 'reset')">
-                <h3 id="reset" class="setting-name-txt" style="left:42.5%;">Reset</h3>
+                <h3 id="reset" class="setting-name-txt" style="left:43%;">Reset</h3>
             </div>
         </div>
         <div id="reset_hint" class="dialog-hint" style="top:77.8%;color:rgb(245,245,245);">

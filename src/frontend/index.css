@@ -1,5 +1,5 @@
 html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: verdana, serif;
     color: white;
     user-select: none;
     -webkit-user-select: none;
@@ -186,17 +186,17 @@ h5 {
 }
 .name-txt {
     position: absolute;
-    top: 3%;
-    left: 8.7%;
+    top: 10%;
+    left: 8%;
 }
 .serial-txt {
     position: absolute;
-    top: 50%;
-    left: 9%;
+    top: 53%;
+    left: 8%;
     color: rgb(200, 200, 200);
 }
 .percent-slider {
-    top: 0;
+    top: 1%;
     padding-top: 5%;
     height: 47.6%;
 }
@@ -232,8 +232,8 @@ h5 {
     top: 1px;
     width: 35%;
     height: 100%;
-    font-size: medium;
-    font-weight: 600;
+    font-size: 1.1em;
+    font-weight: normal;
     color: white;
     background-color: rgba(0, 0, 0, 0);
     border: none;
@@ -362,11 +362,10 @@ input[type="range"]:hover ~ .hundred-mkr {
     left: 24.5%;
     background-image: url(./img/icon_backward_100x100.png);
 }
-.more-setting-txt {
+.more-settings-txt {
     position: absolute;
     top: 25%;
-    left: 10.5%;
-    font-weight: 400;
+    left: 9.5%;
     font-size: 1em;
 }
 .more-settings-dropdown {
@@ -433,7 +432,8 @@ input[type="checkbox"], input[type="range"] {
 }
 .settings-header-txt {
     position: absolute;
-    left: 28%;
+    top: 6%;
+    left: 26%;
     font-weight: 500;
 }
 .four-settings {
@@ -484,13 +484,13 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-name-txt {
     position: absolute;
-    top: 19%;
+    top: 25%;
     left: 5%;
     font-size: 1.1em;
 }
 .setting-value-txt {
     position: absolute;
-    top: 19%;
+    top: 25%;
     left: 79.9%;
     width: 15%;
     font-size: 1.1em;
@@ -538,7 +538,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .toggle-cbx::before {
     position: absolute;
-    top: 5%;
+    top: 4.5%;
     left: 4%;
     content: '';
     width: 54.5%;
@@ -558,9 +558,9 @@ input:checked + .toggle-cbx::before {
 }
 .more-settings {
     top: 23.5%;
-    left: 54%;
-    width: 38%;
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.6), rgba(65, 65, 65, 0.7));
+    left: 47%;
+    width: 44%;
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.7), rgba(65, 65, 65, 0.8));
     overflow: hidden;
     transition: 0.12s ease-in-out;
 }
@@ -619,6 +619,7 @@ input:checked + .toggle-cbx::before {
     top: 10%;
     left: 3.9%;
     font-size: 1.1em;
+    cursor: pointer;
 }
 .dialog-title-txt {
     font-size: 1.1em;
