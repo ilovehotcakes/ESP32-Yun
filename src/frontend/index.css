@@ -423,7 +423,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .back-arrow {
     position: absolute;
-    top: 27%;
+    top: 24%;
     left: -1.5%;
     width: 5.5%;
     height: 50%;
@@ -617,9 +617,8 @@ input:checked + .toggle-cbx::before {
 }
 .back-btn {
     position: absolute;
-    top: 10%;
-    left: 3.9%;
-    font-size: 1.1em;
+    top: 11%;
+    left: 3.5%;
     cursor: pointer;
 }
 .dialog-title-txt {
