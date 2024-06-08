@@ -1,9 +1,9 @@
 window.addEventListener('load', function() {
     connect();
+    isMobileDevice();
 });
 
 function connect() {
-    isMobileDevice();
     try {
         const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
 
@@ -80,19 +80,13 @@ function connect() {
 
 function isMobileDevice() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    var desktop_elements = document.getElementById('desktop_elements');
-    var mobile_elements = document.getElementById('mobile_elements');
     // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
-        if (mobile_elements != null) {
-            document.getElementById('forward_backward').removeChild(mobile_elements);
-        }
+        document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
         return true;
     }
     // Desktop device
-    if (desktop_elements != null) {
-        document.getElementById('forward_backward').removeChild(desktop_elements);
-    }
+    document.getElementById('forward_backward').removeChild(document.getElementById('mobile_elements'));
     return false;
 }
 
