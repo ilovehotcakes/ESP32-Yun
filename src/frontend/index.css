@@ -15,6 +15,24 @@ body {
     background-color: rgb(50, 50, 50);
     overflow: hidden;
 }
+h2 {
+    margin: 0;
+    font-size: 1.4em;
+}
+h3 {
+    margin: 0;
+    font-size: 1.25em;
+    font-weight: 500;
+}
+h4 {
+    margin: 0;
+    color: rgb(245,245,245);
+}
+h5 {
+    margin: 0;
+    font-size: 0.7em;
+    font-weight: 500;
+}
 @property --hue1 {
     syntax: '<integer>';
     inherits: false;
@@ -86,24 +104,6 @@ body {
         --hue7: 357;
         --hue8: 352;
     }
-}
-h2 {
-    margin: 0;
-    font-size: 1.4em;
-}
-h3 {
-    margin: 0;
-    font-size: 1.2em;
-    font-weight: 500;
-}
-h4 {
-    margin: 0;
-    color: rgb(245,245,245);
-}
-h5 {
-    margin: 0;
-    font-size: 0.7em;
-    font-weight: 500;
 }
 
 
@@ -187,13 +187,13 @@ h5 {
 }
 .name-txt {
     position: absolute;
-    top: 10%;
-    left: 8%;
+    top: 9%;
+    left: 7%;
 }
 .serial-txt {
     position: absolute;
-    top: 53%;
-    left: 8%;
+    top: 54%;
+    left: 7%;
     color: rgb(200, 200, 200);
 }
 .percent-slider {
@@ -345,7 +345,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-size: 2.4rem;
 }
 .stop-btn {
-    left: 43%;
+    left: 43.5%;
     background-image: url(./img/icon_stop_100x100.png);
 }
 .close-btn {
@@ -379,7 +379,7 @@ input[type="range"]:hover ~ .hundred-mkr {
 .advanced-controls-dropdown {
     position: absolute;
     top: 6%;
-    left: 73.4%;
+    left: 73.5%;
     width: 8%;
     height: 52.1%;
 }
@@ -397,7 +397,7 @@ input[type="range"]:hover ~ .hundred-mkr {
     background-repeat: no-repeat;
     background-position: center;
     transform: rotate(180deg);
-    transition: 0.2s;
+    transition: 0.1s linear;
 }
 input:checked + .dropdown-cbx::before {
     background-color: rgba(122, 122, 122, 0.582);
@@ -409,7 +409,7 @@ input[type="checkbox"], input[type="range"] {
     -moz-appearance: none;
 }
 .more-settings-cbx::before {
-    background-size: 64%;
+    background-size: 80%;
     background-image: url(./img/icon_more_100x100.png);
     transform: none;
 }
@@ -421,20 +421,27 @@ input[type="checkbox"], input[type="range"] {
     top: 2%;
     height: 6%;
 }
-.back-arrow {
+.back-btn {
     position: absolute;
-    top: 24%;
-    left: -1.5%;
-    width: 5.5%;
-    height: 50%;
+    top: 15%;
+    left: 0;
+    height: 72%;
+    width: 8%;
+    padding: 0;
+    content: '';
+    border-radius: 3em;
     background-size: 1.3em;
-    background-position: center;
     background-image: url(./img/icon_back_100x100.png);
+    background-color: rgba(172, 172, 172, 0.548);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    transition: 0.2s;
 }
 .settings-header-txt {
     position: absolute;
     top: 7%;
-    left: 26%;
+    left: 27%;
     font-weight: 500;
 }
 .four-settings {
@@ -614,12 +621,6 @@ input:checked + .toggle-cbx::before {
 }
 .form-btn:active {
     color: rgb(31, 105, 216);
-}
-.back-btn {
-    position: absolute;
-    top: 11%;
-    left: 3.5%;
-    cursor: pointer;
 }
 .dialog-title-txt {
     font-size: 1.1em;
