@@ -96,24 +96,24 @@ inline void SystemTask::checkButtonPress() {
     } else if (digitalRead(BUTTON_PIN) == HIGH && button_pressed_) {
         button_pressed_ = false;
         button_press_duration_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
-        if (button_press_duration_ > SETUP_MODE_TIMER && button_press_duration_ < FACTORY_RESET_TIMER) {
+        if (button_press_duration_ > FACTORY_RESET_TIMER) {
+            LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
+            systemReset();
+        } else if (button_press_duration_ > SETUP_MODE_TIMER) {
             LOGI("Triggered wireless setup, button pressed for %dms", button_press_duration_);
             bool toggle_setup_mode = !static_cast<bool>(wireless_task_->getSettings()["setup_mode_"]);
             sendTo(wireless_task_, Message(WIRELESS_SETUP, toggle_setup_mode), portMAX_DELAY);
             vTaskDelay(100 / portTICK_PERIOD_MS);
             systemRestart();
-        } else if (button_press_duration_ > FACTORY_RESET_TIMER) {
-            LOGI("Triggered factory reset, button pressed for %dms", button_press_duration_);
-            systemReset();
         } else {
             LOGI("No action, button pressed for %dms", button_press_duration_);
         }
     } else if (digitalRead(BUTTON_PIN) == LOW && button_pressed_) {
         int button_press_elapsed_ = (esp_timer_get_time() - button_press_start_) / 1000;  // us to ms
-        if (button_press_elapsed_ > SETUP_MODE_TIMER && button_press_elapsed_ < FACTORY_RESET_TIMER) {
-            digitalWrite(LED_PIN, HIGH);
-        } else if (button_press_elapsed_ > FACTORY_RESET_TIMER) {
+        if (button_press_elapsed_ > FACTORY_RESET_TIMER) {
             digitalWrite(LED_PIN, LOW);
+        } else if (button_press_elapsed_ > SETUP_MODE_TIMER) {
+            digitalWrite(LED_PIN, HIGH);
         }
     }
 }
