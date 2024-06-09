@@ -2,14 +2,14 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" type="image/x-icon" href="./img/favicon_60x60.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./img/touch_icon_180x180.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="./img/favicon_60x60.png"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/touch_icon_180x180.png"/>
     <title>ESP32 Yun</title>
     <link rel="stylesheet" type="text/css" href="./index.css">
     <script src="./index.js"></script>
 </head>
 <body>
-<div class="background">
+<div id="background" class="background">
 <div class="canvas">
     <!-- Motor controls to move the motor -->
     <div id="motor_controls" class="glass container shadow">
@@ -17,7 +17,7 @@
             <h3 id="system_name" class="name-txt">%NAME%</h3>
             <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
             <label class="advanced-controls-dropdown">
-                <input type="checkbox" onclick="toggleAdvancedControls()" unchecked>
+                <input id="advanced_controls_dropdown" type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx clickable">
             </label>
             <label class="more-settings-dropdown">

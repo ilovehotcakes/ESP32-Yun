@@ -31,8 +31,8 @@ def process_html():
                         assembled_html += line
                 assembled_html += "\t</script>\n"
             elif ".png" in html_line:
-                file_path = current_directory + html_line[html_line.index("href=")+7:-5]
-                href_tag = html_line[:html_line.index("href=")+6] + base_64(file_path) + "\" />\n"
+                file_path = current_directory + html_line[html_line.index("href=")+7:-4]
+                href_tag = html_line[:html_line.index("href=")+6] + base_64(file_path) + "\"/>\n"
                 assembled_html += href_tag
             else:
                 if "%;" in html_line:

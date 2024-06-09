@@ -1,6 +1,9 @@
-window.addEventListener('load', function() {
+var advanced_controls = null;
+
+window.addEventListener('load', () => {
     connect();
     isMobileDevice();
+    advanced_controls = document.getElementById('motor_controls').removeChild(document.getElementById('advanced_controls'));
 });
 
 function connect() {
@@ -9,18 +12,18 @@ function connect() {
 
         websocket.onopen = (event) => {
             console.log(`Connection established with ${window.location.hostname}`);
-            console.log(event);
+            // console.log(event);
         };
 
         websocket.onclose = (event) => {
             console.log(`Connection with ${window.location.hostname} closed`);
-            console.log(event);
+            // console.log(event);
             setTimeout(connect(), 1000);
         };
 
         websocket.onerror = (error) => {
             console.log('Websocket error');
-            console.log(error);
+            // console.log(error);
         };
 
         websocket.onmessage = (event) => {
@@ -70,7 +73,7 @@ function connect() {
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
-        console.log(error);
+        // console.log(error);
     }
 
     if (!document.getElementById('sync_settings').checked) {
@@ -83,6 +86,7 @@ function isMobileDevice() {
     // Mobile device
     if (/android/i.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent)) {
         document.getElementById('forward_backward').removeChild(document.getElementById('desktop_elements'));
+        document.getElementById('background').setAttribute('style', 'height:90%;');
         return true;
     }
     // Desktop device
@@ -91,8 +95,14 @@ function isMobileDevice() {
 }
 
 function toggleAdvancedControls() {
+    if (document.getElementById('advanced_controls_dropdown').checked) {
+        document.getElementById('motor_controls').appendChild(advanced_controls);
+        setTimeout(() => {advanced_controls.classList.remove('hide');}, 1);
+    } else {
+        advanced_controls.classList.add('hide');
+        document.getElementById('motor_controls').removeChild(advanced_controls);
+    }
     document.getElementById('motor_controls_body').classList.toggle('hide');
-    document.getElementById('advanced_controls').classList.toggle('hide');
 }
 
 function toggleMoreSettings() {
