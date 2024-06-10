@@ -9,9 +9,11 @@ const char index_html[] = R"rawliteral(<!DOCTYPE html>
 html {
     font-family: verdana, serif;
     color: white;
-    user-select: none;
     -webkit-user-select: none;
+    -khtml-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body {
     width: 100vw;
@@ -409,9 +411,9 @@ input:checked + .dropdown-cbx::before {
     transform: rotate(0deg);
 }
 input[type="checkbox"], input[type="range"] {
-    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
 }
 .more-settings-cbx::before {
     background-size: 100%%;
@@ -686,12 +688,19 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
 .border {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
+.no-focus {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+.no-focus:focus {
+outline: none !important;
+}
 
 
 
 @media (max-width: 500px) {
     input[type="number"], input[type="text"] {
-        top: 5%%;
+        top: 6%%;
     }
 }	</style>
 	<script>
@@ -948,11 +957,11 @@ function hideOpeningSettings() {
         <div class="motor-controls-header default">
             <h3 id="system_name" class="name-txt">%NAME%</h3>
             <h3 id="serial" class="serial-txt">%AP_SSID%</h3>
-            <label class="advanced-controls-dropdown">
+            <label class="advanced-controls-dropdown no-focus">
                 <input id="advanced_controls_dropdown" type="checkbox" onclick="toggleAdvancedControls()" unchecked>
                 <span class="dropdown-cbx clickable">
             </label>
-            <label class="more-settings-dropdown">
+            <label class="more-settings-dropdown no-focus">
                 <input id="more_settings_dropdown" type="checkbox" onclick="toggleMoreSettings()" unchecked>
                 <span class="more-settings-cbx dropdown-cbx clickable">
             </label>
@@ -1019,7 +1028,7 @@ function hideOpeningSettings() {
         <div class="four-settings shadow glass container">
             <div class="one-forth-height default">
                 <h3 class="setting-name-txt">Sync Settings</h3>
-                <label class="toggle">
+                <label class="toggle no-focus">
                     <input type="checkbox" id="sync_settings" onclick="syncSettings()">
                     <span class="toggle-cbx">
                 </label>
@@ -1051,7 +1060,7 @@ function hideOpeningSettings() {
         <div class="three-settings shadow glass container">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Direction</h3>
-                <label class="toggle">
+                <label class="toggle no-focus">
                     <input type="checkbox" id="direction" onclick="checkboxHttpRequest('motor', 'direction')">
                     <span class="toggle-cbx">
                 </label>
@@ -1074,7 +1083,7 @@ function hideOpeningSettings() {
         <div class="two-settings shadow glass container">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Fastmode (exclusively)</h3>
-                <label class="toggle">
+                <label class="toggle no-focus">
                     <input type="checkbox" id="fastmode" onclick="checkboxHttpRequest('motor', 'fastmode')">
                     <span class="toggle-cbx">
                 </label>
@@ -1091,7 +1100,7 @@ function hideOpeningSettings() {
         <div class="two-settings glass shadow container" style="top:81.5%%;">
             <div class="one-half-height default">
                 <h3 class="setting-name-txt">Stallguard</h3>
-                <label class="toggle">
+                <label class="toggle no-focus">
                     <input type="checkbox" id="stallguard" onclick="checkboxHttpRequest('motor', 'stallguard')">
                     <span class="toggle-cbx">
                 </label>
@@ -1126,7 +1135,7 @@ function hideOpeningSettings() {
         <div class="three-settings glass shadow container" style="top:24.3%%;">
             <div class="one-third-height default">
                 <h3 class="setting-name-txt">Setup Mode</h3>
-                <label class="toggle">
+                <label class="toggle no-focus">
                     <input type="checkbox" id="setup" onclick="checkboxHttpRequest('wireless', 'setup')">
                     <span class="toggle-cbx">
                 </label>
