@@ -96,7 +96,7 @@ void WirelessTask::connectWifi() {
     if (!MDNS.begin(ap_ssid_.c_str())) {
         LOGE("Failed to set mDNS responder");
     }
-    MDNS.addService("_osc", "_tcp", 80);
+    MDNS.addService("_ald", "_tcp", 80);
 
     websocket.onEvent(std::bind(&WirelessTask::wsEventHandler, this, std::placeholders::_1,
                       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
