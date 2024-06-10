@@ -17,7 +17,7 @@ body {
     width: 100vw;
     height: 100vh;
     margin: 0;
-    background-color: rgb(50, 50, 50);
+    background-color: rgb(60, 60, 60);
     overflow: hidden;
 }
 h2 {
@@ -616,7 +616,7 @@ input:checked + .toggle-cbx::before {
     width: 91%%;
 }
 .form-btn {
-    padding-top: 1.8%%;
+    padding: 1.2%% 0 0 0;
     font-size: 1em;
     color: rgb(67, 142, 255);
     background-color: rgba(255, 255, 255, 0);
@@ -651,12 +651,13 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"], input[type="text"] {
     position: absolute;
-    top: 17%%;
-    left: 38.5%%;
-    width: 55%%;
+    top: 12%%;
+    left: 41%%;
+    width: 52%%;
     height: 70%%;
     padding-left: 1px;
     border: none;
+    font-family: verdana, serif;
     font-size: 1.1em;
     color: white;
     background-color: rgba(0, 0, 0, 0);
@@ -684,6 +685,14 @@ textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
 }
 .border {
     border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+
+
+@media (max-width: 500px) {
+    input[type="number"], input[type="text"] {
+        top: 5%%;
+    }
 }	</style>
 	<script>
 var advanced_controls = null;
@@ -1017,21 +1026,21 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-forth-pos horizontal-separator"></div>
-            <div class="one-forth-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for Current (mA)', 'Current', [['Opening', 'opening_current'], ['Closing', 'closing_current']], 'Higher torque requires more current. However, each stepper motor has a current limit. Please check the motor\'s datasheet for the current limit.', 1)">
+            <div class="one-forth-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Current (mA)&quot;', 'Current', [['Opening', 'opening_current'], ['Closing', 'closing_current']], 'Higher torque requires more current. However, each stepper motor has a current limit. Please check the motor\'s datasheet for the current limit.', 1)">
                 <h3 class="setting-name-txt">Current (mA)</h3>
                 <h3 id="opening_current" class="setting-opening-txt setting-value-txt">75</h3>
                 <h3 id="closing_current" class="setting-value-txt">200</h3>
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-            <div class="one-half-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for Velocity (Hz)', 'Velocity', [['Opening', 'opening_velocity'], ['Closing', 'closing_velocity']], '', 0.1)">
+            <div class="one-half-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Velocity (Hz)&quot;', 'Velocity', [['Opening', 'opening_velocity'], ['Closing', 'closing_velocity']], 'Velocity in Hertz and Hertz is defined as revolutions per second.', 0.1)">
                 <h3 class="setting-name-txt">Velocity (Hz)</h3>
                 <h3 id="opening_velocity" class="setting-opening-txt setting-value-txt">3.0</h3>
                 <h3 id="closing_velocity" class="setting-value-txt">3.0</h3>
             </div>
 
             <div class="three-forths-pos horizontal-separator"></div>
-            <div class="three-forths-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for Acceleration (Hz/s)', 'Acceleration', [['Opening', 'opening_acceleration'], ['Closing', 'closing_acceleration']], '', 0.1)">
+            <div class="three-forths-pos one-forth-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Acceleration (Hz/s)&quot;', 'Acceleration', [['Opening', 'opening_acceleration'], ['Closing', 'closing_acceleration']], 'Acceleration in revolution/second^2.', 0.1)">
                 <h3 class="setting-name-txt">Acceleration (Hz/s)</h3>
                 <h3 id="opening_acceleration" class="setting-opening-txt setting-value-txt">0.5</h3>
                 <h3 id="closing_acceleration" class="setting-value-txt">0.5</h3>
@@ -1049,13 +1058,13 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-third-pos horizontal-separator"></div>
-            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('motor', 'value for Full Steps (per turn)', 'Full Steps', [['Steps', 'full_steps']], 'Please check the motor\'s datasheet for the number of steps per full turn.', 1)">
+            <div class="one-third-pos one-third-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Full Steps (per turn)&quot;', 'Full Steps', [['Steps', 'full_steps']], 'Please check the motor\'s datasheet for the number of steps per full turn.', 1)">
                 <h3 class="setting-name-txt">Full Steps (per turn)</h3>
                 <h3 id="full_steps" class="setting-value-txt">200</h3>
             </div>
 
             <div class="two-thirds-pos horizontal-separator"></div>
-            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('motor', 'value for Microsteps (per step)', 'Microsteps', [['Steps', 'microsteps']], 'Microstepping creates subdivisions within a full step, resulting in a smoother transition between each full step. Valid values are 0, 2, 4, 8, 16, 32, 64, 128, 256.', 1)">
+            <div class="two-thirds-pos one-third-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Microsteps (per step)&quot;', 'Microsteps', [['Steps', 'microsteps']], 'Microstepping creates subdivisions within a full step, resulting in a smoother transition between each full step. Valid values are 0, 2, 4, 8, 16, 32, 64, 128, 256.', 1)">
                 <h3 class="setting-name-txt">Microsteps (per step)</h3>
                 <h3 id="microsteps" class="setting-value-txt">16</h3>
             </div>
@@ -1072,7 +1081,7 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-            <div class="one-half-pos one-half-height default clickable" onclick="openPopupDialog('motor', 'value for Fastmode Threshold', 'Threshold', [['Threshold', 'fastmode_threshold']], 'Fastmode or SpreadCycle is a voltage chopper based method of controlling the motor. The advantage is it can run faster, however, it is more audible. Fastmode is always enabled and the threshold determines when to automatically switch it on. Higher values switches sooner.', 1)">
+            <div class="one-half-pos one-half-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Fastmode Threshold&quot;', 'Threshold', [['Threshold', 'fastmode_threshold']], 'Fastmode or SpreadCycle is a voltage chopper based method of controlling the motor. The advantage is it can run faster, however, it is more audible. Fastmode is always enabled and the threshold determines when to automatically switch it on. Higher values switches sooner.', 1)">
                 <h3 class="setting-name-txt">Threshold</h3>
                 <h3 id="fastmode_threshold" class="setting-value-txt">33</h3>
             </div>
@@ -1089,7 +1098,7 @@ function hideOpeningSettings() {
             </div>
 
             <div class="one-half-pos horizontal-separator"></div>
-            <div class="one-half-pos one-half-height default clickable" onclick="openPopupDialog('motor', 'value for Stallguard Threshold', 'Threshold', [['Threshold', 'stallguard_threshold']], 'The threshold of stalling the motor in the situation of over-torquing. Lower value requires more torque to trip.', 1)">
+            <div class="one-half-pos one-half-height default clickable" onclick="openPopupDialog('motor', 'value for &quot;Stallguard Threshold&quot;', 'Threshold', [['Threshold', 'stallguard_threshold']], 'The threshold of stalling the motor in the situation of over-torquing. Lower value requires more torque to trip.', 1)">
                 <h3 class="setting-name-txt">Threshold</h3>
                 <h3 id="stallguard_threshold" class="setting-value-txt">10</h3>
             </div>
