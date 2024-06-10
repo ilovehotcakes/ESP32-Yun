@@ -39,7 +39,7 @@ void MotorTask::run() {
     // int start = 0;
     while (1) {
         // start = micros();
-        encod_pos_ = encoder_.getCumulativePosition();
+        encod_pos_ = encoder_.getCumulativePosition() - encod_offset_;
         motor_->setCurrentPosition(positionToStep(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
@@ -290,6 +290,7 @@ bool MotorTask::zeroEncoder() {
         return false;
     }
     encoder_.resetCumulativePosition(0);
+    encod_offset_ = encoder_.getCumulativePosition();
     LOGI("Encoder zeroed");
     return true;
 }

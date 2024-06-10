@@ -77,6 +77,7 @@ private:
 
     // Keeping track of the overall position via encoder's position and then  convert it into
     // motor's position and percentage.
+    int32_t encod_offset_      = 0;
     int32_t encod_pos_         = 0;
     int32_t encod_max_pos_     = static_cast<int32_t>(DEFAULT_ENCODER_POSITIONS) * 10;
     int   total_steps_         = full_steps_ * microsteps_;
