@@ -245,6 +245,7 @@ h5 {
     color: white;
     background-color: rgba(0, 0, 0, 0);
     border: none;
+    cursor: pointer;
     transition: 0.1s ease;
 }
 .button2:active {
@@ -272,6 +273,7 @@ input[type="range"] {
     border-radius: 0.75em;
     outline: none;
     overflow: hidden;
+    cursor: pointer;
     transition: 0.25s ease;
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -360,10 +362,12 @@ input[type="range"]:hover ~ .hundred-mkr {
 .forward-btn {
     top: 6%%;
     left: 61%%;
+    background-size: 2.9em;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsSAAALEgHS3X78AAADn0lEQVR4nO2c63HaUBBGjzP5bzpIOrA7sDuwU0HoIKQDuwNcQUgHpoJABbErCHQAFSg/1srIGbh6cKX7XbFnhhk/hPwxR7uSlosviqLA0eFD6gDOe1yIGC5EDBcihgsRw4WI4ULEcCFiuBAxXIgYLkQMFyKGCxHDhYjhQsRwIWK4EDFciBguRAwXIoYLEcOFiOFCxPjYYJsJMAXuKz97AebAJn6kaOSZuyiK0OO6KIpNcZyHmueneoRy74Rzc1EcX7k4wY6oTzVOt9iRuIp2lJzGBKuAy5rt1HID4XPIjHoZvG3zC3gGPkfIdCoz6mXA+9yTXhO1ICTkPvC7Q9xhFTXrHicK05bb32EVlTo3QLBlnbIK+xV7gasT9tGVXHMD/V32XmHtYIFQO2hAmXtOotx9VUiVPXbULSLtr45ccwPD3BheAj+wNnA9wN+LRZLcQ96p3wC/SdgOOlLmfmCA3EO0rENssXbw3MO+c80NpBNSssYuUzcR95lrbiD9cPEG+IO1g5y4we65HmLvOHWFVIk1ysg1N5C+QqqojWCaEnUEoySkRGUE05YoIxillnWILqOMXHMDmhVS5exGMOpCSr4iNJFtwTcs97TpE9Rb1iHWmJiXI7/PNTeQT4VUGfUIJscKqbLH2kF1lJFD7qMjmNyFlKyxdzh35JsbGI8QsEvNa/LNDeR5DjnGFfldhYHlnpbfjEkItF/goMK0/GJMLSt3LmB8FZI9YxPymjpAR/7lHpuQReoAHZmXX4zpHOKXvUKsgdvUITqw5L/cuQvZA1+wF7ULbyrFFsv97i4d8hbyhL3V29uSnJ54xFrUwdxNPkGlRqMxtiCNcuckJMla2wi0yp1Ly/qJtadF2hitKdvqoukT1Csk+ec1OjK6RQ574Dt28luljdKKk3MrVsgSO7o2iXO0ZYlNbU+6/FYSIvmp2AaMcinpI3byW6WN0Yo9PeROXSG9LevvmdF9HKEcHdySl4zec6cQ8kRgdCBMcOQRiyFb1qhHHrEYQshZjDxi0XfLOpuRRyz6qpCzG3nEIlQhXRYMKIw8th2eo5AbCAtpezWxxF7QvG7Dnlm03H6JtafUuYHwIgf/B2YJCFXIDnvPN9QCFEceO+zG7VjuXkYesQhVSEme/0wy09xNhDgDojLtdd5wIWK4EDFciBguRAwXIoYLEcOFiOFCxHAhYrgQMVyIGC5EDBcihgsRw4WI4ULEcCFiuBAxXIgYLkSMv/kfQ+95ujJ1AAAAAElFTkSuQmCC');}
 .backward-btn {
     top: 6%%;
     left: 24.5%%;
+    background-size: 2.9em;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsSAAALEgHS3X78AAADqklEQVR4nO2c3VXbQBBGr3PyjjtAHcQdZDsIqSBOBXE6MB04HSgdOBXgVBCoIKYDqEB52ONEMRbW32q+hbnn8IIBf+JqR6vRrmdVVeHo8MY6gPM/LkQMFyKGCxHDhYjhQsRwIWK4EDFciBguRAwXIoYLEcOFiOFCxHAhYrgQMVyIGC5EDBcihgsRw4WI4ULEcCFivLUOcIYCWAGL2ve2QAk8GORpS0Hf3FVVqX6tq6p6qE6zr6pqIZCxKXcTZ3PPKr2Vi4F4Jl2e+blH4pmoMlIC7XLfE0fOydxK15A5cVjfcP6gAC6IZcGagm65L3kmt4qQFbAHPnT8veXoSbqxAm7pnvuq6QXrkhWADfBuwN+YjROlE4FEua1GyJx4QDcMO6ipmROvE8lyW0x7l0QZFwbvPYQlE+SeUsiCeEDvJ3zPMZg09xQlaw6sgV/kJeNQVifNnXqEXBEPqs10UAmz3KmEFMSLX04jAgRypyhZa+LcPDcZa+A3xrnHHCGBdq0DNQJCuccYIV1bHioUCOYeKqRvy8Oavi2P5PQtWYHhrQMLAuK5u44Qb3kkpouQJbE8fUmSJB2HsvrJOEcr2pQsb3lMyHMjxFseBjSNkJxbHiX5dZL/cizkcPGTmw6e4XAvlN2IOOb4ieEt4rOQE8zIN/cT6teQJfkdFMRZVI65T1IfITmeZQB35Jn75AipC5FboPXCkVrk4DRQF/LTLMUw7qwDjEldSGkVYiCldYAx8WmvHa2uIYE8S1cgz9xPOBbyQDy4j8RV2rlQz/1oG2UYTbOsLbFbej1hljHYEh/NfjPO0Zs2i63V29hNi62zzN3mPuSWWA4+k1c5yDJ3lxvDkjzLQUnM/d02Rjv67g8J6CwW6LI/JCCeu2/rZEes0V/JqByQQe4xdlBZP9Tqu4OqII4WqdxjbmkL2CzJHLqlLSCUe8xu74541l0jWg4a2PEvtzmpNn0WTLesf8xNnwXGuVM9D9mTZwtmj3Hu1A+ocm7BLDC455pyn3qqVkbqfeqT5p7yEW6WrQwmzm3xTL3EWzCN+Edr9CPwwj5a48COYa0MqxncjmG5GxdmWAs5sCGWgx8df68cPUk3NkQxXXNvm16wLlmnCPgHmEmx43wL5p74D1CRAe1aMPfELRONuRVHSJ2CV/YhmOpCXh2KJetV40LEcCFiuBAxXIgYLkQMFyKGCxHDhYjhQsRwIWK4EDFciBguRAwXIoYLEcOFiOFCxHAhYrgQMVyIGH8AVMEPV55kbqAAAAAASUVORK5CYII=');}
 .more-settings-txt {
     position: absolute;
@@ -491,13 +495,13 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-name-txt {
     position: absolute;
-    top: 25%%;
+    top: 24%%;
     left: 5%%;
     font-size: 1.1em;
 }
 .setting-value-txt {
     position: absolute;
-    top: 25%%;
+    top: 24%%;
     left: 79.9%%;
     width: 15%%;
     font-size: 1.1em;
@@ -506,7 +510,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-value-txt2 {
     position: absolute;
-    top: 19%%;
+    top: 24%%;
     left: 31.9%%;
     width: 63%%;
     font-size: 1.1em;
@@ -567,7 +571,7 @@ input:checked + .toggle-cbx::before {
     top: 23.5%%;
     left: 47%%;
     width: 44%%;
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.7), rgba(65, 65, 65, 0.8));
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.8), rgba(65, 65, 65, 0.9));
     overflow: hidden;
     transition: 0.12s ease-in-out;
 }
@@ -616,6 +620,7 @@ input:checked + .toggle-cbx::before {
     font-size: 1em;
     color: rgb(67, 142, 255);
     background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
     border: none;
 }
 .form-btn:active {
@@ -646,7 +651,7 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"], input[type="text"] {
     position: absolute;
-    top: 14%%;
+    top: 17%%;
     left: 38.5%%;
     width: 55%%;
     height: 70%%;
@@ -756,7 +761,7 @@ function connect() {
         };
     } catch (error) {
         console.log('Failed to connect to websocket');
-        console.log(error);
+        // console.log(error);
     }
 
     if (!document.getElementById('sync_settings').checked) {

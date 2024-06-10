@@ -237,6 +237,7 @@ h5 {
     color: white;
     background-color: rgba(0, 0, 0, 0);
     border: none;
+    cursor: pointer;
     transition: 0.1s ease;
 }
 .button2:active {
@@ -264,6 +265,7 @@ input[type="range"] {
     border-radius: 0.75em;
     outline: none;
     overflow: hidden;
+    cursor: pointer;
     transition: 0.25s ease;
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -355,11 +357,13 @@ input[type="range"]:hover ~ .hundred-mkr {
 .forward-btn {
     top: 6%;
     left: 61%;
+    background-size: 2.9em;
     background-image: url(./img/icon_forward_100x100.png);
 }
 .backward-btn {
     top: 6%;
     left: 24.5%;
+    background-size: 2.9em;
     background-image: url(./img/icon_backward_100x100.png);
 }
 .more-settings-txt {
@@ -491,13 +495,13 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-name-txt {
     position: absolute;
-    top: 25%;
+    top: 24%;
     left: 5%;
     font-size: 1.1em;
 }
 .setting-value-txt {
     position: absolute;
-    top: 25%;
+    top: 24%;
     left: 79.9%;
     width: 15%;
     font-size: 1.1em;
@@ -506,7 +510,7 @@ input[type="checkbox"], input[type="range"] {
 }
 .setting-value-txt2 {
     position: absolute;
-    top: 19%;
+    top: 24%;
     left: 31.9%;
     width: 63%;
     font-size: 1.1em;
@@ -567,7 +571,7 @@ input:checked + .toggle-cbx::before {
     top: 23.5%;
     left: 47%;
     width: 44%;
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.7), rgba(65, 65, 65, 0.8));
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.8), rgba(65, 65, 65, 0.9));
     overflow: hidden;
     transition: 0.12s ease-in-out;
 }
@@ -616,6 +620,7 @@ input:checked + .toggle-cbx::before {
     font-size: 1em;
     color: rgb(67, 142, 255);
     background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
     border: none;
 }
 .form-btn:active {
@@ -646,7 +651,7 @@ input:checked + .toggle-cbx::before {
 }
 input[type="number"], input[type="text"] {
     position: absolute;
-    top: 14%;
+    top: 17%;
     left: 38.5%;
     width: 55%;
     height: 70%;
