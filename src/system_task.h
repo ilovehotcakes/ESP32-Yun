@@ -1,4 +1,5 @@
 #pragma once
+#include <WiFi.h>
 #include "task.h"
 
 #define SYSTEM_WAKE_DURATION 5000   // ms
@@ -19,11 +20,12 @@ protected:
     void run();
 
 private:
-    String serial_ = "";
+    String system_name_ = "Hello World";
+    String serial_      = "";
     // String manufacturer_ = "";
     // String model_ = "";
-    // String firmware_ = "0.1.1";
-    int system_wake_time_  = SYSTEM_WAKE_DURATION;          // ms
+    String firmware_ = GIT_REV;
+    int system_wake_time_  = SYSTEM_WAKE_DURATION;         // ms
     int system_sleep_time_ = SYSTEM_SLEEP_DURTION * 1000;  // us
 
     bool button_pressed_        = false;
@@ -37,5 +39,6 @@ private:
     void loadSettings();
     inline void checkButtonPress();
     void systemSleep(TimerHandle_t timer);
+    void systemRestart();
     void systemReset();
 };

@@ -41,21 +41,21 @@ private:
     TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
     // User adjustable TMC2209 motor driver settings, updated to driver registers via UART
-    int   driver_stdby_  = false;
-    int   open_close_    = true;  // If true, opeining/closing settings should be different
+    bool  driver_stdby_  = false;
+    bool  sync_settings_ = false;  // If false, opeining/closing settings are different values
     float open_velocity_ = 3.0;
     float clos_velocity_ = 3.0;
     float open_accel_    = 0.5;
     float clos_accel_    = 0.5;
     int   open_current_  = 200;
     int   clos_current_  = 75;
-    int   direction_     = false;
-    int   microsteps_    = 16;
+    bool  direction_     = false;
+    int   microsteps_    = 2;
     int   full_steps_    = DEFAULT_MOTOR_FULLSTEPS;
-    int   stallguard_en_ = true;
+    bool  stallguard_en_ = true;
     int   coolstep_thrs_ = 0;
     int   stallguard_th_ = 10;
-    int   spreadcycl_en_ = false;
+    bool  spreadcycl_en_ = false;
     int   spreadcycl_th_ = 33;
 
     // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
@@ -77,6 +77,7 @@ private:
 
     // Keeping track of the overall position via encoder's position and then  convert it into
     // motor's position and percentage.
+    int32_t encod_offset_      = 0;
     int32_t encod_pos_         = 0;
     int32_t encod_max_pos_     = static_cast<int32_t>(DEFAULT_ENCODER_POSITIONS) * 10;
     int   total_steps_         = full_steps_ * microsteps_;
@@ -88,13 +89,14 @@ private:
 
     void stallguardInterrupt();
     void loadSettings();  // Load motor settings from flash
-    void prepareToMove(bool check, bool direction);
+    bool prepareToMove(bool check, bool direction);
     void move(bool direction);
     void moveToStep(int target_step);
     void moveToPercent(int target_percent);
     void stop();
     bool setMin();
     bool setMax();
+    bool zeroEncoder();
     bool motorEnable(uint8_t enable_pin, uint8_t value);
     void calculateTotalSteps();
     inline int getPercent();

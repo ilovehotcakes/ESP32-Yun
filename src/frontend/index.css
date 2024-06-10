@@ -1,76 +1,705 @@
 html {
-    font-family: Helvetica;
-    display: inline-block;
-    margin: 0px auto;
-    text-align: center;
+    font-family: verdana, serif;
+    color: white;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body {
-    margin-top: 50px;
-    -webkit-user-select: none;
-    touch-action: pan-x pan-y;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-color: rgb(60, 60, 60);
+    overflow: hidden;
 }
-h1 {
-    color: #444444;
-    margin: 50px auto;
+h2 {
+    margin: 0;
+    font-size: 1.4em;
 }
-p {
-    font-size: 19px;
-    color: #888;
+h3 {
+    margin: 0;
+    font-size: 1.25em;
+    font-weight: 500;
 }
-.button {
-    display: inline-block;
-    width: 100px;
-    margin: 0px 5px;
-    padding: 10px;
-    font-size: 20px;
-    text-align: center;
-    cursor: pointer;
-    outline: none;
-    color: #fff;
-    background-color: #04AA6D;
+h4 {
+    margin: 0;
+    color: rgb(245,245,245);
+}
+h5 {
+    margin: 0;
+    font-size: 0.7em;
+    font-weight: 500;
+}
+@property --hue1 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 217;
+}
+@property --hue2 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 42;
+}
+@property --hue3 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 306;
+}
+@property --hue4 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 243;
+}
+@property --hue5 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 155;
+}
+@property --hue6 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 247;
+}
+@property --hue7 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 357;
+}
+@property --hue8 {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 352;
+}
+@keyframes a {
+    from {
+        --hue1: 217;
+        --hue2: 42;
+        --hue3: 306;
+        --hue4: 243;
+        --hue5: 155;
+        --hue6: 247;
+        --hue7: 357;
+        --hue8: 352;
+    }
+    50% {
+        --hue1: 37;
+        --hue2: 222;
+        --hue3: 126;
+        --hue4: 63;
+        --hue5: 335;
+        --hue6: 67;
+        --hue7: 177;
+        --hue8: 172;
+    }
+    to {
+        --hue1: 217;
+        --hue2: 42;
+        --hue3: 306;
+        --hue4: 243;
+        --hue5: 155;
+        --hue6: 247;
+        --hue7: 357;
+        --hue8: 352;
+    }
+}
+
+
+
+.default {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 9px #999;
+    transition: 0.2s ease;
 }
-.button:active {
-    background-color: #3e8e41;
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-    transform: translateY(4px);
+.default-hide {
+    left: 110%;
+    transition: 0.2s ease-in-out;
 }
-.desktop-only-elements {
-    display: none;
+.background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    /* min-width: 600px;
+    min-height: 700px; */
+    background-color: hsl(63, 100%, 80%);
+    background-image:
+        radial-gradient(at 35% 25%, hsl(var(--hue1), 65%, 70%) 0px, transparent 50%),
+        radial-gradient(at  4% 92%, hsl(var(--hue2), 89%, 66%) 0px, transparent 50%),
+        radial-gradient(at 91% 13%, hsl(var(--hue3), 99%, 76%) 0px, transparent 50%),
+        radial-gradient(at 67% 39%, hsl(var(--hue4), 73%, 64%) 0px, transparent 50%),
+        radial-gradient(at 38% 70%, hsl(var(--hue5), 96%, 62%) 0px, transparent 50%),
+        radial-gradient(at 88% 82%, hsl(var(--hue6), 70%, 71%) 0px, transparent 50%),
+        radial-gradient(at  7% 18%, hsl(var(--hue7), 80%, 72%) 0px, transparent 50%),
+        radial-gradient(at 15% 51%, hsl(var(--hue8), 81%, 74%) 0px, transparent 50%);
+    background-position: center;
+    animation: a 30s linear infinite;
+    z-index: 1;
 }
-.mobile-only-elements {
-    display: inline-block;
-}
-.slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 300px;
-    margin: 50px 0px;
-    height: 50px;
-    background: #d3d3d3;
-    outline: none;
-}
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px; /* Set a specific slider handle width */
-    height: 35px; /* Slider handle height */
-    background: #04AA6D; /* Green background */
-    cursor: pointer;
+.canvas {
+    position: absolute;
+    width: 375px;
+    height: 625px;
+    /* border: 1px solid black; */
+    border: none;
+    border-radius: 1em;
+    overflow: hidden;
 }
 .container {
-    width: 500px;
-    height: 300px;
-    margin: 200px auto;
+    position: absolute;
+    top: 36%;
+    left: 4.5%;
+    width: 91%;
+    height: 28%;
+    border-radius: 1em;
+    border: none;
+    transition: 0.2s ease;
+    overflow: hidden;
 }
-.glass{
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+.glass {
+    background: linear-gradient(135deg, rgba(145, 145, 145, 0.5), rgba(100, 100, 100, 0.6));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border:1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+
+
+.motor-controls-hide {
+    left: -110%;
+    transition: 0.15s ease-in-out;
+}
+.motor-controls-header {
+    top: 7%;
+    height: 30%;
+}
+.motor-controls-body {
+    top: 36.7%;
+    height: 63%;
+    transition: height 0.12s ease-in-out, opacity 75ms ease-in-out;
+}
+.name-txt {
+    position: absolute;
+    top: 9%;
+    left: 7%;
+}
+.serial-txt {
+    position: absolute;
+    top: 54%;
+    left: 7%;
+    color: rgb(200, 200, 200);
+}
+.percent-slider {
+    top: 1%;
+    padding-top: 5%;
+    height: 47.6%;
+}
+.open-stop-close {
+    top: 46%;
+    height: 52.4%;
+}
+.forward-backward {
+    top: 0;
+    height: 52.4%;
+}
+.min-zero-max {
+    top: 52.4%;
+    margin: 0 0 0 -1px;
+    height: 47%;
+}
+.horizontal-separator {
+    position: absolute;
+    top: 52.4%;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(200, 200, 200, 0.525);
+}
+.vertical-separator {
+    position: absolute;
+    top: 1px;
+    width: 1px;
+    height: 100%;
+    background-color: rgba(200, 200, 200, 0.525);
+}
+.button2 {
+    position: absolute;
+    top: 1px;
+    width: 35%;
+    height: 100%;
+    padding: 0;
+    font-size: 1.1em;
+    font-weight: normal;
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    cursor: pointer;
+    transition: 0.1s ease;
+}
+.button2:active {
+    background-color: rgba(194, 194, 194, 0.5);
+}
+.set-min-btn {
+    left: 0;
+    border-radius: 0 0 0 1em;
+}
+.zeroing-btn {
+    left: 35%;
+    width: 30%;
+}
+.set-max-btn {
+    margin-left: 1px;
+    left: 65%;
+    border-radius: 0 0 1em 0;
+}
+input[type="range"] {
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    width: 84%;
+    height: 12%;
+    border-radius: 0.75em;
+    outline: none;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    cursor: pointer;
+    box-shadow: -20rem 0 0 20rem rgba(255, 255, 255, 0.700);
+}
+input[type="range"]:hover {
+    top: 10%;
+    left: 4.5%;
+    width: 90%;
+    height: 44%;
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+    box-shadow: -20rem 0 0 20rem rgba(255, 255, 255, 0.950);
+}
+.tick {
+    position: absolute;
+    top: 40%;
+    width: 1px;
+    height: 7px;
+    background-color: rgba(195, 195, 195, 0.6);
+    transition: 50ms ease;
+}
+input[type="range"]:hover ~ .tick {
+    width: 0px;
+}
+.marker {
+    position: absolute;
+    top: 50%;
+    font-size: 0.8em;
+    color: rgba(195, 195, 195, 0.6);
+    transition: 0.25s ease;
+}
+.zero-mkr {
+    left: 7.5%;
+}
+input[type="range"]:hover ~ .zero-mkr {
+    top: 60%;
+    left: 4.5%;
+    color: white;
+}
+.hundred-mkr {
+    left: 86.75%;
+}
+input[type="range"]:hover ~ .hundred-mkr {
+    top: 60%;
+    left: 88%;
+    color: white;
+}
+.button1 {
+    position: absolute;
+    top: 5%;
+    width: 14.3%;
+    height: 84.5%;
+    color: rgba(0, 0, 0, 0);
+    background-size: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    border-radius: 3em;
+    cursor: pointer;
+    outline: none;
+    transition: 100ms ease;
+}
+.button1:active {
+    background-size: 2.2rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(189, 189, 189, 0.75);
+}
+.open-btn {
+    left: 15%;
+    background-image: url(./img/icon_open_100x100.png);
+    background-size: 2.4rem;
+}
+.stop-btn {
+    left: 43.5%;
+    background-image: url(./img/icon_stop_100x100.png);
+}
+.close-btn {
+    left: 70.7%;
+    background-image: url(./img/icon_close_100x100.png);
+    background-size: 2.4rem;
+}
+.forward-btn {
+    top: 6%;
+    left: 61%;
+    background-size: 2.9em;
+    background-image: url(./img/icon_forward_100x100.png);
+}
+.backward-btn {
+    top: 6%;
+    left: 24.5%;
+    background-size: 2.9em;
+    background-image: url(./img/icon_backward_100x100.png);
+}
+.more-settings-txt {
+    position: absolute;
+    top: 25%;
+    left: 9.5%;
+    font-size: 1em;
+}
+.more-settings-dropdown {
+    position: absolute;
+    top: 6%;
+    left: 86.2%;
+    width: 8%;
+    height: 52.1%;
+}
+.advanced-controls-dropdown {
+    position: absolute;
+    top: 6%;
+    left: 73.5%;
+    width: 8%;
+    height: 52.1%;
+}
+.dropdown-cbx::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    border-radius: 3em;
+    background-size: 1.3em;
+    background-image: url(./img/icon_dropdown_100x100.png);
+    background-color: rgba(172, 172, 172, 0.548);
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: rotate(180deg);
+    transition: 0.1s linear;
+}
+input:checked + .dropdown-cbx::before {
+    background-color: rgba(122, 122, 122, 0.582);
+    transform: rotate(0deg);
+}
+input[type="checkbox"], input[type="range"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.more-settings-cbx::before {
+    background-size: 100%;
+    background-image: url(./img/icon_more_100x100.png);
+    transform: none;
+}
+
+
+
+/* For settings page */
+.settings-header {
+    top: 2%;
+    height: 6%;
+}
+.back-btn {
+    position: absolute;
+    top: 15%;
+    left: 0;
+    height: 72%;
+    width: 8%;
+    padding: 0;
+    content: '';
+    border-radius: 3em;
+    background-size: 1.3em;
+    background-image: url(./img/icon_back_100x100.png);
+    background-color: rgba(172, 172, 172, 0.548);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    transition: 0.2s;
+}
+.settings-header-txt {
+    position: absolute;
+    top: 7%;
+    left: 27%;
+    font-weight: 500;
+}
+.four-settings {
+    top: 9.5%;
+    height: 28%;
+    border-radius: 0.5em;
+}
+.three-settings {
+    top: 40.5%;
+    height: 21%;
+    border-radius: 0.5em;
+}
+.two-settings {
+    top: 64.5%;
+    height: 14%;
+    border-radius: 0.5em;
+}
+.one-setting {
+    height: 7%;
+    border-radius: 0.5em;
+}
+.one-forth-height {
+    height: calc(100% / 4);
+}
+.one-third-height {
+    height: calc(100% / 3);
+}
+.one-half-height {
+    height: calc(100% / 2);
+}
+.whole-height {
+    height: 100%;
+}
+.one-forth-pos {
+    top: 25%;
+}
+.one-half-pos {
+    top: 50%;
+}
+.three-forths-pos {
+    top: 75%;
+}
+.one-third-pos {
+    top: 33%;
+}
+.two-thirds-pos {
+    top: 66.7%;
+}
+.setting-name-txt {
+    position: absolute;
+    top: 24%;
+    left: 5%;
+    font-size: 1.1em;
+}
+.setting-value-txt {
+    position: absolute;
+    top: 24%;
+    left: 79.9%;
+    width: 15%;
+    font-size: 1.1em;
+    text-align: right;
+    color: rgb(200, 200, 200);
+}
+.setting-value-txt2 {
+    position: absolute;
+    top: 24%;
+    left: 31.9%;
+    width: 63%;
+    font-size: 1.1em;
+    text-align: right;
+    color: rgb(200, 200, 200);
+}
+.setting-opening-txt {
+    left: 69%;
+    opacity: 0;
+    transition: 0.1s ease-in-out;
+}
+.setting-opening-txt-show {
+    left: 63%;
+    opacity: 100;
+    transition: 0.1s ease-in-out;
+}
+.toggle {
+    position: absolute;
+    top: 16%;
+    left: 80.5%;
+    margin-top: -1px;
+    width: 14.8%;
+    height: 70%;
+}
+.toggle-cbx {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 3em;
+    background-color: rgba(199, 199, 199, 0.603);
+    transition: 0.2s;
+    cursor: pointer;
+    overflow: hidden;
+}
+.toggle-cbx::before {
+    position: absolute;
+    top: 4.5%;
+    left: 4%;
+    content: '';
+    width: 54.5%;
+    height: 90%;
+    border-radius: 3em;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    transition: 0.2s ease-in-out;
+}
+input:checked + .toggle-cbx {
+    background-color: rgb(45, 226, 100);
+    transition: 0.2s ease-in-out;
+}
+input:checked + .toggle-cbx::before {
+    left: 42%;
+    transition: 0.2s ease-in-out;
+}
+.more-settings {
+    top: 23.5%;
+    left: 47%;
+    width: 44%;
+    background: linear-gradient(135deg, rgba(80, 80, 80, 0.8), rgba(65, 65, 65, 0.9));
+    overflow: hidden;
+    transition: 0.12s ease-in-out;
+}
+.more-settings-hide {
+    top: 38%;
+    left: 90%;
+    height: 0;
+    width: 0;
+    transition: 0.12s ease-in-out;
+}
+.more-settings-shift {
+    left: -60%;
+    transition: 0.2s ease-in-out;
+}
+
+
+/* For pop-up dialog to change settings */
+.popup-dialog {
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(36, 36, 36, 0.9);
+    transition: 0.2s ease-in-out;
+}
+.popup-dialog-show {
+    top: 2%;
+    transition: 0.2s ease;
+}
+.dialog-prompt {
+    display: flex;
+    justify-content: center;
+    top: 1.5%;
+    height: 3%;
+}
+.dialog-title {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 7%;
+    left: 4.5%;
+    width: 91%;
+}
+.form-btn {
+    padding: 1.2% 0 0 0;
+    font-size: 1em;
+    color: rgb(67, 142, 255);
+    background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
+    border: none;
+}
+.form-btn:active {
+    color: rgb(31, 105, 216);
+}
+.dialog-title-txt {
+    font-size: 1.1em;
+    color: rgb(255, 255, 255);
+}
+.form-input {
+    top: 17.7%;
+}
+.form-input-txt {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+}
+.dialog-hint {
+    position: absolute;
+    top: 26%;
+    left: 8%;
+    width: 84%;
+    height: 20%;
+    color: lightgray;
+}
+.dialog-hint-shift {
+    top: 33%;
+}
+input[type="number"], input[type="text"] {
+    position: absolute;
+    top: 12%;
+    left: 41%;
+    width: 52%;
+    height: 70%;
+    padding-left: 1px;
+    border: none;
+    font-family: verdana, serif;
+    font-size: 1.1em;
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+}
+textarea:focus, input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+}
+
+
+
+.hide {
+    opacity: 0;
+    height: 0;
+}
+.clickable {
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+.clickable:active {
+    background-color: rgba(100, 100, 100, 0.6);
+    transition: 0.1s ease;
+}
+.shadow {
+    box-shadow: 0 7px 20px 0 rgba(0, 0, 0, 0.15);
+}
+.border {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.no-focus {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+.no-focus:focus {
+outline: none !important;
+}
+
+
+
+@media (max-width: 500px) {
+    input[type="number"], input[type="text"] {
+        top: 6%;
+    }
 }

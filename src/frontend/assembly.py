@@ -1,5 +1,11 @@
 import base64
 
+def base_64(file_path):
+    with open(file_path, 'rb') as img_file:
+        b64_string = base64.b64encode(img_file.read()).decode("utf-8")
+        return "data:image/png;base64," + b64_string
+
+
 def process_html():
     current_directory = "./src/frontend"
     assembled_html = "const char index_html[] = R\"rawliteral("
@@ -11,8 +17,10 @@ def process_html():
                 with open(file_path, 'r') as css_file:
                     for line in css_file:
                         if "%" in line:
-                            i = line.index("%")
-                            t = line[:i] + "%" + line[i:]
+                            line = line.replace("%", "%%")
+                        elif "background-image: url" in line and "https://" not in line:
+                            file_path = current_directory + line[27:-3]
+                            line = line[:26] + f"'{base_64(file_path)}');"
                         assembled_html += line
                 assembled_html += "\t</style>\n"
             elif "index.js" in html_line:
@@ -23,12 +31,12 @@ def process_html():
                         assembled_html += line
                 assembled_html += "\t</script>\n"
             elif ".png" in html_line:
-                file_path = current_directory + html_line[html_line.index("href=")+7:-5]
-                with open(file_path, 'rb') as img_file:
-                    b64_string = base64.b64encode(img_file.read()).decode("utf-8")
-                    href_tag = html_line[:html_line.index("href=") + 6] + "data:image/png;base64," + b64_string + "\" />\n"
-                    assembled_html += href_tag
+                file_path = current_directory + html_line[html_line.index("href=")+7:-4]
+                href_tag = html_line[:html_line.index("href=")+6] + base_64(file_path) + "\"/>\n"
+                assembled_html += href_tag
             else:
+                if "%;" in html_line:
+                    html_line = html_line.replace("%", "%%")
                 assembled_html += html_line
 
     assembled_html += ")rawliteral\";"

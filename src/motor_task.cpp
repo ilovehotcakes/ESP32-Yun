@@ -39,7 +39,7 @@ void MotorTask::run() {
     // int start = 0;
     while (1) {
         // start = micros();
-        encod_pos_ = encoder_.getCumulativePosition();
+        encod_pos_ = encoder_.getCumulativePosition() - encod_offset_;
         motor_->setCurrentPosition(positionToStep(encod_pos_));
 
         if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
@@ -55,67 +55,70 @@ void MotorTask::run() {
                     moveToStep(inbox_.parameter);
                     break;
                 case MOTOR_FORWARD:
-                    move(true);
-                    break;
-                case MOTOR_BACKWARD:
                     move(false);
                     break;
-                case MOTOR_SET_MAX:
-                    setMax();
+                case MOTOR_BACKWARD:
+                    move(true);
                     break;
                 case MOTOR_SET_MIN:
                     setMin();
                     break;
-                case MOTOR_STDBY:
+                case MOTOR_SET_MAX:
+                    setMax();
+                    break;
+                case MOTOR_ZERO:
+                    zeroEncoder();
+                    break;
+                case MOTOR_STANDBY:
                     if (inbox_.parameter == 1) driverStandby();
                     else driverStartup();
                     break;
-                case MOTOR_OPEN_CLOSE:
-                    setAndSave(open_close_, inbox_.parameter, "open_close_");
+                case MOTOR_SYNC_STTNG:
+                    setAndSave(sync_settings_, static_cast<bool>(inbox_.parameter), "sync_settings_");
                     break;
-                case MOTOR_SPEED:
+                case MOTOR_VLCTY:
                     setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
-                case MOTOR_OP_SPEED:
-                    if (open_close_) setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
+                case MOTOR_OP_VLCTY:
+                    setAndSave(open_velocity_, inbox_.parameterf, "open_velocity_");
                     break;
-                case MOTOR_CL_SPEED:
-                    if (open_close_) setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
+                case MOTOR_CL_VLCTY:
+                    setAndSave(clos_velocity_, inbox_.parameterf, "clos_velocity_");
                     break;
                 case MOTOR_ACCEL:
                     setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_OP_ACCEL:
-                    if (open_close_) setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
+                    setAndSave(open_accel_, inbox_.parameterf, "open_accel_");
                     break;
                 case MOTOR_CL_ACCEL:
-                    if (open_close_) setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
+                    setAndSave(clos_accel_, inbox_.parameterf, "clos_accel_");
                     break;
                 case MOTOR_CURRENT:
                     setAndSave(open_current_, inbox_.parameter, "open_current_");
                     setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_OP_CURRENT:
-                    if (open_close_) setAndSave(open_current_, inbox_.parameter, "open_current_");
+                    setAndSave(open_current_, inbox_.parameter, "open_current_");
                     break;
                 case MOTOR_CL_CURRENT:
-                    if (open_close_) setAndSave(clos_current_, inbox_.parameter, "clos_current_");
+                    setAndSave(clos_current_, inbox_.parameter, "clos_current_");
                     break;
                 case MOTOR_DIRECTION:
-                    setAndSave(direction_, inbox_.parameter, "direction_");
-                    break;
-                case MOTOR_MICROSTEPS:
-                    setAndSave(microsteps_, inbox_.parameter, "microsteps_");
-                    calculateTotalSteps();
+                    setAndSave(direction_, static_cast<bool>(inbox_.parameter), "direction_");
                     break;
                 case MOTOR_FULL_STEPS:
                     setAndSave(full_steps_, inbox_.parameter, "full_steps_");
                     calculateTotalSteps();
                     break;
+                case MOTOR_MICROSTEPS:
+                    setAndSave(microsteps_, inbox_.parameter, "microsteps_");
+                    calculateTotalSteps();
+                    break;
                 case MOTOR_STALLGUARD:
-                    setAndSave(stallguard_en_, inbox_.parameter, "stallguard_en_");
+                    setAndSave(stallguard_en_, static_cast<bool>(inbox_.parameter), "stallguard_en_");
                     break;
                 case MOTOR_TCOOLTHRS:
                     setAndSave(coolstep_thrs_, inbox_.parameter, "coolstep_thrs_");
@@ -124,7 +127,7 @@ void MotorTask::run() {
                     setAndSave(stallguard_th_, inbox_.parameter, "stallguard_th_");
                     break;
                 case MOTOR_SPREADCYCL:
-                    setAndSave(spreadcycl_en_, inbox_.parameter, "spreadcycl_en_");
+                    setAndSave(spreadcycl_en_, static_cast<bool>(inbox_.parameter), "spreadcycl_en_");
                     break;
                 case MOTOR_TPWMTHRS:
                     setAndSave(spreadcycl_th_, inbox_.parameter, "spreadcycl_th_");
@@ -168,9 +171,9 @@ void IRAM_ATTR MotorTask::stallguardInterrupt() {
 void MotorTask::loadSettings() {
     bool load = readFromDisk();
 
-    open_close_     = getOrDefault("open_close_", open_close_);
+    sync_settings_  = getOrDefault("sync_settings_", sync_settings_);
     open_velocity_  = getOrDefault("open_velocity_", open_velocity_);
-    clos_velocity_  = getOrDefault("clos_velocity_",clos_velocity_);
+    clos_velocity_  = getOrDefault("clos_velocity_", clos_velocity_);
     open_accel_     = getOrDefault("open_accel_", open_accel_);
     clos_accel_     = getOrDefault("clos_accel_", clos_accel_);
     open_current_   = getOrDefault("open_current_", open_current_);
@@ -185,61 +188,68 @@ void MotorTask::loadSettings() {
     spreadcycl_th_  = getOrDefault("spreadcycl_th_", spreadcycl_th_);
 
     encod_max_pos_  = getOrDefault("encod_max_pos_", encod_max_pos_);
-    encoder_.resetCumulativePosition(encod_pos_);
+    zeroEncoder();
     calculateTotalSteps();
 
     if (!load) {
         writeToDisk();
     }
 
-    LOGI("Motor settings loaded(curr/max): %d/%d", 0, encod_max_pos_);
+    LOGI("Motor settings loaded(curr/max): %d/%d", encod_pos_, encod_max_pos_);
 }
 
 
-void MotorTask::prepareToMove(bool check, bool direction) {
+bool MotorTask::prepareToMove(bool check, bool direction) {
     if (motor_->isRunning()) {
         stop();
-        return;
+        return false;
     }
 
     if (check) {
-        return;
+        return false;
     }
 
     while (driver_stdby_) {
         driverStartup();
-        vTaskDelay(10 / portTICK_PERIOD_MS);  // Wait for driver to startup
     }
 
-    if (direction && open_close_) {
-        updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
-    } else {
+    if (direction && !sync_settings_) {
         updateMotorSettings(open_velocity_, open_accel_, open_current_);
+    } else {
+        updateMotorSettings(clos_velocity_, clos_accel_, clos_current_);
     }
+
+    return true;
 }
 
 
 void MotorTask::move(bool direction) {
-    prepareToMove(false, direction);
+    if (!prepareToMove(false, direction)) {
+        return;
+    }
     if (direction) {
-        motor_->runForward();
-        LOGI("Motor running forward");
-    } else {
         motor_->runBackward();
         LOGI("Motor running backward");
+    } else {
+        motor_->runForward();
+        LOGI("Motor running forward");
     }
 }
 
 
 void MotorTask::moveToStep(int target_step) {
     int current_step = positionToStep(encod_pos_);
-    prepareToMove(target_step == current_step, target_step > current_step);
+    if (!prepareToMove(target_step == current_step, target_step < current_step)) {
+        return;
+    }
     motor_->moveTo(target_step);
 }
 
 
 void MotorTask::moveToPercent(int target_percent) {
-    prepareToMove(target_percent == getPercent(), target_percent > getPercent());
+    if (!prepareToMove(target_percent == getPercent(), target_percent < getPercent())) {
+        return;
+    }
     int32_t new_position = static_cast<int32_t>(target_percent * encod_max_pos_ / 100.0 + 0.5);
     motor_->moveTo(positionToStep(new_position));
     LOGI("Motor moving(curr/max -> tar): %d/%d -> %d", encod_pos_, encod_max_pos_, new_position);
@@ -254,22 +264,34 @@ void MotorTask::stop() {
 
 
 bool MotorTask::setMin() {
-    if (encod_pos_ >= encod_max_pos_) {
+    if (encod_pos_ >= encod_max_pos_ || motor_->isRunning()) {
         return false;
     }
     setAndSave(encod_max_pos_, encod_max_pos_ - encod_pos_, "encod_max_pos_");
-    encoder_.resetCumulativePosition(0);
+    zeroEncoder();
     LOGI("Motor new min(curr/max): %d/%d", 0, encod_max_pos_);
     return true;
 }
 
 
 bool MotorTask::setMax() {
-    if (encod_pos_ <= 0) {
+    if (encod_pos_ <= 0 || motor_->isRunning()) {
         return false;
     }
     setAndSave(encod_max_pos_, encod_pos_, "encod_max_pos_");
-    LOGI("Motor new max(curr/max): %d/%d", encod_max_pos_, encod_max_pos_);
+    LOGI("Motor new max(curr/max): %d/%d", encod_pos_, encod_max_pos_);
+    return true;
+}
+
+
+bool MotorTask::zeroEncoder() {
+    if (motor_->isRunning()) {
+        LOGI("Encoder can't be zeroed while motor is running");
+        return false;
+    }
+    encoder_.resetCumulativePosition(0);
+    encod_offset_ = encoder_.getCumulativePosition();
+    LOGI("Encoder zeroed");
     return true;
 }
 
@@ -333,7 +355,11 @@ void MotorTask::updateMotorSettings(float velocity, float acceleration, int curr
         // sensitive and requires less torque to stall. The double of this value is compared to
         // SG_RESULT. The stall output becomes active if SG_RESULT fall below this value.
         driver_.SGTHRS(stallguard_th_);
+
+        // Enable StallGuard or else it will stall the motor when starting the driver
+        attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for settings to be updated
 }
 
 
@@ -345,6 +371,7 @@ void MotorTask::driverStartup() {
 
     // Pull standby pin low to disable driver standby
     digitalWrite(STBY_PIN, LOW);
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
 
     // Sets pdn_disable=1: disables automatic standstill current reduction, needed for UART; also
     // sets mstep_reg_select=1: use UART to change microstepping settings.
@@ -382,15 +409,16 @@ void MotorTask::driverStartup() {
         // If SG is sampled equal to or above this threshold enough times, CoolStep decreases the
         // current to both coils.
         driver_.semax(0);
-
-        // Enable StallGuard or else it will stall the motor when starting the driver
-        attachInterrupt(DIAG_PIN, std::bind(&MotorTask::stallguardInterrupt, this), RISING);
     }
 
-    // TODO: check via UART driver register read/write ok?
-    driver_stdby_ = false;
+    vTaskDelay(5 / portTICK_PERIOD_MS);  // Wait for driver to startup
 
-    LOGI("Driver has started");
+    if (driver_.blank_time() == 24) {
+        driver_stdby_ = false;
+        LOGI("Driver has started");
+    } else {
+        driver_stdby_ = true;
+    }
 }
 
 

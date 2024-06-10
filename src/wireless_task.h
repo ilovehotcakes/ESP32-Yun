@@ -19,7 +19,7 @@
     #include <ArduinoOTA.h>
 #endif
 
-#define MAX_ATTEMPTS 5
+#define MAX_ATTEMPTS 9
 #define WDT_DURATION 9  // Sec
 
 
@@ -53,13 +53,9 @@ private:
     void connectWifi();
     void routing();
     bool isPrefetch(AsyncWebServerRequest *request);
-    bool hasOneParam(AsyncWebServerRequest *request);
-    bool httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                            String &setting, const char *key);
-    bool httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                            bool (*eval)(int), String error_message, Task *task);
-    bool httpRequestHandler(AsyncWebServerRequest *request, Command command,
-                            bool (*eval)(float), String error_message, Task *task);
+    void httpRequestHandler(AsyncWebServerRequest *request);
     void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         AwsEventType type, void *arg, uint8_t *data, size_t len);
+    String htmlStringProcessor(const String& var);
+    String getJSON();
 };
