@@ -7,6 +7,9 @@ Under active development.
 
 [![PlatformIO CI](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml/badge.svg)](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml)
 
+<p align="center">
+    <img src="images/quick_demo.gif" width="800"/>
+</p>
 
 ## Features
 * 📡 WiFi-based: no need for extra hub
