@@ -8,7 +8,7 @@ Under active development.
 [![PlatformIO CI](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml/badge.svg)](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml)
 
 <p align="center">
-    <img src="images/quick_demo.gif" width="700"/>
+    <img src="images/quick_demo.gif" width="600"/>
 </p>
 
 ## Features
