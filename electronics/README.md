@@ -14,7 +14,7 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 </p>
 
 ## Option 2 - Breadboarding with breakout modules:
-Both [TMC2209](https://www.amazon.com/dp/B07ZQ3C1XW) and [AS5600](https://www.amazon.com/dp/B09KGWC1PT/) come in breakout board packages which can be purchased from Amazon/AliExpress and assembled on a solderless breadboard. Please refer to this version of the [bom](prototype/bom.csv) and reference the schematic to put the circuit together.
+Both [TMC2209](https://www.amazon.com/dp/B07ZQ3C1XW) and [AS5600](https://www.amazon.com/dp/B09KGWC1PT/) come in breakout board packages which can be purchased from Amazon/AliExpress and assembled on a solderless breadboard. Please refer to this version of the [bom](prototype/bom.csv) and reference the schematic to assemble the circuit.
 <p align="center">
-    <img src="schematic.png" width="800"/>
+    <img src="schematic.png" width="815"/>
 </p>
