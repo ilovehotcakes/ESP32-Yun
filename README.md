@@ -31,16 +31,22 @@ There are three components: electronics, firmware, and mounting hardware.
 * (Optional) 3D printer for the motor mount
 
 ### 1. Electronics
-Please refer to the [*electronics*](https://github.com/ilovehotcakes/ESP32-Yun/electronics) folder.
+Please refer to the [*electronics*](electronics/) folder.
+
+**[[schematic](electronics/schematic.png)][[gerber files](electronics/gerber.zip)][[bom](electronics/bom.csv)][[pick-and-place file](electronics/pick_and_place.csv)]**
+<p>
+    <img src="images/electronics/v1_1/pcb_3d_top.png" width="400">
+    <img src="images/electronics/v1_1/pcb_3d_bot.png" width="400">
+</p>
 
 ### 2. Firmware
-Flashing the firmware via [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
+Flash the firmware via [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
 
 #### Dependencies:
 * espressif32@3.5.0
 * [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
-* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
-* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
+* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper/tree/0.27.5)
+* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600/tree/0.4.1)
 * [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
 * [ArduinoJson@^7.0.4](https://github.com/bblanchon/ArduinoJson/tree/v7.0.4)
 * [LittleFS_esp32@^1.0.6](https://github.com/lorol/LITTLEFS/tree/1.0.6)
@@ -57,16 +63,16 @@ Flashing the firmware via [VSCode](https://code.visualstudio.com/) + [PlatformIO
 You can find the stl and pre-sliced files under the [*cad*](cad/) folder. To mount the magnet for the rotary encoder, it is recommended to use the manget gluing jig to make sure that the magnet is centered on the axis-of-rotation; otherwise, it could affect the accuracy of the rotary encoder.
 
 #### Parts:
-* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/nema_11_motor_mount.stl)]
-* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/magnet_gluing_jig_v1.stl)]
-* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/as5600_mount.stl)]
+* Nema 11 motor mount: [[**stl**](cad/nema_11_motor_mount.stl)]
+* AS5600 magnet gluing jig: [[**stl**](cad/prototype/magnet_gluing_jig_v1.stl)]
+* AS5600 rotary encoder mount: [[**stl**](cad/as5600_mount.stl)]
 
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_back.png" width="400">
+    <img src="images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
+    <img src="images/cad/v1_0/nema_11_motor_mount_back.png" width="400">
     </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2195.jpg" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2196.jpg" width="400">
+    <img src="images/cad/v1_0/IMG_2195.jpg" width="400">
+    <img src="images/cad/v1_0/IMG_2196.jpg" width="400">
 </p>
 
 
@@ -74,7 +80,7 @@ You can find the stl and pre-sliced files under the [*cad*](cad/) folder. To mou
 During the first time booting up, ESP32 Yun is put into setup mode and it functions as a WiFi access point. Connect to it with your device like you would connect to a WiFi network. After connection is established, open a web browser and go to the IP address **[192.168.4.1]()** to access the web UI. There you can enter your WiFi network credentials and change other settings.
 
 ### HTTP Restful API
-All RestAPIs are implemented using HTTP GET requests. To control the motor or change any settings, use [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/&lt;URI&gt;?&lt;PARAM&gt;=&lt;VALUE&gt;](). For example: [http://192.168.4.1/motor?percent=100]() There are three URIs: motor, system, and wireless.
+All RestAPIs are implemented as HTTP GET requests. To control the motor or change any settings, use [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/&lt;URI&gt;?&lt;PARAM&gt;=&lt;VALUE&gt;](). For example: [http://192.168.4.1/motor?percent=0](). There are four URIs: motor, system, wireless, and json.
 
 ### Motor parameters:
 * stop: stop the motor
@@ -117,7 +123,7 @@ All RestAPIs are implemented using HTTP GET requests. To control the motor or ch
 * password: passowrd of your WiFi network
 
 ### Json
-Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all setting in a Json object.
+Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all settings in a Json object.
 
 ### Button
 * Toggle setup mode: press and hold down for 5 seconds till the led turns on

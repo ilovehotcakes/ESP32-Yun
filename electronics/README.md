@@ -1,8 +1,6 @@
 # Electronics
 Here are two ways to acquire the electronics: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and assembling on a breadboard.
 
-**[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/gerber.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/bom.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/pick_and_place.csv)]**
-
 #### Option 1 - Ordering PCB from JLCPCB:
 1. Download and upload the gerber files to [JLCPCB.com](https://jlcpcb.com/). The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
 2. If you prefer to manually assemble the PCB, please refer to the schematic and bom.
@@ -11,11 +9,8 @@ Here are two ways to acquire the electronics: **(1)** directly order printed cir
 5. Solder connectors J1-J4 and separate the AS5600 break-off board from the main board.
 6. Crimp some 4-pin JST PH connectors and connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_top.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_bot.png" width="400">
-    </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_top.png" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_bot.png" width="400">
+    <img src="v1_1/pcb_top.png" width="400"/>
+    <img src="v1_1/pcb_bot.png" width="400">
 </p>
 
 #### Option 2 - Breadboarding with breakout modules:
