@@ -1,7 +1,7 @@
 # ESP32 Yun
 An open-source, end-to-end hardward & software solution for motorizing your smart home.
 
-ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with two-phase bipolar stepper motors. It comes with a web user-interface for intuitive controls and HTTP restful APIs for easy integrations. Please see [demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4) for full demonstration.
+ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with two-phase bipolar stepper motors. It comes with a web user-interface for intuitive controls and HTTP restful APIs for custom integrations.
 
 Under active development.
 
@@ -9,14 +9,16 @@ Under active development.
 
 
 ## Features
-📡 WiFi-based: no need for extra hub
-🔄 Closed-loop system: motor can be manually moved without losing track of its position
-🛑 Automatic stalling detection and stopping: preventing injuries and protecting the motor
-🤖 Custom hardware: few parts, cheap and relatively easy to assemble
-🖥️ Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
-🌐 HTTP restful APIs: easy to create integrations for smart home platforms
-😶 Extremely quiet, won't even wake a baby!
-🚀 Can go really fast!
+* 📡 WiFi-based: no need for extra hub
+* 🔄 Closed-loop system: motor can be manually moved without losing track of its position
+* 🛑 Automatic stalling detection and stopping: preventing injuries and protecting the motor
+* 🤖 Custom hardware: few parts, cheap and relatively easy to assemble
+* 🖥️ Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
+* 🌐 HTTP restful APIs: easy to create integrations for smart home platforms
+* 😶 Extremely quiet, won't even wake a baby!
+* 🚀 Can go really fast!
+
+Please see [demo video](images/demo_video.mp4) for full demonstration!
 
 
 ## Building your own
