@@ -116,7 +116,7 @@ All RestAPIs are implemented as HTTP GET requests. To control the motor or chang
 #### System params:
 * sleep: put ESP32 Yun into standby
 * restart: restart the system
-* reset: factory reset system
+* reset: reset all settings to factory settings
 * name: rename the system
 
 #### Wireless params:
@@ -124,15 +124,15 @@ All RestAPIs are implemented as HTTP GET requests. To control the motor or chang
 * ssid: ssid of your WiFi network
 * password: passowrd of your WiFi network
 
-#### Json
+#### Json:
 Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all settings in a Json object.
 
 ### Button
 * Toggle setup mode: press and hold down for 5 seconds till the led turns on
 * Factory reset: press and hold down for 15 seconds till the led turns off after it turns on at 5 seconds
 
-### (Optional) Tuning StallGuard4
-StallGuard4(SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working as intended. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
+### (Optional) tuning StallGuard4
+StallGuard4 (SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working correctly. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
 
 
 ## In the works
