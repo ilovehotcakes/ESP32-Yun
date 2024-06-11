@@ -133,8 +133,9 @@ Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all set
 StallGuard4(SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working as intended. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
 
 
-## In the Works
-* Write custom drivers to reduce dependency
-* Updating PCB so little to no soldering is required
+## In the works
+* Custom drivers to reduce dependency and firmware size
+* Updating PCB so little-to-no soldering is required
 * Replace ESP32 WROOM 32E so USB-to-TTL is not required to flash the firmware
 * BLE support
+* Ultra-low power for battery application
