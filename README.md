@@ -1,7 +1,7 @@
 # ESP32 Yun
-An all-in-one hardward & software solution for motorizing windows/blinds for your smart homes.
+An all-in-one hardward & software solution for motorizing your smart home.
 
-ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with NEMA stepper motors and other two-phase bipolar stepper motors. It comes with a web user-interface for intuitive contorls and HTTP restful APIs for easy integrations. Please see [demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4) for full demonstration.
+ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with two-phase bipolar stepper motors. It comes with a web user-interface for intuitive controls and HTTP restful APIs for easy integrations. Please see [demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4) for full demonstration.
 
 Under active development.
 
@@ -13,8 +13,8 @@ Under active development.
 * Closed-loop system: motor can be manually moved without losing track of its position
 * Automatic stalling detection and stopping: preventing injuries and protecting the motor
 * Custom hardware: few parts, cheap and relatively easy to assemble
-* Web UI: no need to download app to control motor or change settings, works on desktop and mobile devices
-* HTTP restful APIs: easy to create integrations for other smart home platforms
+* Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
+* HTTP restful APIs: easy to create integrations for smart home platforms
 * Extremely quiet, won't even wake a baby!
 * Can go really fast!
 
@@ -54,7 +54,7 @@ Flashing the firmware via [VSCode](https://code.visualstudio.com/) + [PlatformIO
 6. Let go of the button once the firmware starts uploading. Unplug ESP32 motorcover after the firmware has finished uploading.
 
 ### 3. Mounting hardware
-You can find the stl and pre-sliced files under the [*cad*](./cad/) folder. To mount the magnet for the rotary encoder, it is recommended to use the manget gluing jig to make sure that the magnet is centered on the axis-of-rotation; otherwise, it could affect the accuracy of the rotary encoder.
+You can find the stl and pre-sliced files under the [*cad*](cad/) folder. To mount the magnet for the rotary encoder, it is recommended to use the manget gluing jig to make sure that the magnet is centered on the axis-of-rotation; otherwise, it could affect the accuracy of the rotary encoder.
 
 #### Parts:
 * Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/nema_11_motor_mount.stl)]
