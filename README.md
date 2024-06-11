@@ -9,14 +9,14 @@ Under active development.
 
 
 ## Features
-* 📡 WiFi-based: no need for extra hub
-* 🔄 Closed-loop system: motor can be manually moved without losing track of its position
-* 🛑 Automatic stalling detection and stopping: preventing injuries and protecting the motor
-* 🤖 Custom hardware: few parts, cheap and relatively easy to assemble
-* 🖥️ Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
-* 🌐 HTTP restful APIs: easy to create integrations for smart home platforms
-* 😶 Extremely quiet, won't even wake a baby!
-* 🚀 Can go really fast!
+📡 WiFi-based: no need for extra hub
+🔄 Closed-loop system: motor can be manually moved without losing track of its position
+🛑 Automatic stalling detection and stopping: preventing injuries and protecting the motor
+🤖 Custom hardware: few parts, cheap and relatively easy to assemble
+🖥️ Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
+🌐 HTTP restful APIs: easy to create integrations for smart home platforms
+😶 Extremely quiet, won't even wake a baby!
+🚀 Can go really fast!
 
 
 ## Building your own
