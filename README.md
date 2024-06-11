@@ -34,7 +34,7 @@ There are three components: electronics, firmware, and mounting hardware.
 Please refer to the [*electronics*](electronics/) folder.
 
 **[[schematic](electronics/schematic.png)][[gerber files](electronics/gerber.zip)][[bom](electronics/bom.csv)][[pick-and-place file](electronics/pick_and_place.csv)]**
-<p>
+<p align="center">
     <img src="images/electronics/v1_1/pcb_3d_top.png" width="400">
     <img src="images/electronics/v1_1/pcb_3d_bot.png" width="400">
 </p>
