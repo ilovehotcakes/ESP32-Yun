@@ -1,5 +1,5 @@
 # ESP32 Yun
-An all-in-one, ope-source hardward & software solution for motorizing your smart home.
+An end-to-end, open-source hardward & software solution for motorizing your smart home.
 
 ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with two-phase bipolar stepper motors. It comes with a web user-interface for intuitive controls and HTTP restful APIs for easy integrations. Please see [demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4) for full demonstration.
 
@@ -20,7 +20,7 @@ Under active development.
 
 
 ## Building your own
-There are three components: electronics, firmware, and mounting hardware. ⚠️Requires basic electronic skills such as soldering and flashing firmware.
+There are three components: electronics, firmware, and mounting hardware. ⚠️Requires basic knowledge of flashing firmware and soldering.
 
 ### Requirements:
 * [USB-to-TTL serial adatper](https://www.amazon.com/dp/B07WX2DSVB) to upload the firmware
@@ -82,7 +82,7 @@ During the first time booting up, ESP32 Yun is put into setup mode and it functi
 ### HTTP Restful API
 All RestAPIs are implemented as HTTP GET requests. To control the motor or change any settings, use [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/&lt;URI&gt;?&lt;PARAM&gt;=&lt;VALUE&gt;](). For example: [http://192.168.4.1/motor?percent=0](). There are four URIs: motor, system, wireless, and json.
 
-### Motor parameters:
+#### Motor params:
 * stop: stop the motor
 * percent: move the motor to the specified percentage
 * step: move the motor to the specified step
@@ -111,18 +111,18 @@ All RestAPIs are implemented as HTTP GET requests. To control the motor or chang
 * fastmode: set to exclusively use fastmode, i.e. SpreadCycle
 * fastmode-threshold: set threshold to automatically switch over to fastmode
 
-### System parameters:
+#### System params:
 * sleep: put ESP32 Yun into standby
 * restart: restart the system
 * reset: factory reset system
 * name: rename the system
 
-### Wireless parameters:
+#### Wireless params:
 * setup: setup mode
 * ssid: ssid of your WiFi network
 * password: passowrd of your WiFi network
 
-### Json
+#### Json
 Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all settings in a Json object.
 
 ### Button
