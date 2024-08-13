@@ -2,119 +2,349 @@
 
 
 WirelessTask::WirelessTask(const uint8_t task_core) : 
-        Task{"Wireless", 8192, 1, task_core},
-        mqtt_client_(wifi_client_) {
-    wireless_message_queue_ = xQueueCreate(10, sizeof(int));
-    assert(wireless_message_queue_ != NULL);
+        Task{"WirelessTask", 8192, 1, task_core, 99}, webserver(80), websocket("/ws") {
+    pinMode(LED_PIN, OUTPUT);
+    esp_task_wdt_init(WDT_DURATION, true);  // Restart system if watchdog hasn't been fed
 }
 
 
-WirelessTask::~WirelessTask() {
-    vQueueDelete(wireless_message_queue_);
-}
+WirelessTask::~WirelessTask() {}
 
 
 void WirelessTask::run() {
-    disableCore0WDT();  // Disable watchdog timer
-    connectWifi();      // Must connect to WiFi before setting up OTA
-
-    #if COMPILEOTA
-        ArduinoOTA.begin();
-    #endif
+    loadSettings();
 
     while (1) {
-        // Check WiFi connection
-        if (WiFi.status() != WL_CONNECTED) {
+        if (initialized_ && WiFi.status() != WL_CONNECTED) {
             connectWifi();
         }
 
-        // Check MQTT connection
-        if (!mqtt_client_.connected()) {
-            connectMqtt();
+        if (xQueueReceive(queue_, (void*) &inbox_, 0) == pdTRUE) {
+            LOGI("WirelessTask received message: %s", inbox_.toString().c_str());
+            switch (inbox_.command) {
+                case UPDATE_POSITION:
+                    // If motor has changed position(%), broadcast it to all WS clients
+                    motor_position_ = inbox_.parameter;
+                    websocket.textAll(getJSON());
+                    break;
+                case WIRELESS_SETUP:
+                    setAndSave(setup_mode_, static_cast<bool>(inbox_.parameter), "setup_mode_");
+                    break;
+            }
         }
 
-        // Use non blocking method to check for messages
-        mqtt_client_.loop();
-
-        // Check if there is message sent from the motor
-        int message = -1;
-        if (xQueueReceive(wireless_message_queue_, (void*) &message, 0) == pdTRUE) {
-            // LOGD("WirelessTask received message from wireless_message_queue_: %i", message);
-            sendMqtt((String) message);
-        }
+        websocket.cleanupClients();  // Remove disconnected WS clients
 
         #if COMPILEOTA
             ArduinoOTA.handle();
         #endif
+
+        vTaskDelay(1);  // Finished all task within loop, yielding control back to scheduler
     }
 }
 
 
-// Restart on timeout
+void WirelessTask::loadSettings() {
+    bool load = readFromDisk();
+
+    ap_ssid_ = getOrDefault("ap_ssid_", ap_ssid_);
+    if (ap_ssid_ == "") {  // Factory reset
+        ap_ssid_ = "yun-" + getSerialNumber().substring(6, 12);
+        settings_["ap_ssid_"] = ap_ssid_;
+    }
+    sta_ssid_ = getOrDefault("sta_ssid_", sta_ssid_);
+    sta_password_ = getOrDefault("sta_password_", sta_password_);
+    attempts_ = getOrDefault("attempts_", attempts_);
+    if (sta_ssid_ == "" || attempts_ > MAX_ATTEMPTS) {
+        setup_mode_ = true;
+        setAndSave(setup_mode_, true, "setup_mode_");
+    } else {
+        setup_mode_ = getOrDefault("setup_mode_", setup_mode_);
+    }
+
+    if (!load) {
+        writeToDisk();
+    }
+
+    LOGI("Wireless settings loaded, attempt #%u", attempts_);
+}
+
+
 void WirelessTask::connectWifi() {
-    // Turn on LED to indicate disconnected
+    // Turn on LED to indicate not connected
     digitalWrite(LED_PIN, HIGH);
 
-    LOGI("Attempting to connect to WPA SSID: %s", ssid_.c_str());
-
-    WiFi.disconnect();
-    // WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid_.c_str(), password_.c_str());
-
-    while (WiFi.status() != WL_CONNECTED) {
-        vTaskDelay(2000);
+    if (!setup_mode_) {
+        // ESP32 in STA mode
+        LOGI("Attempting to connect to WiFi, SSID=%s, password=%s", sta_ssid_.c_str(), sta_password_.c_str());
+        setAndSave(attempts_, attempts_ + 1, "attempts_");
+        esp_task_wdt_add(getTaskHandle());
+        WiFi.begin(sta_ssid_.c_str(), sta_password_.c_str());
+        while (WiFi.status() != WL_CONNECTED) {
+            delay(1000);
+        }
+        // Remove wireless task from watchdog timer to avoid manually feeding WDT
+        esp_task_wdt_delete(getTaskHandle());
+        LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
+    } else {
+        // ESP32 in AP mode which acts as an router
+        LOGI("Starting AP, SSID: %s", ap_ssid_.c_str());
+        WiFi.softAP(ap_ssid_.c_str());
+        initialized_ = false;
     }
 
-    LOGI("Connected to the WiFi, IP: %s", WiFi.localIP().toString().c_str());
-}
+    if (!MDNS.begin(ap_ssid_.c_str())) {
+        LOGE("Failed to set mDNS responder");
+    }
+    MDNS.addService("_ald", "_tcp", 80);
 
+    websocket.onEvent(std::bind(&WirelessTask::wsEventHandler, this, std::placeholders::_1,
+                      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+                      std::placeholders::_5, std::placeholders::_6));
 
-void WirelessTask::connectMqtt() {
-    // Turn on LED to indicate disconnected
-    digitalWrite(LED_PIN, HIGH);
+    webserver.addHandler(&websocket);
 
-    LOGI("Attempting to connect to MQTT broker: %s", broker_ip_.c_str());
+    routing();
 
-    mqtt_client_.setServer(broker_ip_.c_str(), broker_port_);
-    
-    while(!mqtt_client_.connect(mqtt_id_.c_str(), mqtt_user_.c_str(), mqtt_password_.c_str()));
+    webserver.begin();
 
-    mqtt_client_.subscribe(in_topic_.c_str());
-    mqtt_client_.setCallback(std::bind(&WirelessTask::readMqtt, this,
-                             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    #if COMPILEOTA
+        ArduinoOTA.setHostname(ap_ssid_.c_str());
+        ArduinoOTA.begin();
+    #endif
 
-    LOGI("Connected to the MQTT broker, topic: %s", in_topic_.c_str());
+    setAndSave(attempts_, 1, "attempts_");
 
     digitalWrite(LED_PIN, LOW);
 }
 
 
-void WirelessTask::readMqtt(char* topic, byte* buf, unsigned int len) {
-    String message = "";
-    for (int i = 0; i < len; i++) {
-        message += (char) buf[i];
+void WirelessTask::routing() {
+    // Root serves UI web page
+    webserver.on("/", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        request->send_P(200, "text/html", index_html, 
+                        std::bind(&WirelessTask::htmlStringProcessor, this, std::placeholders::_1));
+    });
+
+    // HTTP RESTful API for moving motor and changing motor settings
+    webserver.on("/motor", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (isPrefetch(request)) {
+            return;
+        }
+        httpRequestHandler(request);
+    });
+
+    // HTTP RESTful API for managing system
+    webserver.on("/system", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (isPrefetch(request)) {
+            return;
+        }
+        httpRequestHandler(request);
+    });
+
+    // HTTP RESTful API for managing wireless settings
+    webserver.on("/wireless", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        if (isPrefetch(request)) {
+            return;
+        }
+        httpRequestHandler(request);
+    });
+
+    webserver.on("/json", HTTP_GET, [=](AsyncWebServerRequest *request) {
+        request->send(200, "application/json", getJSON());
+    });
+
+    webserver.onNotFound([=](AsyncWebServerRequest *request) {
+        if(request->method() == HTTP_GET) {
+            request->send(404, "text/plain", "failed: use /motor? or /system? or /wireless? or /json" );
+        }
+    });
+}
+
+
+bool WirelessTask::isPrefetch(AsyncWebServerRequest *request) {
+    for(int i = 0; i < request->headers(); i++){
+        AsyncWebHeader *header = request->getHeader(i);
+        if ((header->name() == "Purpose" && header->value() == "prefetch")    // Chrome/Safari/Edge
+         || (header->name() == "X-Purpose" && header->value() == "prefetch")  // Safari (old)
+         || (header->name() == "X-moz" && header->value() == "prefetch")) {   // Firefox
+            return true;
+        }
     }
-    int command = message.toInt();
+    return false;
+}
 
-    LOGI("Received message from MQTT server: %i", command);
 
-    if (xQueueSend(motor_command_queue_, (void*) &command, 10) != pdTRUE) {
-        LOGE("Failed to send to motor_command_queue_");
+void WirelessTask::httpRequestHandler(AsyncWebServerRequest *request) {
+    // Prevent the system task from sleeping before finishing processing HTTP requests
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
+
+    if (request->params() > 10) {
+        request->send(400, "text/plain", "too many parameters");
+        return;
+    }
+
+    for (int i = 0; i < request->params(); i++) {
+        String param = request->getParam(i)->name();
+        Command command = hash(param);
+        if (command == ERROR_COMMAND) {
+            String list_of_commands;
+            if (request->url() == "/motor") {
+                list_of_commands =  listMotorCommands();
+            } else if (request->url() == "/system") {
+                list_of_commands =  listSystemCommands();
+            } else {
+                list_of_commands =  listWirelessCommands();
+            }
+            request->send(400, "text/plain", "failed: <param>=" + param 
+                             + " not accepted\nuse of these <param>=" + list_of_commands);
+            return;
+        }
+    }
+
+    String response = "";
+    bool success = true;
+    Task *task = motor_task_;
+    if (request->url() == "/system") {
+        task = system_task_;
+    } else if (request->url() == "/wireless") {
+        task = this;
+    }
+
+    for (int i = 0; i < request->params(); i++) {
+        String param = request->getParam(i)->name();
+        String value_str = request->getParam(param)->value();
+        Command command = hash(param);
+        if (command >= MOTOR_VLCTY && command <= MOTOR_CL_ACCEL) {
+            std::pair<std::function<bool(float)>, String> eval = getCommandEvalFuncf(command);
+            float value = value_str.toFloat();
+            if (eval.first(value)) {
+                response += "failed: " + param + eval.second + "\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%.1f", param.c_str(), value);
+            response += "success: " + param + "\n";
+            sendTo(task, Message(command, value), portMAX_DELAY);
+        } else if (command == WIRELESS_SSID) {
+            if (value_str == "") {
+                response += "failed: " + param + " needs to be a non-empty string\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
+            response += "success: " + param + "\n";
+            setAndSave(sta_ssid_, value_str, "sta_ssid_");
+        } else if (command == WIRELESS_PASS) {
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
+            response += "success: " + param + "\n";
+            setAndSave(sta_password_, value_str, "sta_password_");
+        } else if (command == SYSTEM_RENAME) {
+            if (value_str.length() > 30) {
+                response += "failed: " + param + " needs less than 30 characters long\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%s", param.c_str(), value_str);
+            response += "success: " + param + "\n";
+            int shift[4] = {24, 16, 8, 0};
+            int temp_value = 2147483648;
+            for (int i = 0; i < value_str.length(); i += 4) {
+                for (int j = i; j < i + 4; j++) {
+                    int shifted = static_cast<int>(value_str.charAt(j)) << shift[j % 4];
+                    temp_value |= shifted;
+                }
+                sendTo(task, Message(command, temp_value), portMAX_DELAY);
+                temp_value = 0;
+            }
+            if (value_str.length() % 4 == 0) {
+                sendTo(task, Message(command, 0), portMAX_DELAY);
+            }
+        } else {
+            std::pair<std::function<bool(int)>, String> eval = getCommandEvalFunc(command);
+            int value = value_str.toInt();
+            if (eval.first(value) || (eval.second != "" && value == 0 && value_str != "0")) {
+                response += "failed: " + param + eval.second + "\n";
+                success = false;
+                break;
+            }
+            LOGI("Parsed HTTP request: param=%s, value=%u", param.c_str(), value);
+            response += "success: " + param + "\n";
+            sendTo(task, Message(command, value), portMAX_DELAY);
+        }
+    }
+
+    if (success) {
+        request->send(200, "text/plain", response);
+    } else {
+        request->send(400, "text/plain", response);
+    }
+
+    delay(100 / portTICK_PERIOD_MS);
+    websocket.textAll(getJSON());
+}
+
+
+void WirelessTask::wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
+                                  AwsEventType type, void *arg, uint8_t *data, size_t len) {
+    // Prevent the system task from sleeping before finishing processing WS events
+    xTimerStart(system_sleep_timer_, portMAX_DELAY);
+    switch (type) {
+        case WS_EVT_CONNECT:
+            client->printf(getJSON().c_str());
+            LOGI("WebSocket client #%u connected from %s", client->id(),
+                                                           client->remoteIP().toString().c_str());
+            break;
+        case WS_EVT_DISCONNECT:
+            LOGI("WebSocket client #%u disconnected", client->id());
+            break;
+        case WS_EVT_DATA:
+            LOGI("WebSocket client #%u sent a message", client->id());
+            break;
+        case WS_EVT_PONG:
+        case WS_EVT_ERROR:
+            LOGE("WebSocket client #%u error: %u", client->id(), *(static_cast<uint16_t*>(arg)));
+            break;
     }
 }
 
 
-void WirelessTask::sendMqtt(String message) {
-    mqtt_client_.publish(out_topic_.c_str(), message.c_str());
-    LOGI("Sent message: %s", message);
+String WirelessTask::htmlStringProcessor(const String& var) {
+    if (var == "SLIDER") {
+        return motor_position_;
+    } else if (var == "AP_SSID") {
+        return ap_ssid_;
+    } else if (var == "NAME") {
+        return system_task_->getSettings()["system_name_"];
+    } else if (var == "AP_SSID") {
+        return ap_ssid_;
+    }
+    return "";
 }
 
 
-void WirelessTask::addListener(QueueHandle_t queue) {
-    motor_command_queue_ = queue;
+String WirelessTask::getJSON() {
+    JsonDocument all_settings;
+    all_settings["motor_position"] = motor_position_;
+    all_settings["system"] = system_task_->getSettings();
+    all_settings["wireless"] = getSettings();
+    all_settings["motor"] = motor_task_->getSettings();
+    String result;
+    serializeJson(all_settings, result);
+    return result;
 }
 
 
-QueueHandle_t WirelessTask::getWirelessMessageQueue() {
-    return wireless_message_queue_;
+void WirelessTask::addMotorTask(Task *task) {
+    motor_task_ = task;
+}
+
+
+void WirelessTask::addSystemTask(Task *task) {
+    system_task_ = task;
+}
+
+
+void WirelessTask::addSystemSleepTimer(TimerHandle_t timer) {
+    system_sleep_timer_ = timer;
 }

@@ -1,122 +1,146 @@
-# ESP32 Motorcover
-An open-source and DIY-friendly solution to motorize windows/blinds for your smart homes.
+# ESP32 Yun
+An open-source, end-to-end hardward & software solution for motorizing your smart home.
 
-ESP32 motorcover is an affordable, reliable, and user-friendly wireless stepper motor controller that works with NEMA stepper motors and other bipolar stepper motors.
+ESP32 Yun is an affordable, reliable, and user-friendly wireless stepper motor controller that works with two-phase bipolar stepper motors. It comes with a web user-interface for intuitive controls and HTTP restful APIs for custom integrations.
 
-Under active development. **WARNING:** requires some soldering and electronic knowledge. Please follow along at your own risk. This project is being actively developed to further lower the barrier-to-entry.
+Under active development.
 
+[![PlatformIO CI](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml/badge.svg)](https://github.com/ilovehotcakes/ESP32-Yun/actions/workflows/build.yml)
 
-## Design
-In [**Home Assistant**](https://www.home-assistant.io/), a [**cover**](https://www.home-assistant.io/integrations/cover/) is a type of entity that could be a blind, shade, shutter, window, garage door, etc. A motorized cover provides the ability to control your covers through your choice of smarthome hub/system (HA, Google Home, Alexa, etc.) through iOS/Android apps, voice control, or automations. Please see the **[[demo video](https://user-images.githubusercontent.com/52260129/211658800-c67d9bb7-6f65-4ab0-a19c-eaa4f9b99e2e.mp4)]** for full demonstration.
+<p align="center">
+    <img src="images/quick_demo.gif" width="700"/>
+</p>
 
-### **Features:**
-* Works with WiFi, no need for extra hub
-* Closed-loop system, making the motor movements extremely precise and reliable
-* Automatic stalling detection and stopping, preventing injuries and protecting the motor
-* Extremely quiet, won't even wake a baby!
-* Few parts, cheap and easy to assemble
+## Features
+* 📡 WiFi-based: no need for extra hub
+* 🔄 Closed-loop system: motor can be manually moved without losing track of its position
+* 🛑 Automatic stalling detection and stopping: preventing injuries and protecting the motor
+* 🤖 Custom hardware: few parts, cheap and relatively easy to assemble
+* 🖥️ Web UI: no need to download app to control motor or change settings, works on desktop/mobile devices
+* 🌐 HTTP restful APIs: easy to create integrations for smart home platforms
+* 😶 Extremely quiet, won't even wake a baby!
+* 🚀 Can go really fast!
+
+Please see [demo video](images/demo_video.mp4) for full demonstration!
 
 
 ## Building your own
-There are three main components to consider: electronics, firmware, and motor + mounting hardware.
+There are three components: electronics, firmware, and mounting hardware. ⚠️Requires basic knowledge of flashing firmware and soldering.
 
 ### Requirements:
-* Computer and [USB-to-TTL serial adatper](https://www.amazon.com/dp/B07WX2DSVB) to upload the firmware
-* [Soldering iron](https://www.amazon.com/dp/B096X6SG13/)
-* Wires and [JST PH connectors](https://www.amazon.com/dp/B0731MZCGF)/[crimper](https://www.amazon.com/dp/B00YGLKBSK)
-* Bipolar stepper motor, such as [Nema 11](https://www.amazon.com/dp/B00PNEPK94/)
-* Power supply: 3.3-24V, 1.2A max
-* (Optional) 3D printer for the motor mount and coupling
+* [USB-to-TTL serial adatper](https://www.amazon.com/dp/B07WX2DSVB) to upload the firmware
+* Soldering iron, wires, and [JST PH connectors](https://www.amazon.com/dp/B0731MZCGF)/[crimper](https://www.amazon.com/dp/B00YGLKBSK)
+* Two-phase bipolar stepper motor, such as a [Nema 11](https://www.amazon.com/dp/B00PNEPK94/)
+* Magnet for the rotary encoder
+* Power supply: 3.3-9V, 1.2A max
+* (Optional) 3D printer for the motor mount
 
 ### 1. Electronics
-Here are two ways to acquire the electronics: **(1)** directly order printed circuit boards from JLCPCB/PCBWay or **(2)** buying parts from Amazon and putting them together on a breadboard.
+Please refer to the [*electronics*](electronics/) folder.
 
-**[[schematic](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/schematic.png)][[gerber files](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/gerber.zip)][[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/bom.csv)][[pick-and-place file](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/pick_and_place.csv)]**
-
-#### Option 1 - Ordering PCB from JLCPCB:
-1. Download and upload the gerber files to [JLCPCB.com](https://jlcpcb.com/). The only setting that needs to be changed is the **"Impedance Control"**. Select **"Yes"** and choose **"JLC0416H-3313"** once the dialog pops up.
-2. If you prefer to manually assemble the PCB, please refer to the schematic and bom.
-3. If you prefer to have the PCB assembled by JLCPCB(additional cost), download the pick-and-place and bom files, and toggle **"PCB Assembly"**. Click on **"Confirm"** to go the next page.
-4. Upload the bom and pick-and-place files. Click **"Process BOM & CPL"** and **"Continue"** when the error pops up. The error is for the missing connectors which will need to be manually solder once the PCBs arrive.
-5. Solder connectors J1-J4 and separate the AS5600 break-off board from the main board.
-6. Crimp some 4-pin JST PH connectors and connect the stepper motor to the **"motor"** connector, power supply to the **"pwr"** connector, and AS5600 breakoff board to the **"encoder"** connector.
+**[[schematic](electronics/schematic.png)][[gerber files](electronics/gerber.zip)][[bom](electronics/bom.csv)][[pick-and-place file](electronics/pick_and_place.csv)]**
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_top.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_bot.png" width="400">
-    </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_top.png" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/v1_1/pcb_3d_bot.png" width="400">
+    <img src="images/electronics/v1_1/pcb_3d_top.png" width="400">
+    <img src="images/electronics/v1_1/pcb_3d_bot.png" width="400">
 </p>
 
-#### Option 2 - Breadboarding with breakout modules:
-This could be more approachable if you don't solder. You can get breakout board modules and assemble them on a solderless breadboard. Please refer to this version of the **[bom](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/electronics/prototype/bom.csv)** and reference the schematic to put the circuit together. An example assembly looks like [this](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/electronics/prototype/assembled_controller.jpg).
-
 ### 2. Firmware
-Your choice of IDE to program the firmware, e.g. [Arduino IDE](https://www.arduino.cc/en/software) or [ESP-IDF](https://idf.espressif.com/). I use [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
+Flash the firmware via [VSCode](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/install/ide?install=vscode).
 
 #### Dependencies:
 * espressif32@3.5.0
 * [TMCStepper@^0.7.3](https://github.com/teemuatlut/TMCStepper)
-* [PubSubClient@^2.8](https://github.com/knolleary/pubsubclient)
-* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper)
-* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600)
+* [FastAccelStepper@^0.27.5](https://github.com/gin66/FastAccelStepper/tree/0.27.5)
+* [robtillaart/AS5600@^0.4.1](https://github.com/RobTillaart/AS5600/tree/0.4.1)
+* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+* [ArduinoJson@^7.0.4](https://github.com/bblanchon/ArduinoJson/tree/v7.0.4)
+* [LittleFS_esp32@^1.0.6](https://github.com/lorol/LITTLEFS/tree/1.0.6)
 
 #### Steps:
-1. Install the dependencies.
-2. Add WiFi and MQTT credentials to **secrets.h**.
-3. Double check and set proper current sense resistor value in **platformio.ini**.
-4. Set the motor specs, current, speed, and acceleration in **motor.h**.
-5. Set the USB-to-TTL serial adatper's voltage level to **3V3** and plug it in to the computer.
-6. Keep holding the button on ESP32 motorcover and start flashing the firmware.
-7. Once the IDE start transmitting data, connect the four wires from ESP32 motorcover to the adapter: **RX->TXD**, **TX->RXD**, **+->VCC**, **-->GND**.
-8. Let go of the ESP32 motorcover button once the firmware starts uploading. Unplug ESP32 motorcover once the firmware is done uploading.
+1. Clone this repository.
+2. Double check and set proper current sense resistor value in **platformio.ini**.
+3. Set the USB-to-TTL serial adatper's logic level to **3V3** and plug it in to the computer.
+4. Keep holding the button on ESP32 Yun and start flashing the firmware.
+5. Once the IDE begins data transmition, connect the four wires from ESP32 Yun to the adapter: **RX to TXD**, **TX to RXD**, **+ to VCC**, and **− to GND**.
+6. Let go of the button once the firmware starts uploading. Unplug ESP32 motorcover after the firmware has finished uploading.
 
-### 3. Motor and mounting hardware
-It's helpful to own a 3D printer beause you can print a lot of parts needed for this project and some of the printed parts don't require screws to secure the parts. You can find the stl and pre-sliced files under the **cad** folder.
+### 3. Mounting hardware
+You can find the stl and pre-sliced files under the [*cad*](cad/) folder. To mount the magnet for the rotary encoder, it is recommended to use the manget gluing jig to make sure that the magnet is centered on the axis-of-rotation; otherwise, it could affect the accuracy of the rotary encoder.
 
 #### Parts:
-* Nema 11 motor mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/nema_11_motor_mount.stl)]
-* Nema 11 motor mount(generic): [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/nema11_mount_v3.stl)] [[**mirrored stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/nema11_mount_v3_mirrored.stl)]
-* AS5600 rotary encoder mount: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/as5600_mount.stl)]
-* AS5600 magnet gluing jig: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/prototype/magnet_gluing_jig_v1.stl.stl)]
-* (Optional) motor coupling: [[**stl**](https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/cad/coupling.stl)]
-* (Optional) pcb mount: coming soon
+* Nema 11 motor mount: [[**stl**](cad/nema_11_motor_mount.stl)]
+* AS5600 magnet gluing jig: [[**stl**](cad/prototype/magnet_gluing_jig_v1.stl)]
+* AS5600 rotary encoder mount: [[**stl**](cad/as5600_mount.stl)]
 
 <p align="center">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/nema_11_motor_mount_back.png" width="400">
+    <img src="images/cad/v1_0/nema_11_motor_mount_front.png" width="400"/>
+    <img src="images/cad/v1_0/nema_11_motor_mount_back.png" width="400">
     </br>
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2195.jpg" width="400">
-    <img src="https://github.com/ilovehotcakes/ESP32-Motorcover/blob/main/images/cad/v1_0/IMG_2196.jpg" width="400">
+    <img src="images/cad/v1_0/IMG_2195.jpg" width="400">
+    <img src="images/cad/v1_0/IMG_2196.jpg" width="400">
 </p>
 
 
 ## Usage
-Currently, you will need a MQTT server to send commands to the ESP32 motorcover. You can either run one on a computer or a rasberry pi. An update that doesn't require a MQTT server is coming soon.
+During the first time booting up, ESP32 Yun is put into setup mode and it functions as a WiFi access point. Connect to it with your device like you would connect to a WiFi network. After connection is established, open a web browser and go to the IP address **[192.168.4.1]()** to access the web UI. There you can enter your WiFi network credentials and change other settings.
 
-### Sending commands via MQTT
-* *inTopic* is where the motorcover will receive MQTT commands. For example, I set "/server/shades/1" on the MQTT server to send commands to motorshade #1.
-* *outTopic* is where motorcover will send MQTT messages to update its state. For example, I set "/client/shades/1" on the MQTT server to receive messages from motorshade #1.
-* Home Assistant provides an integration for [MQTT covers](https://www.home-assistant.io/integrations/cover.mqtt/).
+### HTTP Restful API
+All RestAPIs are implemented as HTTP GET requests. To control the motor or change any settings, use [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/&lt;URI&gt;?&lt;PARAM&gt;=&lt;VALUE&gt;](). For example: [http://192.168.4.1/motor?percent=0](). There are four URIs: motor, system, wireless, and json.
 
-### MQTT commands:
-* **0~100: move to position(%);** 0 -> open, 100 -> close
-*  **-1  : stop**
-*  **-2  : open**
-*  **-3  : close**
-*  **-4  : set min position**
-*  **-5  : set max position**
-*  **-98 : reset system to default**
-*  **-99 : reboot system**
+#### Motor params:
+* stop: stop the motor
+* percent: move the motor to the specified percentage
+* step: move the motor to the specified step
+* forward: run the motor foward continuously
+* backward: run the motor backward continuously
+* set-min: set the beginning endpoint
+* set-max: set the ending endpoint
+* zero: set the current motor position to zero
+* standby: put the motor driver into standby to reduce power consumption
+* sync-settings: sync open/closing settings for current, velocity, and acceleration 
+* velocity: set both opening and closing velocity
+* opening-velocity: set opening velocity
+* closing-velocity: set closing velocity
+* acceleration: set opening and closing acceleration
+* opening-acceleration: set opening acceleration
+* closing-acceleration: set closing acceleration
+* current: set opening and closing current
+* opening-current: set opening current
+* closing-current: set closing current
+* direction: change the direction of the motor
+* full-steps: set the number of full steps per turn
+* microsteps: set the number of subvisions per full step
+* stallguard: enable/disable stallguard
+* coolstep-threshold: set threshold to enable stallguard and coolstep
+* stallguard-threshold: set threshold to trigger stallguard
+* fastmode: set to exclusively use fastmode, i.e. SpreadCycle
+* fastmode-threshold: set threshold to automatically switch over to fastmode
 
-### (Optional) Tuning StallGuard4
-StallGuard4(SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working as intended. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
+#### System params:
+* sleep: put ESP32 Yun into standby
+* restart: restart the system
+* reset: reset all settings to factory settings
+* name: rename the system
+
+#### Wireless params:
+* setup: setup mode
+* ssid: ssid of your WiFi network
+* password: passowrd of your WiFi network
+
+#### Json:
+Use HTTP GET request [http://&lt;ESP32-YUN-IP-ADDRESS&gt;/json]() to get all settings in a Json object.
+
+### Button
+* Toggle setup mode: press and hold down for 5 seconds till the led turns on
+* Factory reset: press and hold down for 15 seconds till the led turns off after it turns on at 5 seconds
+
+### (Optional) tuning StallGuard4
+StallGuard4 (SG) is a feature of the motor driver, TMC2209, which provides automatic stall detection and stopping. SG requires some trial-and-error as well as some patience to get it working correctly. Please refer to the [TMC2209 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf), chapter 16, page 70.
 
 
-## Coming soon
-* Remove the need for a MQTT server to send commands
-* Ability to change WiFi credentials and motor settings after flashing the firmware
-* Write custom drivers to reduce dependency
+## In the works
+* Custom drivers to reduce dependency and firmware size
+* Updating PCB so little-to-no soldering is required
+* Replace ESP32 WROOM 32E so USB-to-TTL is not required to flash the firmware
 * BLE support
-* Updating PCB so little to no soldering is required
-* Replace ESP32 WROOM 32E with ESP32-S3 so USB-to-TTL is not required
+* Ultra-low power for battery application

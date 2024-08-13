@@ -1,0 +1,3 @@
+The frontend is consisted of a single index.html webpage, however, it is split into three separate files in this directory: index.html, index.css, index.js for ease of development. The final index webpage needs to be assembled into one html file and stored as a string variable so it can be read by the wireless task.
+
+The python script, index_script.py, reads and assembles the files from this directory and writes the output file index.h to the include directory. If you are using platformio, the frontend will be automatically generated when building the project; else, manually run the python script or copy-and-paste the files together.

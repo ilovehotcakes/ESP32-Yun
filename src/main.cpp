@@ -1,42 +1,45 @@
 /**
-    ESP32 Motorcover
     Aurthor: Jason Chen, 2022
+    Licence: TODO
 
-    A simple ESP32 program that let's user control powerful and quiet stepper motors via MQTT. You
-    use it to open/close blinds, shades, etc. Can be used with Alexa or Home Assistant.
+    An ESP32-based low-powered wireless motor controller that works with two-phase bipolar stepper
+    motors. It is a closed-loop system so it is capable of keeping track of its position even when
+    the motor is off.
 
-    This program utilizes TMC2209 drivers for the stepper motor and it drives NEMA stepper motors.
-
-    You can copy the BasicOTA example from the Arduino example library and paste it into a file
-    named "ota.h". Exlude the wifi setup and "loop()"; rename "setup()"" to "otaSetup()" and
-    include it in the src folder to enable OTA updates. Useful for wireless updates.
+    You can use it to motorize and automate the opening & closing of blinds/shades/windows etc.
 **/
-#include <Arduino.h>
-#include "logger.h"
+#include "system_task.h"
 #include "motor_task.h"
 #include "wireless_task.h"
 
 
-static MotorTask motor_task(1);
-static WirelessTask wireless_task(0);
+static WirelessTask wireless_task(0);  // Running on core0
+static SystemTask system_task(0);      // Running on core0
+static MotorTask motor_task(1);        // Running on core1
 
 
 void setup() {
-    // Start logger
-    LOG_INIT(9600, LogLevel::INFO);
+    // Initializing serial output if compiled
+    LOG_INIT(115200, LogLevel::INFO);
 
-    // Initialize LED & BUTTON
-    pinMode(LED_PIN, OUTPUT);
-    pinMode(BUTTON_PIN, INPUT);
+    if (!LITTLEFS.begin(true)) {
+        LOGE("Failed to mount filesystem");
+    }
 
-    delay(2000);
-    // Start the WiFi connection
+    // setCpuFrequencyMhz(80);
+
+    system_task.init();
+    system_task.addMotorTask(&motor_task);
+    system_task.addWirelessTask(&wireless_task);
+
     wireless_task.init();
-    wireless_task.addListener(motor_task.getMotorCommandQueue());
+    wireless_task.addMotorTask(&motor_task);
+    wireless_task.addSystemTask(&system_task);
+    wireless_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
-    delay(2000);
     motor_task.init();
-    motor_task.addListener(wireless_task.getWirelessMessageQueue());
+    motor_task.addWirelessTask(&wireless_task);
+    motor_task.addSystemSleepTimer(system_task.getSystemSleepTimer());
 
     // Delete setup/loop task
     vTaskDelete(NULL);

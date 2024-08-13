@@ -1,107 +1,111 @@
 #pragma once
 /**
-    motor_task.h - A class that contains all stepper motor attribute and controls.
+    motor_task.h - A class that contains all functions to control a two-phase bipolar stepper motor.
     Author: Jason Chen, 2022
 
-    This class contains all stepper motor controls, which includes, initializing the stepper driver
-    (TMCStepper), stepper motor control (FastAccelStepper), as well as recalling its previous
-    position and maximum position on reboot. It also sends current position via MQTT after it
-    stops.
+    The MCU sends PWM signals to the stepper motor driver, TMC2209, to control the current to the
+    motor and thereby moving the motor. Higher voltages and current generate more torque and higher
+    RPMs. To operate the driver: (1) start the driver by taking it out of STANDBY, and (2) ENABLE
+    the motor coils. Both are done automatically.
 
-    It also gives the user the option to set the maximum and minimum stepper motor positions via
-    MQTT. (1) User doesn't have to pre-calculate the max/min travel distance (2) User can re-adjust
-    max/min positions without reflashing firmware.
+    The position of the system is absolute and it is translated between 3 different methods:
+        (1) "Position" refers to the encoder's position, used for internal position tracking
+        (2) "Steps" refers to the motor's position, used for moving the motor
+        (3) "Percentage" refers to the overall percentage, used by UI
 **/
-#include <Arduino.h>
 #include <HardwareSerial.h>       // Hardwareserial for uart
+#include <FunctionalInterrupt.h>  // std:bind()
 #include <TMCStepper.h>
 #include <FastAccelStepper.h>
 #include <AS5600.h>
-#include <Preferences.h>
-#include <FunctionalInterrupt.h>  // std:bind()
 #include "task.h"
-#include "logger.h"
 
 
-// Commands recieved from MQTT
-enum Command {
-    COVER_STOP    = -1,
-    COVER_OPEN    = -2,
-    COVER_CLOSE   = -3,
-    COVER_SET_MIN = -4,
-    COVER_SET_MAX = -5,
-    SYS_RESET     = -98,
-    SYS_REBOOT    = -99
-};
+#define DEFAULT_MOTOR_FULLSTEPS   200      // NEMA motors have 200 full steps/rev
+#define DEFAULT_ENCODER_POSITIONS 4096.0f  // AS5600 absolute position is 12-bit
 
 
-class MotorTask : public Task<MotorTask> {
-    friend class Task<MotorTask>;
-
+class MotorTask : public Task {
 public:
     MotorTask(const uint8_t task_core);
     ~MotorTask();
-    void addListener(QueueHandle_t queue);
-    QueueHandle_t getMotorCommandQueue();
+    void addWirelessTask(Task *task);
+    void addSystemSleepTimer(xTimerHandle timer);
 
 protected:
     void run();
 
 private:
-    // TMCStepper library for interfacing MCU with stepper driver hardware
-    TMC2209Stepper driver_ = TMC2209Stepper(&SERIAL_PORT, R_SENSE, DRIVER_ADDR);
+    // TMCStepper library for interfacing with the stepper motor driver hardware, to read/write
+    // registers for setting speed, acceleration, current, etc.
+    TMC2209Stepper driver_ = TMC2209Stepper(&Serial1, R_SENSE, DRIVER_ADDR);
 
-    // FastAccelStepper library for sending commands to the stepper driver to
-    // move/accelerate and stop/deccelerate the stepper motor
+    // User adjustable TMC2209 motor driver settings, updated to driver registers via UART
+    bool  driver_stdby_  = false;
+    bool  sync_settings_ = false;  // If false, opeining/closing settings are different values
+    float open_velocity_ = 3.0;
+    float clos_velocity_ = 3.0;
+    float open_accel_    = 0.5;
+    float clos_accel_    = 0.5;
+    int   open_current_  = 200;
+    int   clos_current_  = 75;
+    bool  direction_     = false;
+    int   microsteps_    = 2;
+    int   full_steps_    = DEFAULT_MOTOR_FULLSTEPS;
+    bool  stallguard_en_ = true;
+    int   coolstep_thrs_ = 0;
+    int   stallguard_th_ = 10;
+    bool  spreadcycl_en_ = false;
+    int   spreadcycl_th_ = 33;
+
+    // FastAccelStepper library for generating PWM signal to the stepper driver to move/accelerate
+    // and stop/deccelerate the stepper motor.
     FastAccelStepperEngine engine_ = FastAccelStepperEngine();
-    FastAccelStepper *motor_ = NULL;
+    FastAccelStepper *motor_       = NULL;
 
-    // Rotary encoder for keeping track of actual motor positions because motor could
-    // slip and cause the position to be incorrect
+    // None user adjustable motor states. Managed by MotorTask.
+    int8_t  last_updated_percent_ = -100;
+    volatile bool stalled_        = false;
+    portMUX_TYPE stalled_mux_     = portMUX_INITIALIZER_UNLOCKED;
+    // bool motor_opening = false;
+    // bool motor_closing = false;
+    // bool motor_move_completed = false;
+
+    // Rotary encoder for keeping track of motor's actual position because motor could slip and
+    // cause the position to be incorrect. A closed-loop system.
     AS5600 encoder_;
 
-    // Saving positions and other attributes
-    Preferences motor_settings_;
+    // Keeping track of the overall position via encoder's position and then  convert it into
+    // motor's position and percentage.
+    int32_t encod_offset_      = 0;
+    int32_t encod_pos_         = 0;
+    int32_t encod_max_pos_     = static_cast<int32_t>(DEFAULT_ENCODER_POSITIONS) * 10;
+    int   total_steps_         = full_steps_ * microsteps_;
+    float motor_encoder_ratio_ = total_steps_ / DEFAULT_ENCODER_POSITIONS;
+    float encoder_motor_ratio_ = DEFAULT_ENCODER_POSITIONS / total_steps_;
 
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from wireless task
-    QueueHandle_t motor_command_queue_;     // Used to send messages to wireless task
-    int command_ = -50;
-
-    // TMC2209 settings
-    int microsteps_           = 128;
-    int steps_per_revolution_ = 200 * microsteps_;  // NEMA motors have 200 full steps/rev
-    int velocity_             = static_cast<int>(steps_per_revolution_ * 3);
-    int acceleration_         = static_cast<int>(velocity_ * 0.5);
-    bool direction_           = false;
-    int opening_current_      = 200;
-    int closing_current_      = 75;  // 1, 3: 200; 2: 400; 4: 300
-    int stallguard_threshold_ = 10;
-    volatile bool stalled_    = false;
-    portMUX_TYPE stalled_mux_ = portMUX_INITIALIZER_UNLOCKED;
-
-    int32_t encod_max_pos_        = 0;
-    int8_t  last_updated_percent_ = -100;
-    float motor_encoder_ratio_    = steps_per_revolution_ / 4096.0;
-    float encoder_motor_ratio_    = 4096.0 / steps_per_revolution_;
-    bool stallguard_enable_       = true;
+    Task *wireless_task_;              // To receive messages from wireless task
+    xTimerHandle system_sleep_timer_;  // To prevent system from sleeping before motor stops
 
     void stallguardInterrupt();
-    void loadSettings(); // Load motor settings from flash
-    void moveToPercent(int percent);
+    void loadSettings();  // Load motor settings from flash
+    bool prepareToMove(bool check, bool direction);
+    void move(bool direction);
+    void moveToStep(int target_step);
+    void moveToPercent(int target_percent);
     void stop();
-    void setMin();
-    void setMax();
+    bool setMin();
+    bool setMax();
+    bool zeroEncoder();
+    bool motorEnable(uint8_t enable_pin, uint8_t value);
+    void calculateTotalSteps();
     inline int getPercent();
-    inline int positionToSteps(int encoder_position);
-    bool enableDriver(uint8_t enable_pin, uint8_t value);
-
-    // TODO
-    // void setMicrosteps()
-    // void setVelocity() {}
-    // void setAcceleration() {}
-    // void setOpeningCurrent() {}
-    // void setClosingCurrent() {}
-    // void setDirection() {}
-    // void disableStallguard() {}
-    // void enableStallguard() {}
+    inline int positionToStep(int encoder_position);
+    // For quick configuration guide, please refer to p70-72 of TMC2209's datasheet rev1.09
+    // TMC2209's UART interface automatically becomes enabled when correct UART data is sent. It
+    // automatically adapts to uC's baud rate. Block until UART is finished initializing so ESP32
+    // can send settings to the driver via UART.
+    void updateMotorSettings(float velocity, float acceleration, int current);
+    void driverStartup();
+    void driverStandby();
 };

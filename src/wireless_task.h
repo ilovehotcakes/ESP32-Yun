@@ -1,53 +1,61 @@
 #pragma once
 /**
-    wireless_task.h - A class that contains all stepper motor attribute and controls.
+    wireless_task.h - A class that handles all wireless communications.
     Author: Jason Chen, 2023
 
-    WirelessTask establishes and maintains WiFi connection and MQTT connection.
+    WirelessTask establishes and maintains WiFi connections. It also serves a interactive webpage
+    for users to control and change settings to the system and motor.
 **/
-#include <Arduino.h>
 #include <WiFi.h>
-#include <PubSubClient.h> // Mqtt
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
 #include <FunctionalInterrupt.h>  // std:bind()
+#include <esp_task_wdt.h>
 #include "task.h"
-#include "logger.h"
-#include "secrets.h"
+#include "index.h"  // Index HTML webpage
 
 #if COMPILEOTA
     #include <ArduinoOTA.h>
 #endif
 
+#define MAX_ATTEMPTS 9
+#define WDT_DURATION 9  // Sec
 
-class WirelessTask : public Task<WirelessTask> {
-    friend class Task<WirelessTask>;
 
+class WirelessTask : public Task {
 public:
     WirelessTask(const uint8_t task_core);
     ~WirelessTask();
-    void addListener(QueueHandle_t queue);
-    QueueHandle_t getWirelessMessageQueue();
+    void addMotorTask(Task *task);
+    void addSystemTask(Task *task);
+    void addSystemSleepTimer(TimerHandle_t timer);
 
 protected:
     void run();
 
 private:
+    AsyncWebServer webserver;   // Create AsyncWebServer object on port 80
+    AsyncWebSocket websocket;
+    String ap_ssid_      = "";  // SSID (hostname) for AP
+    String sta_ssid_     = "";  // SSID (hostname) for WiFi
+    String sta_password_ = "";  // Password for WiFi
+    bool   setup_mode_   = false;
+    bool   initialized_  = true;
+    int    attempts_     = 1;
+
+    Task *motor_task_;    // To send messages to motor task
+    Task *system_task_;   // To send messages to system task
+    TimerHandle_t system_sleep_timer_;  // Prevent system sleep before processing incoming messages
+    String motor_position_ = "0";
+
+    void loadSettings();
     void connectWifi();
-    void connectMqtt();
-    void readMqtt(char* topic, byte* buf, unsigned int len);
-    void sendMqtt(String message);
-
-    QueueHandle_t wireless_message_queue_;  // Used to receive message from motor task
-    QueueHandle_t motor_command_queue_;     // Used to send messages to motor task
-
-    WiFiClient  wifi_client_;
-    PubSubClient mqtt_client_;
-    String   ssid_          = secretSSID;      // SSID (name) for WiFi
-    String   password_      = secretPass;      // Network password for WiFi
-    String   mqtt_id_       = secretMqttID;    // MQTT ID for PubSubClient
-    String   mqtt_user_     = secretMqttUser;  // MQTT server username (optional)
-    String   mqtt_password_ = secretMqttPass;  // MQTT server password (optional)
-    String   broker_ip_     = secretBrokerIP;  // IP of MQTT server
-    uint16_t broker_port_   = secretBrokerPort;
-    String   in_topic_      = secretInTopic;   // MQTT inbound topic
-    String   out_topic_     = secretOutTopic;  // MQTT outbound topic
+    void routing();
+    bool isPrefetch(AsyncWebServerRequest *request);
+    void httpRequestHandler(AsyncWebServerRequest *request);
+    void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
+                        AwsEventType type, void *arg, uint8_t *data, size_t len);
+    String htmlStringProcessor(const String& var);
+    String getJSON();
 };

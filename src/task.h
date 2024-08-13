@@ -1,55 +1,166 @@
 #pragma once
 /**
-    Copyright 2020 Scott Bezek and the splitflap contributors
+    task.h - A base wrapper class to instantiate FreeRTOS tasks with extra shared functions.
+    Author: Jason Chen, 2024
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    Inspired by SmartKnob by Scott Bezek and
+    https://fjrg76.wordpress.com/2018/05/20/objectifying-task-creation-in-freertos/
 **/
-
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include "FS.h"
+#include <LITTLEFS.h>
+#include "logger.h"
+#include "command.h"
 
-// Static polymorphic abstract base class for a FreeRTOS task using CRTP pattern. Concrete implementations
-// should implement a run() method.
-// Inspired by https://fjrg76.wordpress.com/2018/05/23/objectifying-task-creation-in-freertos-ii/
-template<class T>
+
+struct Message {
+    Message(Command command, int parameter) : command(command), parameter(parameter) {}
+    Message(Command command, float parameterf) : command(command), parameterf(parameterf) {}
+    String toString() { return "command=" + hash(command) + ", parameter="
+                               + (parameter != INT_MIN ? String(parameter) : String(parameterf)); }
+    Command command;
+    int parameter = INT_MIN;
+    float parameterf = 0.0;
+};
+
+
 class Task {
 public:
-    Task(const char* const name, uint32_t stackDepth, UBaseType_t priority, const BaseType_t coreID = tskNO_AFFINITY) :
-            name {name},
-            stackDepth {stackDepth},
-            priority {priority},
-            coreID {coreID}
-    {}
+    Task(const char* const name, uint32_t stack_depth, UBaseType_t priority,
+         const BaseType_t core_id = tskNO_AFFINITY, int queue_length = 1) :
+            name_ {name},
+            inbox_(ERROR_COMMAND, INT_MIN),
+            stack_depth_ {stack_depth},
+            priority_ {priority},
+            core_id_ {core_id} {
+        queue_ = xQueueCreate(queue_length, sizeof(Message));
+        assert(queue_ != NULL);
+    }
 
-    virtual ~Task() {}
-
-    TaskHandle_t getTaskHandle() {
-        return taskHandle;
+    ~Task() {
+        vQueueDelete(queue_);
     }
 
     void init() {
-        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name, stackDepth, this, priority, &taskHandle, coreID);
-        assert("Failed to create task." && result == pdPASS);
+        BaseType_t result = xTaskCreatePinnedToCore(taskFunction, name_, stack_depth_,
+                                                    this, priority_, &task_handle_, core_id_);
+        assert(result == pdPASS);
     }
+
+    TaskHandle_t getTaskHandle() {
+        return task_handle_;
+    }
+
+    QueueHandle_t getQueueHandle() {
+        return queue_;
+    }
+
+    JsonDocument getSettings() {
+        return settings_;
+    }
+
+protected:
+    const char* name_;
+    Message inbox_;
+    QueueHandle_t queue_;
+    JsonDocument settings_;
+
+    bool sendTo(Task *task, Message message, int timeout) {
+        LOGI("Sending message from %s to %s", name_, task->name_);
+        if (xQueueSend(task->getQueueHandle(), (void*) &message, timeout) != pdTRUE) {
+            LOGE("Failed to send message from %s to %s", name_, task->name_);
+            return false;
+        }
+        return true;
+    }
+
+    void setAndSave(float &setting, float value, const char *key) {
+        setting = value;
+        settings_[key] = serialized(String(value, 1));
+        writeToDisk();
+    }
+
+    template<typename T>
+    void setAndSave(T &setting, T value, const char *key) {
+        setting = value;
+        settings_[key] = value;
+        writeToDisk();
+    }
+
+    float getOrDefault(const char *key, float default_value) {
+        if (!settings_.containsKey(key)) {
+            settings_[key] = serialized(String(default_value, 1));
+            return default_value;
+        }
+        float float_conversion = static_cast<float>(settings_[key]);
+        settings_[key] = serialized(String(float_conversion, 1));
+        return float_conversion;
+    }
+
+    template<typename T>
+    T getOrDefault(const char *key, T default_value) {
+        if (!settings_.containsKey(key)) {
+            settings_[key] = default_value;
+        }
+        return settings_[key];
+    }
+
+    bool writeToDisk() {
+        String path = String("/") + name_ + ".txt";
+        LOGI("%s writing file to %s", name_, path.c_str());
+        File file = LITTLEFS.open(path, FILE_WRITE);
+        if (!file) {
+            LOGI("%s failed to open file for writing", name_);
+            return false;
+        }
+        if (serializeJson(settings_, file)) {
+            LOGI("%s successfully written to file", name_);
+        } else {
+            LOGI("%s failed to write to file", name_);
+        }
+        file.close();
+        return true;
+    }
+
+    bool readFromDisk() {
+        String path = String("/") + name_ + ".txt";
+        LOGI("%s reading file from %s", name_, path.c_str());
+        File file = LITTLEFS.open(path, FILE_READ);
+        if (!file) {
+            LOGI("%s failed to open file for reading", name_);
+            return false;
+        }
+        while (file.available()) {
+            deserializeJson(settings_, file);
+        }
+        file.close();
+        return true;
+    }
+
+    String getSerialNumber() {
+        uint8_t mac_address[6];
+        esp_read_mac(mac_address, ESP_MAC_WIFI_STA);
+        String serial = "";
+        for (int i = 0; i < 6; i++) {
+            char hexidecimal[2];
+            sprintf(hexidecimal, "%02X", mac_address[i]);
+            serial += hexidecimal;
+        }
+        serial.toLowerCase();
+        return serial;
+    }
+
+    virtual void run() = 0;
 
 private:
+    uint32_t stack_depth_;
+    UBaseType_t priority_;
+    TaskHandle_t task_handle_;
+    const BaseType_t core_id_;
+
     static void taskFunction(void* params) {
-        T* t = static_cast<T*>(params);
+        Task *t = static_cast<Task*>(params);
         t->run();
     }
-
-    const char* const name;
-    uint32_t stackDepth;
-    UBaseType_t priority;
-    TaskHandle_t taskHandle;
-    const BaseType_t coreID;
 };
